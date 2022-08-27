@@ -1,0 +1,8 @@
+<div id="cardInfo" fxLayout="column" fxLayoutAlign="center start">
+    <span class="cardName">{{data.card.name}}</span>
+    <span class="cardCost"> {{data.card.cost}} €</span>
+
+
+    <button mat-raised-button (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy">Compra</button>
+   
+</div>

@@ -1,0 +1,5 @@
+<div id="card">
+    {{ card.name }}
+
+    <button *ngIf="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name" (click)="openDialog()">Open Info</button>
+</div>

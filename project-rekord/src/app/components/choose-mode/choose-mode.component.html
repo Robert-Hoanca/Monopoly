@@ -1,0 +1,54 @@
+<div id="chooseMode">
+
+    <div *ngIf="!gameService.choosenMode">
+        <button mat-raised-button (click)="chooseMode('local')">Local</button>
+        <button mat-raised-button (click)="chooseMode('online')">Online</button>
+    </div>
+    <div *ngIf="gameService.choosenMode">
+
+        <mat-card *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around">
+
+            
+            <span>{{player.choosenPawn}}</span>
+            <span>{{player.name}}</span>
+            <span>{{player.money}}</span>
+
+        </mat-card>
+
+        <mat-card>
+
+            <div class="choosePawn">
+              
+                <div class="pawnModel" *ngFor="let pawn of gameService.pawnTypes;let i = index">
+                   
+                    <div *ngIf="i == pawnModelCounter">
+                        <span>IMG</span>
+                        <div class="pawnChange">
+                            <button  mat-icon-button (click)="changeModel('minus')" [disabled]="pawnModelCounter==0"><mat-icon>chevron_left</mat-icon></button>
+        
+                            <span>{{pawn.name}}</span>
+        
+                            <button  mat-icon-button (click)="changeModel('plus')" [disabled]="pawnModelCounter>=(gameService.pawnTypes.length - 1)"><mat-icon>chevron_right</mat-icon></button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <mat-form-field>
+                <mat-label>player Name</mat-label>
+                <input matInput autocomplete="off" placeholder="Insert Here Your Name" [(ngModel)]="playerName">
+            </mat-form-field>
+            
+            <span>{{gameService.playersModel.money}}</span>
+
+
+            <button mat-raised-button [disabled]="!playerName" (click)="gameService.createPlayer(playerName, pawnModelCounter);createPlayer()">Join</button>
+
+        </mat-card>
+
+
+        <button mat-raised-button (click)="gameService.startGame()" [disabled]="gameService.players.length<2">PLAY</button>
+    </div>
+    
+</div>
