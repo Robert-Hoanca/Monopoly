@@ -96,14 +96,29 @@ export class GameService {
   }*/
 
   buyProperty(property:any){
-    console.log(property)
-    const player = this.players.find(player => player.name == this.players[this.turn].name);
-    player.money -= property.cost;
+    this.actualTurnPlayer.money -= property.cost;
     property.canBuy = false;
     property.owner = this.players[this.turn].name;
-    this.diceNumber = undefined;
+  }
+  sellProperty(property:any){
+    if(!property.distrained){
+      this.actualTurnPlayer.money +=  property.cost - ((property.cost / 100) * 10);
+    }else{
+      this.actualTurnPlayer.money +=  property.distrainedCost - ((property.distrainedCost / 100) * 50);
+    }
+    property.canBuy = true;
+    property.owner = "";
+
   }
 
+  distrainProperty(property:any){
+    property.distrained = true;
+    this.actualTurnPlayer.money += property.distrainedCost;
+  }
+  cancelDistrainedFromProperty(property:any){
+    property.distrained = false;
+    this.actualTurnPlayer.money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
+  }
 
 
   /////////////////DELETE
