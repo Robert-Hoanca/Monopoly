@@ -1,7 +1,9 @@
+import { NgtLoader, NgtVector3 } from '@angular-three/core';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GameService } from 'src/app/game.service';
 import { CardDialogComponent } from 'src/app/shared/card-dialog/card-dialog.component';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 @Component({
   selector: 'app-card',
@@ -12,11 +14,17 @@ export class CardComponent implements OnInit {
   @Input() card!: any;
   @Input() cardIndex!: any;
   cardInfoRef: MatDialogRef<any> | undefined;
-  constructor(public dialog: MatDialog, public gameService: GameService) { }
+
+  //Three js
+  @Input('position') position?: NgtVector3;
+  model$ = this.loader.use(GLTFLoader, '/assets/blenderModels/card/card.gltf');
+  hovered = false;
+  
+  constructor(public dialog: MatDialog, public gameService: GameService, private loader: NgtLoader ) { }
 
   ngOnInit(): void {
+    console.log("position",this.cardIndex)
   }
-
 
   openDialog(){
     this.cardInfoRef = this.dialog.open(CardDialogComponent, {

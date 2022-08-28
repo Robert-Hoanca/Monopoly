@@ -10,6 +10,9 @@
   },
   "private": true,
   "dependencies": {
+    "@angular-three/core": "^6.0.0",
+    "@angular-three/schematics": "^6.0.1",
+    "@angular-three/soba": "^6.0.1",
     "@angular/animations": "^14.1.0",
     "@angular/cdk": "^14.2.0",
     "@angular/common": "^14.1.0",
@@ -25,6 +28,7 @@
     "firebase": "^9.9.3",
     "firebase-admin": "^11.0.1",
     "rxjs": "~7.5.0",
+    "three": "~0.142.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
   },
@@ -33,6 +37,7 @@
     "@angular/cli": "~14.1.1",
     "@angular/compiler-cli": "^14.1.0",
     "@types/jasmine": "~4.0.0",
+    "@types/three": "~0.142.0",
     "jasmine-core": "~4.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.1.0",

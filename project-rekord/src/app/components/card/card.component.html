@@ -1,5 +1,14 @@
-<div id="card">
+<!--<div id="card">
     {{ card.name }}
 
     <button *ngIf="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name" (click)="openDialog()">Open Info</button>
-</div>
+
+    <ng-container  >
+   
+</ng-container>
+</div>-->
+
+<ngt-mesh *ngIf="model$ | async as model" [position]="position">
+    <ngt-primitive [object]="model.scene"
+    ></ngt-primitive>
+</ngt-mesh>

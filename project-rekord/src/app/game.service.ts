@@ -76,6 +76,7 @@ export class GameService {
     }
     this.actualTurnPlayer = this.players[this.turn];
     this.actualTurnPlayer.canDice = true;
+    this.diceNumber = undefined;
   }
 
   rollTheDice(){

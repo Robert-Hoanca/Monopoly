@@ -27,6 +27,18 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 
+//Three Js
+import { NgtCanvasModule ,NgtCanvas} from '@angular-three/core';
+import { NgtMesh } from '@angular-three/core/meshes';
+import { NgtAmbientLight, NgtSpotLight, NgtPointLight, NgtAmbientLightModule, NgtPointLightModule } from '@angular-three/core/lights';
+import { NgtBoxGeometry } from '@angular-three/core/geometries';
+import { NgtMeshBasicMaterial } from '@angular-three/core/materials';
+import { NgtPrimitiveModule } from '@angular-three/core/primitive';
+
+import { NgtSobaLoaderModule } from '@angular-three/soba/loaders';
+import { NgtSobaOrbitControlsModule } from '@angular-three/soba/controls';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -50,7 +62,19 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     MatDialogModule,
     FlexLayoutModule,
     MatIconModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    NgtCanvasModule,
+    NgtCanvas,
+    NgtAmbientLight,
+    NgtSpotLight,
+    NgtPointLight,
+    NgtMesh,
+    NgtBoxGeometry,
+    NgtMeshBasicMaterial,
+    NgtPrimitiveModule,
+    NgtSobaLoaderModule,
+    NgtSobaOrbitControlsModule,
+    
   ],
   providers: [],
   bootstrap: [AppComponent]

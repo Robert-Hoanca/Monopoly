@@ -7,13 +7,21 @@
     <div *ngIf="gameService.choosenMode">
 
         <mat-card *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around">
-
+            <ngt-canvas>
+                <ngt-ambient-light intensity="1"></ngt-ambient-light>
+                <ngt-mesh>
+                    <ngt-box-geometry></ngt-box-geometry>
+                    <ngt-mesh-basic-material></ngt-mesh-basic-material>
+                </ngt-mesh>
+             
+            </ngt-canvas>
             
             <span>{{player.choosenPawn}}</span>
             <span>{{player.name}}</span>
             <span>{{player.money}}</span>
 
         </mat-card>
+
 
         <mat-card>
 
