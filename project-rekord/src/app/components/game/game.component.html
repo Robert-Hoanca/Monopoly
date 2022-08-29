@@ -7,7 +7,7 @@
         <ngt-spot-light [position]="10" angle="0.15" penumbra="1"></ngt-spot-light>
         <ngt-point-light [position]="-10"></ngt-point-light>
 
-        <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [position]="[(i / 10), (i / 10), 0]"></app-card>
+        <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [position]="[0,0,0]"></app-card>
        
        <ngt-soba-orbit-controls></ngt-soba-orbit-controls>
     </ngt-canvas>

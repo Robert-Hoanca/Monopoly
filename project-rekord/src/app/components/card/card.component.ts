@@ -23,9 +23,11 @@ export class CardComponent implements OnInit {
   constructor(public dialog: MatDialog, public gameService: GameService, private loader: NgtLoader ) { }
 
   ngOnInit(): void {
-    console.log("position",this.cardIndex)
   }
-
+  test(){
+    console.log("position",this.cardIndex)
+    this.position = [3,0,0];
+  }
   openDialog(){
     this.cardInfoRef = this.dialog.open(CardDialogComponent, {
       width: '450px',

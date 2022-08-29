@@ -32,7 +32,7 @@ import { NgtCanvasModule ,NgtCanvas} from '@angular-three/core';
 import { NgtMesh } from '@angular-three/core/meshes';
 import { NgtAmbientLight, NgtSpotLight, NgtPointLight, NgtAmbientLightModule, NgtPointLightModule } from '@angular-three/core/lights';
 import { NgtBoxGeometry } from '@angular-three/core/geometries';
-import { NgtMeshBasicMaterial } from '@angular-three/core/materials';
+import { NgtMeshBasicMaterial, NgtMeshStandardMaterial } from '@angular-three/core/materials';
 import { NgtPrimitiveModule } from '@angular-three/core/primitive';
 
 import { NgtSobaLoaderModule } from '@angular-three/soba/loaders';
@@ -74,6 +74,7 @@ import { NgtSobaOrbitControlsModule } from '@angular-three/soba/controls';
     NgtPrimitiveModule,
     NgtSobaLoaderModule,
     NgtSobaOrbitControlsModule,
+    NgtMeshStandardMaterial
     
   ],
   providers: [],

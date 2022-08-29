@@ -8,7 +8,13 @@
 </ng-container>
 </div>-->
 
-<ngt-mesh *ngIf="model$ | async as model" [position]="position">
-    <ngt-primitive [object]="model.scene"
+<ngt-mesh>
+
+    <ngt-primitive
+        *ngIf="model$ | async as model"
+        [object]="model.scene"
+        [position]="[0,0,0]" 
     ></ngt-primitive>
+  
+
 </ngt-mesh>
