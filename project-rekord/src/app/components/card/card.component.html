@@ -3,18 +3,18 @@
 
     <button *ngIf="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name" (click)="openDialog()">Open Info</button>
 
-    <ng-container  >
-   
-</ng-container>
+
+
+    (onClick)="test()"
 </div>-->
 
-<ngt-mesh>
-
-    <ngt-primitive
-        *ngIf="model$ | async as model"
-        [object]="model.scene"
-        [position]="[0,0,0]" 
-    ></ngt-primitive>
-  
-
-</ngt-mesh>
+<th-object3D
+    loadGLTF
+    [url]="url"
+    [position]="position"
+    [rotation]="rotation"
+    (onClick)="test()"
+    
+>
+<th-meshBasicMaterial [args]="{color: meshColor}"></th-meshBasicMaterial>
+</th-object3D>

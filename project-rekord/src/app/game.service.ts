@@ -11,6 +11,9 @@ import { FlexAlignStyleBuilder } from '@angular/flex-layout';
   providedIn: 'root'
 })
 export class GameService {
+  //Colors
+  bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
+  sessionColor:string= '';
   players: Array<any> = [];
   actualTurnPlayer:any = {};
 
@@ -19,6 +22,7 @@ export class GameService {
   chosenMap:string = 'testMap';
 
   gameTable:any = {};
+  cardsPositionCounter:number = 0;
   playersModel: any = {};
   pawnTypes: any = [];
   diceNumber:number|undefined;
@@ -31,18 +35,17 @@ export class GameService {
   async retrieveDBData(){
     const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
     this.gameTable  = await (await getDoc(gameTableRef)).data();
-    console.log(this.gameTable)
     const playersModelRef = doc(this.db, "playerModel", 'playerModel');
     this.playersModel = await (await getDoc(playersModelRef)).data();
-
-
-
     const pawnTypesRef = await getDocs(collection(this.db, "pawnTypes"));
     pawnTypesRef.forEach((doc) => {
       this.pawnTypes.push(doc.data())
     });
   }
 
+  chooseSessionColor(){
+    this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
+  }
 
   createPlayer(name:string, pawnIndex:number){
     this.players.push({

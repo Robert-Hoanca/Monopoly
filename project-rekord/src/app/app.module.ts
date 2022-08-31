@@ -28,7 +28,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 
 //Three Js
-import { NgtCanvasModule ,NgtCanvas} from '@angular-three/core';
+/*import { NgtCanvasModule ,NgtCanvas} from '@angular-three/core';
 import { NgtMesh } from '@angular-three/core/meshes';
 import { NgtAmbientLight, NgtSpotLight, NgtPointLight, NgtAmbientLightModule, NgtPointLightModule } from '@angular-three/core/lights';
 import { NgtBoxGeometry } from '@angular-three/core/geometries';
@@ -37,7 +37,21 @@ import { NgtPrimitiveModule } from '@angular-three/core/primitive';
 
 import { NgtSobaLoaderModule } from '@angular-three/soba/loaders';
 import { NgtSobaOrbitControlsModule } from '@angular-three/soba/controls';
+ NgtCanvasModule,
+    NgtCanvas,
+    NgtAmbientLight,
+    NgtSpotLight,
+    NgtPointLight,
+    NgtMesh,
+    NgtBoxGeometry,
+    NgtMeshBasicMaterial,
+    NgtPrimitiveModule,
+    NgtSobaLoaderModule,
+    NgtSobaOrbitControlsModule,
+    NgtMeshStandardMaterial*/
 
+//NGX THREE
+import { NgxThreeModule } from 'ngx-three';
 
 @NgModule({
   declarations: [
@@ -63,18 +77,7 @@ import { NgtSobaOrbitControlsModule } from '@angular-three/soba/controls';
     FlexLayoutModule,
     MatIconModule,
     MatPaginatorModule,
-    NgtCanvasModule,
-    NgtCanvas,
-    NgtAmbientLight,
-    NgtSpotLight,
-    NgtPointLight,
-    NgtMesh,
-    NgtBoxGeometry,
-    NgtMeshBasicMaterial,
-    NgtPrimitiveModule,
-    NgtSobaLoaderModule,
-    NgtSobaOrbitControlsModule,
-    NgtMeshStandardMaterial
+    NgxThreeModule
     
   ],
   providers: [],
