@@ -10,6 +10,9 @@ export class ChooseModeComponent implements OnInit {
 
   pawnModelCounter:number=0;
   playerName:string='';
+  actualPawnDisplayer:string = '';
+
+  url:string='';
 
   constructor(public gameService: GameService) { }
 
@@ -19,7 +22,7 @@ export class ChooseModeComponent implements OnInit {
     this.gameService.choosenMode = mode;
   }
 
-  changeModel(way:string){
+  changeModel(way:string,){
     if(way == 'minus'){
       this.pawnModelCounter--;
     }else if(way == 'plus'){
@@ -30,6 +33,10 @@ export class ChooseModeComponent implements OnInit {
   createPlayer(){
     this.playerName = '';
     this.pawnModelCounter = 0;
+  }
+
+  filterPawns(){
+    return this.gameService.pawnTypes.filter((pawn: { specialPawn: any; }) => !pawn.specialPawn)
   }
 
 }

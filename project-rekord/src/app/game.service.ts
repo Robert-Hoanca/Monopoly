@@ -25,6 +25,7 @@ export class GameService {
   cardsPositionCounter:number = 0;
   playersModel: any = {};
   pawnTypes: any = [];
+  specialPawnTypes: any = [];
   diceNumber:number|undefined;
 
 
@@ -35,11 +36,14 @@ export class GameService {
   async retrieveDBData(){
     const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
     this.gameTable  = await (await getDoc(gameTableRef)).data();
+
     const playersModelRef = doc(this.db, "playerModel", 'playerModel');
     this.playersModel = await (await getDoc(playersModelRef)).data();
+
     const pawnTypesRef = await getDocs(collection(this.db, "pawnTypes"));
     pawnTypesRef.forEach((doc) => {
-      this.pawnTypes.push(doc.data())
+      console.log(doc.data()['specialPawn'])
+      doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
     });
   }
 
@@ -47,11 +51,12 @@ export class GameService {
     this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
   }
 
-  createPlayer(name:string, pawnIndex:number){
+  createPlayer(name:string, pawnIndex:number, type:string){
     this.players.push({
       name: name,
       money: 1500,
-      choosenPawn: this.pawnTypes[pawnIndex].name,
+      choosenPawnLabel: type == 'normal'? this.pawnTypes[pawnIndex].name : this.specialPawnTypes[pawnIndex].name,
+      choosenPawnValue: type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes[pawnIndex].value,
       canDice: false,
       actualCard: 0,
       properties: {
@@ -59,8 +64,8 @@ export class GameService {
         hotels: 0,
       },
     })
-
-    this.pawnTypes.splice(pawnIndex,1)
+    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(pawnIndex,1);
+    
   }
 
   startGame(){
@@ -90,6 +95,7 @@ export class GameService {
     }
     this.actualTurnPlayer.actualCard = this.diceNumber;
     this.actualTurnPlayer.canDice = false;
+    console.log(this.diceNumber)
 
   }
  /* rollTheDiceInitGame(){

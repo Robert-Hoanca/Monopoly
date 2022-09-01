@@ -13,8 +13,8 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="test()"
+    (onClick)="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name?  openDialog(): ''"
     
 >
-<th-meshBasicMaterial [args]="{color: meshColor}"></th-meshBasicMaterial>
 </th-object3D>
+

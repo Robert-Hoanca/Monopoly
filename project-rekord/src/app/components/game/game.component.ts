@@ -12,7 +12,6 @@ export class GameComponent implements OnInit {
   constructor(public gameService: GameService) { }
 
   ngOnInit(): void {
-    this.gameService.chooseSessionColor();
   }
 
   resizeCanvas(event:any){

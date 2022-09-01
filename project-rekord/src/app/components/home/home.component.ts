@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameService } from 'src/app/game.service';
 
 @Component({
   selector: 'app-home',
@@ -8,9 +9,10 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(public router: Router) { }
+  constructor(public router: Router, public gameService: GameService) { }
 
   ngOnInit(): void {
+    this.gameService.chooseSessionColor();
   }
 
   goToChooseModeView(){

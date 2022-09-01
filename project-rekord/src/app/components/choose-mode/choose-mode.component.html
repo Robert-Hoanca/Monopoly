@@ -1,4 +1,4 @@
-<div id="chooseMode">
+<div id="chooseMode" [style]="{background: gameService.sessionColor}">
 
     <div *ngIf="!gameService.choosenMode">
         <button mat-raised-button (click)="chooseMode('local')">Local</button>
@@ -7,16 +7,35 @@
     <div *ngIf="gameService.choosenMode">
 
         <mat-card *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around">
-            <!--<ngt-canvas>
-                <ngt-ambient-light intensity="1"></ngt-ambient-light>
-                <ngt-mesh>
-                    <ngt-box-geometry></ngt-box-geometry>
-                    <ngt-mesh-basic-material></ngt-mesh-basic-material>
-                </ngt-mesh>
-             
-            </ngt-canvas>-->
+
+            <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '200px', width: '200px'}" >
+                <th-scene [thStats]="false" >
+                    <th-ambientLight> </th-ambientLight>
+
             
-            <span>{{player.choosenPawn}}</span>
+                    <th-object3D
+                    loadObj
+                        [url]="'/assets/blenderModels/pawns/' + player.choosenPawnValue + '.obj'"
+                        [position]="[0,0,0]"
+                  
+                    >
+                    </th-object3D>
+
+
+              
+                    <th-perspectiveCamera
+                        [args]="[75, 2, 0.1, 1000]"
+                        [position]="[15,15,15]"
+                    >
+                    <th-mapControls></th-mapControls>
+                    </th-perspectiveCamera>
+                  
+                </th-scene>
+              </th-canvas>
+              
+        
+            
+            <span>{{player.choosenPawnLabel}}</span>
             <span>{{player.name}}</span>
             <span>{{player.money}}</span>
 
@@ -27,16 +46,17 @@
 
             <div class="choosePawn">
               
-                <div class="pawnModel" *ngFor="let pawn of gameService.pawnTypes;let i = index">
+                <div class="pawnModel" *ngFor="let pawn of filterPawns();let i = index">
                    
                     <div *ngIf="i == pawnModelCounter">
+                        <span>{{i}}</span>
                         <span>IMG</span>
                         <div class="pawnChange">
                             <button  mat-icon-button (click)="changeModel('minus')" [disabled]="pawnModelCounter==0"><mat-icon>chevron_left</mat-icon></button>
         
                             <span>{{pawn.name}}</span>
         
-                            <button  mat-icon-button (click)="changeModel('plus')" [disabled]="pawnModelCounter>=(gameService.pawnTypes.length - 1)"><mat-icon>chevron_right</mat-icon></button>
+                            <button  mat-icon-button (click)="changeModel('plus')" [disabled]="pawnModelCounter>=(filterPawns().length - 1)"><mat-icon>chevron_right</mat-icon></button>
                         </div>
                     </div>
                 </div>
@@ -51,11 +71,9 @@
             <span>{{gameService.playersModel.money}}</span>
 
 
-            <button mat-raised-button [disabled]="!playerName" (click)="gameService.createPlayer(playerName, pawnModelCounter);createPlayer()">Join</button>
+            <button mat-raised-button [disabled]="!playerName" (click)="gameService.createPlayer(playerName, pawnModelCounter, 'normal');createPlayer()">Join</button>
 
         </mat-card>
-
-
         <button mat-raised-button (click)="gameService.startGame()" [disabled]="gameService.players.length<2">PLAY</button>
     </div>
     

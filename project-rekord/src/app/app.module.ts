@@ -52,6 +52,8 @@ import { NgtSobaOrbitControlsModule } from '@angular-three/soba/controls';
 
 //NGX THREE
 import { NgxThreeModule } from 'ngx-three';
+import { ThObjLoaderPipe } from './th-obj-loader.pipe';
+import { ThObjLoaderDirective } from './th-obj-loader.directive';
 
 @NgModule({
   declarations: [
@@ -62,6 +64,8 @@ import { NgxThreeModule } from 'ngx-three';
     PawnComponent,
     CardDialogComponent,
     ChooseModeComponent,
+    ThObjLoaderPipe,
+    ThObjLoaderDirective,
   ],
   imports: [
     BrowserModule,
