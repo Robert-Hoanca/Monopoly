@@ -1,6 +1,6 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
-    <th-canvas (onResize)=resizeCanvas($event) [style]="{background: this.gameService.sessionColor}" >
+    <th-canvas  (onResize)=resizeCanvas($event) [style]="{background: this.gameService.sessionColor}" >
         <th-scene [thStats]="false" >
             <th-ambientLight></th-ambientLight>
       
@@ -8,13 +8,15 @@
 
 
                 <th-object3D
-                    loadObj
+                    loadGLTF
                     *ngFor="let player of gameService.players"
-                    [url]="'/assets/blenderModels/pawns/' + player.choosenPawnValue + '.obj'"
-                    [position]="[0,0.2,0]"
-                    [scale]="[0.05,0.05,0.05]"
-                    
+                    [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '.gltf'"
+                    [position]="player.pawn.position"
+                    [scale]="player.pawn.scale"
                 >
+                <th-meshBasicMaterial
+                [args]="{ color: '#ff0000' }"
+                ></th-meshBasicMaterial>
                 </th-object3D>
 
 
@@ -22,7 +24,7 @@
       
                 <th-perspectiveCamera
                     [args]="[75, 2, 0.1, 1000]"
-                    [position]="[1,1,5]"
+                    [position]="gameService.cameraPosition"
                 >
                     <!--<th-orbitControls></th-orbitControls>-->
                     <th-mapControls></th-mapControls>
@@ -44,7 +46,9 @@
 
     <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()"><mat-icon>casino</mat-icon></button>
 
+    
     <!--
         DELETE
+        <button mat-raised-button id="blblbl" (click)="gameService.test()">click me</button>
         <button mat-raised-button (click)="gameService.setDB()">Set db</button>-->
 </div>

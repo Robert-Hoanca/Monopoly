@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ThMesh } from 'ngx-three';
 import { GameService } from 'src/app/game.service';
 
 @Component({
@@ -8,6 +9,8 @@ import { GameService } from 'src/app/game.service';
 })
 export class GameComponent implements OnInit {
   @ViewChild('cardInfo', { static: true }) cardInfo:any;
+  
+  @ViewChild('theGeo', { static: true }) test:any;
 
   constructor(public gameService: GameService) { }
 

@@ -14,7 +14,8 @@
     [position]="position"
     [rotation]="rotation"
     (onClick)="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name?  openDialog(): ''"
-    
+    (onMouseEnter)="test()"
 >
 </th-object3D>
 
+<th-textGeometry loadText [args]="'Hello three.js!'"></th-textGeometry>

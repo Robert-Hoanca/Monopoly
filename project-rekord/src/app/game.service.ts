@@ -6,6 +6,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
 import { FlexAlignStyleBuilder } from '@angular/flex-layout';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,12 +22,15 @@ export class GameService {
   db = getFirestore();
   chosenMap:string = 'testMap';
 
+  cameraPosition: [x: number, y: number, z: number] = [-5,5,-5];
   gameTable:any = {};
   cardsPositionCounter:number = 0;
   playersModel: any = {};
   pawnTypes: any = [];
   specialPawnTypes: any = [];
+  specialPawn:String='';
   diceNumber:number|undefined;
+  getCardPosition$ = new Subject();
 
 
   turn:number= 0;
@@ -42,7 +46,6 @@ export class GameService {
 
     const pawnTypesRef = await getDocs(collection(this.db, "pawnTypes"));
     pawnTypesRef.forEach((doc) => {
-      console.log(doc.data()['specialPawn'])
       doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
     });
   }
@@ -51,21 +54,23 @@ export class GameService {
     this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
   }
 
-  createPlayer(name:string, pawnIndex:number, type:string){
-    this.players.push({
-      name: name,
-      money: 1500,
-      choosenPawnLabel: type == 'normal'? this.pawnTypes[pawnIndex].name : this.specialPawnTypes[pawnIndex].name,
-      choosenPawnValue: type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes[pawnIndex].value,
-      canDice: false,
-      actualCard: 0,
-      properties: {
-        houses: 0,
-        hotels: 0,
-      },
-    })
-    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(pawnIndex,1);
-    
+  createPlayer(name:string, pawnIndex:number){
+    const type = this.specialPawn != ''? 'special' : 'normal';
+    const newPlayer = JSON.parse(JSON.stringify(this.playersModel));
+    newPlayer.name = name;
+    newPlayer.money = 1500;
+    newPlayer.pawn.choosenPawnLabel = type == 'normal'? this.pawnTypes[pawnIndex].name : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).name;
+    newPlayer.pawn.choosenPawnValue =  type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).value;
+    newPlayer.canDice = false;
+    newPlayer.actualCard = 0;
+    newPlayer.properties = {
+      houses: 0,
+      hotels: 0,
+    }
+
+    this.players.push(newPlayer);
+    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1); 
+    this.specialPawn= '';
   }
 
   startGame(){
@@ -94,8 +99,8 @@ export class GameService {
       this.diceNumber = 0 + ((num-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
     }
     this.actualTurnPlayer.actualCard = this.diceNumber;
+    this.getCardPosition$.next(this.diceNumber);
     this.actualTurnPlayer.canDice = false;
-    console.log(this.diceNumber)
 
   }
  /* rollTheDiceInitGame(){
@@ -130,7 +135,8 @@ export class GameService {
     this.actualTurnPlayer.money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
   }
 
-
+  test(){
+  }
   /////////////////DELETE
   async setDB(){
     let cardsData = [];

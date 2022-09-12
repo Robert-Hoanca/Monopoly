@@ -26,29 +26,8 @@ import { ChooseModeComponent } from './components/choose-mode/choose-mode.compon
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import {MatMenuModule} from '@angular/material/menu';
 
-//Three Js
-/*import { NgtCanvasModule ,NgtCanvas} from '@angular-three/core';
-import { NgtMesh } from '@angular-three/core/meshes';
-import { NgtAmbientLight, NgtSpotLight, NgtPointLight, NgtAmbientLightModule, NgtPointLightModule } from '@angular-three/core/lights';
-import { NgtBoxGeometry } from '@angular-three/core/geometries';
-import { NgtMeshBasicMaterial, NgtMeshStandardMaterial } from '@angular-three/core/materials';
-import { NgtPrimitiveModule } from '@angular-three/core/primitive';
-
-import { NgtSobaLoaderModule } from '@angular-three/soba/loaders';
-import { NgtSobaOrbitControlsModule } from '@angular-three/soba/controls';
- NgtCanvasModule,
-    NgtCanvas,
-    NgtAmbientLight,
-    NgtSpotLight,
-    NgtPointLight,
-    NgtMesh,
-    NgtBoxGeometry,
-    NgtMeshBasicMaterial,
-    NgtPrimitiveModule,
-    NgtSobaLoaderModule,
-    NgtSobaOrbitControlsModule,
-    NgtMeshStandardMaterial*/
 
 //NGX THREE
 import { NgxThreeModule } from 'ngx-three';
@@ -76,12 +55,14 @@ import { ThObjLoaderDirective } from './th-obj-loader.directive';
     MatInputModule,
     MatButtonModule,
     MatCardModule,
+    MatMenuModule,
     FormsModule,
     MatDialogModule,
     FlexLayoutModule,
     MatIconModule,
     MatPaginatorModule,
-    NgxThreeModule
+    NgxThreeModule,
+    
     
   ],
   providers: [],

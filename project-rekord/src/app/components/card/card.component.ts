@@ -1,6 +1,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 import { CardDialogComponent } from 'src/app/shared/card-dialog/card-dialog.component';
 import { Vector3 } from 'three';
@@ -15,26 +16,31 @@ export class CardComponent implements OnInit {
   @Input() card!: any;
   @Input() cardIndex!: any;
   cardInfoRef: MatDialogRef<any> | undefined;
-  //Three js
- // @Input('position') position?: NgtVector3;
-  //model$ = this.loader.use(GLTFLoader, '/assets/blenderModels/card/card.gltf');
-  //private loader: NgtLoader 
-
-  //Ngx Three
-  //url:string ='/assets/blenderModels/card/card.gltf'
   url:string= '';
   position: [x: number, y: number, z: number] = [0, 0, 0];
   rotation: [x: number, y: number, z: number] = [0, 0, 0];
   meshColor:string='#ffff00';
+  getCardPosition$: Subscription | undefined;
 
   constructor(public dialog: MatDialog, public gameService: GameService, ) { }
 
   ngOnInit(): void {
     this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/card_corner.gltf':'/assets/blenderModels/card/card.gltf';
     this.setCardPosition();
+    this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
+      if(diceNumber == this.cardIndex){
+        this.gameService.actualTurnPlayer.pawn.position =  this.position;
+        //this.gameService.actualTurnPlayer.pawn.rotation = this.rotation;
+
+
+        //this.gameService.cameraPosition[0] = this.position[0];
+
+        this.gameService.cameraPosition = [  (this.gameService.cameraPosition[0] + 0.01), this.gameService.cameraPosition[1], this.position[2]]
+      }
+    });
   }
   test(){
-    console.log(this.cardIndex)
+    console.log()
   }
 
   setCardPosition(){

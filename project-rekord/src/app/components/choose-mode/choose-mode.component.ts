@@ -11,6 +11,8 @@ export class ChooseModeComponent implements OnInit {
   pawnModelCounter:number=0;
   playerName:string='';
   actualPawnDisplayer:string = '';
+  canAddSpecial:boolean=false;
+  specialPawnExist:boolean = false;
 
   url:string='';
 
@@ -30,9 +32,22 @@ export class ChooseModeComponent implements OnInit {
     }
   }
 
+  disableJoinButton(){
+
+    const specialPawnIndex= this.gameService.specialPawnTypes.findIndex((pawn: { value: String; }) => pawn.value == this.gameService.specialPawn);
+    if(!this.gameService.specialPawn && this.playerName){
+      return false;
+    }else if(this.gameService.specialPawn && this.playerName && specialPawnIndex>-1){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
   createPlayer(){
     this.playerName = '';
     this.pawnModelCounter = 0;
+
   }
 
   filterPawns(){
