@@ -27,12 +27,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+
 
 
 //NGX THREE
 import { NgxThreeModule } from 'ngx-three';
 import { ThObjLoaderPipe } from './th-obj-loader.pipe';
 import { ThObjLoaderDirective } from './th-obj-loader.directive';
+import { ExchangeComponent } from './shared/exchange/exchange.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +48,7 @@ import { ThObjLoaderDirective } from './th-obj-loader.directive';
     ChooseModeComponent,
     ThObjLoaderPipe,
     ThObjLoaderDirective,
+    ExchangeComponent,
   ],
   imports: [
     BrowserModule,
@@ -60,6 +64,7 @@ import { ThObjLoaderDirective } from './th-obj-loader.directive';
     MatDialogModule,
     FlexLayoutModule,
     MatIconModule,
+    MatCheckboxModule,
     MatPaginatorModule,
     NgxThreeModule,
     

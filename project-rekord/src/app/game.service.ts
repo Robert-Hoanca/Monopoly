@@ -7,6 +7,9 @@ import 'firebase/firestore';
 import { Router } from '@angular/router';
 import { FlexAlignStyleBuilder } from '@angular/flex-layout';
 import { Subject } from 'rxjs';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { CardDialogComponent } from './shared/card-dialog/card-dialog.component';
+import { ExchangeComponent } from './shared/exchange/exchange.component';
 
 @Injectable({
   providedIn: 'root'
@@ -32,10 +35,14 @@ export class GameService {
   diceNumber:number|undefined;
   getCardPosition$ = new Subject();
 
+  //CARD DIALOG
+  cardInfoRef: MatDialogRef<any> | undefined;
+  //EXCHANGE DIALOG
+  exchangeRef: MatDialogRef<any> | undefined;
 
   turn:number= 0;
 
-  constructor(private afs: AngularFirestore,public router: Router) { }
+  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
     const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
@@ -63,11 +70,6 @@ export class GameService {
     newPlayer.pawn.choosenPawnValue =  type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).value;
     newPlayer.canDice = false;
     newPlayer.actualCard = 0;
-    newPlayer.properties = {
-      houses: 0,
-      hotels: 0,
-    }
-
     this.players.push(newPlayer);
     type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1); 
     this.specialPawn= '';
@@ -87,6 +89,10 @@ export class GameService {
     }else{
       this.turn++;
     }
+
+    if(this.players[this.turn].bankrupt){
+      this.turn++;
+    }
     this.actualTurnPlayer = this.players[this.turn];
     this.actualTurnPlayer.canDice = true;
     this.diceNumber = undefined;
@@ -103,17 +109,12 @@ export class GameService {
     this.actualTurnPlayer.canDice = false;
 
   }
- /* rollTheDiceInitGame(){
-    let diceNum = 0;
-    this.players.forEach(player => {
-      diceNum = Math.round(Math.random() * (12 - 1) + 1);
-    });
-  }*/
 
   buyProperty(property:any){
     this.actualTurnPlayer.money -= property.cost;
     property.canBuy = false;
     property.owner = this.players[this.turn].name;
+    this.actualTurnPlayer.properties.push(JSON.parse(JSON.stringify(property)))
   }
   sellProperty(property:any){
     if(!property.distrained){
@@ -135,7 +136,32 @@ export class GameService {
     this.actualTurnPlayer.money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
   }
 
-  test(){
+  openCardDialog(card:object){
+    this.cardInfoRef = this.dialog.open(CardDialogComponent, {
+      width: '450px',
+      panelClass: 'cardInfo',
+      hasBackdrop: true,
+      autoFocus: false,
+      data: {
+        card: card,
+      }
+    });
+  }
+
+  checkBankrupt(){
+    if(!this.actualTurnPlayer.properties.length && this.actualTurnPlayer.money ==0){}
+  }
+
+  openExchangeDialog(){
+    this.cardInfoRef = this.dialog.open(ExchangeComponent, {
+      width: '60%',
+      height: '80%',
+      panelClass: 'cardInfo',
+      hasBackdrop: true,
+      autoFocus: false,
+      data: {
+      }
+    });
   }
   /////////////////DELETE
   async setDB(){
@@ -148,6 +174,19 @@ export class GameService {
         distrainedCost: 60,
         name: "Cella " + index,
         owner: "",
+        exchangeSelected: false,
+        completedSeries: false,
+        rentCosts : {
+          normal: '10',
+          completedSeriesZero:'',
+          one: '30',
+          two: '80',
+          three: '120',
+          four:'200',
+          hotel:'350'
+        },
+        housesCounter:0,
+        hotelCounter:0,
       })
     }
     await setDoc(doc(this.db, "gameTables", "testMap"), {cards: cardsData});

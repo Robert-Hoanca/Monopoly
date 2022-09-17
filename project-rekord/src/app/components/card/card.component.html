@@ -13,9 +13,16 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name?  openDialog(): ''"
+    (onClick)="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name?  gameService.openCardDialog(card): ''"
     (onMouseEnter)="test()"
 >
 </th-object3D>
 
-<th-textGeometry loadText [args]="'Hello three.js!'"></th-textGeometry>
+<th-mesh
+  [rotation]="rotation"
+  [position]="position"
+  [scale]="[1, 0.5, 0.5]"
+>
+  <th-boxGeometry></th-boxGeometry>
+  <th-meshBasicMaterial [args]="{color: 'purple'}"></th-meshBasicMaterial>
+</th-mesh>

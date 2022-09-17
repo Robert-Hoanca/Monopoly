@@ -1,11 +1,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/game.service';
-import { CardDialogComponent } from 'src/app/shared/card-dialog/card-dialog.component';
-import { Vector3 } from 'three';
-
 
 @Component({
   selector: 'app-card',
@@ -15,14 +11,13 @@ import { Vector3 } from 'three';
 export class CardComponent implements OnInit {
   @Input() card!: any;
   @Input() cardIndex!: any;
-  cardInfoRef: MatDialogRef<any> | undefined;
   url:string= '';
   position: [x: number, y: number, z: number] = [0, 0, 0];
   rotation: [x: number, y: number, z: number] = [0, 0, 0];
   meshColor:string='#ffff00';
   getCardPosition$: Subscription | undefined;
 
-  constructor(public dialog: MatDialog, public gameService: GameService, ) { }
+  constructor( public gameService: GameService, ) { }
 
   ngOnInit(): void {
     this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/card_corner.gltf':'/assets/blenderModels/card/card.gltf';
@@ -63,15 +58,4 @@ export class CardComponent implements OnInit {
    
   }
 
-  openDialog(){
-    this.cardInfoRef = this.dialog.open(CardDialogComponent, {
-      width: '450px',
-      panelClass: 'cardInfo',
-      hasBackdrop: true,
-      autoFocus: false,
-      data: {
-        card:this.card,
-      }
-    });
-  }
 }

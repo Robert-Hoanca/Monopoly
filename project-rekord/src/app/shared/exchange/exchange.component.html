@@ -1,0 +1,43 @@
+<div id="exchangeContainer" fxLayout="row" fxLayoutAlign="space-around center">
+
+    <div *ngIf="!playerToExchangeWith">
+        <button mat-raised-button *ngFor="let player of getPlayersToExchangeWith()" (click)="selectPlayerToExchange(player)" [disabled]="player.bankrupt">
+            <span>{{player.name}}</span>
+        </button>
+    </div>
+
+    <div *ngIf="playerToExchangeWith" fxLayout="row" fxLayoutAlign="space-around center">
+
+        <button mat-raised-button (click)="goBackToSelection()" class="exchangeGoBackBtn"><mat-icon>arrow_back</mat-icon></button>
+
+        <div class="exchangeCards" fxLayout="row" fxLayoutAlign="space-around center">
+            <mat-card fxLayout="column" fxLayoutAlign="space-around center">
+                <span>{{gameService.actualTurnPlayer.name}}</span>
+    
+                <div>
+                    <mat-card *ngFor="let property of gameService.actualTurnPlayer.properties" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
+                </div>
+    
+                <mat-form-field appearance="fill">
+                    <mat-label>player 1</mat-label>
+                    <input matInput type="number" [(ngModel)]="moneyToExchange[0]">
+                </mat-form-field>
+            </mat-card>
+    
+            <mat-card fxLayout="column" fxLayoutAlign="space-around center">
+                <span>{{playerToExchangeWith.name}}</span>
+    
+                <div>
+                    <mat-card *ngFor="let property of playerToExchangeWith.properties" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
+                </div>
+                <mat-form-field appearance="fill">
+                    <mat-label>Player 2</mat-label>
+                    <input matInput type="number" [(ngModel)]="moneyToExchange[1]">
+                </mat-form-field>
+            </mat-card>
+        </div>
+
+        <button mat-raised-button (click)="finaliseExchange()" class="exchangeFinaliseBtn"> <mat-icon>currency_exchange</mat-icon> </button>
+    </div>
+
+</div>

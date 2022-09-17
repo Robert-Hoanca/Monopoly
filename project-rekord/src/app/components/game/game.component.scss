@@ -12,13 +12,9 @@
         left: 0;
         pointer-events: none;
     }
-
-    #diceBtn,  #nextTurnBtn{
+    #gameButtons{
         position: absolute;
-        bottom: 5px;
-    }
-    #blblbl{
-        position: absolute;
-        bottom: 20px;
+        bottom: 0;
+        width: 100%;
     }
 }

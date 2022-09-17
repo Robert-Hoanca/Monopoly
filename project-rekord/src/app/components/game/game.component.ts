@@ -20,4 +20,5 @@ export class GameComponent implements OnInit {
   resizeCanvas(event:any){
 
   }
+
 }
