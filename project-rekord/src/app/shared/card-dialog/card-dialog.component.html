@@ -1,4 +1,4 @@
-<div id="cardInfo" fxLayout="column" fxLayoutAlign="center start">
+<div id="cardInfo">
     <span class="cardName">{{data.card.name}}</span>
     <span class="cardCost"> {{data.card.cost}} €</span>
 
@@ -9,4 +9,33 @@
     <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.actualTurnPlayer.name" (click)="gameService.distrainProperty(data.card);close()">Pignora</button>
 
     <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.actualTurnPlayer.name" (click)="gameService.cancelDistrainedFromProperty(data.card)">Remove pignora</button>
+
+    <div *ngIf="data.card.completedSeries">
+        <span>Manage Houses</span>
+        
+        <div fxLayout="row" fxLayoutAlign="center start" *ngIf="!hotel">
+            <mat-card *ngFor="let house of houses">
+                <mat-icon>home</mat-icon>
+                <button mat-icon-button (click)="removeHouse()">remove</button>
+            </mat-card>
+            <mat-card *ngIf="houses.length<4" (click)="addHouse()">
+                <mat-icon>add</mat-icon>
+                <mat-icon>home</mat-icon>
+            </mat-card>
+
+            <mat-card *ngIf="houses.length == 4" (click)="addHotel()">
+                <mat-icon>add</mat-icon>
+                <mat-icon>apartment</mat-icon>
+            </mat-card>
+            
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="center start" *ngIf="hotel">
+            <mat-card>
+                <mat-icon>apartment</mat-icon>
+                <button mat-icon-button (click)="removeHotel()">remove</button>
+            </mat-card>
+        </div>
+
+    </div>
 </div>

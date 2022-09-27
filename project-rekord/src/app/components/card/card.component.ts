@@ -25,12 +25,8 @@ export class CardComponent implements OnInit {
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
       if(diceNumber == this.cardIndex){
         this.gameService.actualTurnPlayer.pawn.position =  this.position;
-        //this.gameService.actualTurnPlayer.pawn.rotation = this.rotation;
-
-
-        //this.gameService.cameraPosition[0] = this.position[0];
-
-        this.gameService.cameraPosition = [  (this.gameService.cameraPosition[0] + 0.01), this.gameService.cameraPosition[1], this.position[2]]
+        this.gameService.payTaxes(this.cardIndex);
+        //this.gameService.cameraPosition = [  (this.gameService.cameraPosition[0] + 0.01), this.gameService.cameraPosition[1], this.position[2]]
       }
     });
   }

@@ -27,6 +27,7 @@ export class GameService {
 
   cameraPosition: [x: number, y: number, z: number] = [-5,5,-5];
   gameTable:any = {};
+  gameMaps:any = [];
   cardsPositionCounter:number = 0;
   playersModel: any = {};
   pawnTypes: any = [];
@@ -45,6 +46,13 @@ export class GameService {
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
+
+    const getMaps = await getDocs(collection(this.db, "gameTables"));
+    getMaps.forEach((doc) => {
+      this.gameMaps.push(doc.id)
+      
+    });
+
     const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
     this.gameTable  = await (await getDoc(gameTableRef)).data();
 
@@ -109,7 +117,37 @@ export class GameService {
     this.actualTurnPlayer.canDice = false;
 
   }
+  payTaxes(cardIndex:number){
+    if(this.gameTable.cards[cardIndex].owner){
+      const amount = parseInt(this.calculateTaxesToPay(cardIndex));
+      this.actualTurnPlayer.money -= amount;
+      const playerToPay = this.players.find(player => player.name == this.gameTable.cards[cardIndex].owner).money +=amount;;
+    }
+  }
+  calculateTaxesToPay(cardIndex:number){
+    if(this.gameTable.cards[cardIndex].completedSeries){
+      if(this.gameTable.cards[cardIndex].hotelCounter){
+        this.gameTable.cards[cardIndex].rentCosts.hotel;
+      }else if(this.gameTable.cards[cardIndex].housesCounter){
+        switch(this.gameTable.cards[cardIndex].hotelCounter){
+          case 1:
+            return this.gameTable.cards[cardIndex].rentCosts.one;
+          case 2:
+            return this.gameTable.cards[cardIndex].rentCosts.two;
+          case 3:
+            return this.gameTable.cards[cardIndex].rentCosts.three;
+          case 4:
+            return this.gameTable.cards[cardIndex].rentCosts.four;
+        }
+      }else{
+        return this.gameTable.cards[cardIndex].rentCosts.completedSeriesBasic;
+      }
+    }else if(!this.gameTable.cards[cardIndex].completedSeries){
+      return this.gameTable.cards[cardIndex].rentCosts.normal;
+    }
+  }
 
+  //MANAGE PROPERTIES
   buyProperty(property:any){
     this.actualTurnPlayer.money -= property.cost;
     property.canBuy = false;
@@ -126,7 +164,6 @@ export class GameService {
     property.owner = "";
 
   }
-
   distrainProperty(property:any){
     property.distrained = true;
     this.actualTurnPlayer.money += property.distrainedCost;
@@ -136,6 +173,15 @@ export class GameService {
     this.actualTurnPlayer.money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
   }
 
+  managePropertyHouses(action:string, propIndex:number, numHouses:number){
+    if(action == 'Add'){
+      this.gameTable.cards[propIndex].housesCounter += numHouses;
+    }else if(action == 'Remove'){
+      this.gameTable.cards[propIndex].housesCounter -= numHouses;
+    }
+  }
+
+  //DIALOGS
   openCardDialog(card:object){
     this.cardInfoRef = this.dialog.open(CardDialogComponent, {
       width: '450px',
@@ -147,11 +193,6 @@ export class GameService {
       }
     });
   }
-
-  checkBankrupt(){
-    if(!this.actualTurnPlayer.properties.length && this.actualTurnPlayer.money ==0){}
-  }
-
   openExchangeDialog(){
     this.cardInfoRef = this.dialog.open(ExchangeComponent, {
       width: '60%',
@@ -163,6 +204,13 @@ export class GameService {
       }
     });
   }
+
+  //BANKRUPT
+  checkBankrupt(){
+    if(!this.actualTurnPlayer.properties.length && this.actualTurnPlayer.money ==0){}
+  }
+
+  
   /////////////////DELETE
   async setDB(){
     let cardsData = [];
@@ -178,7 +226,7 @@ export class GameService {
         completedSeries: false,
         rentCosts : {
           normal: '10',
-          completedSeriesZero:'',
+          completedSeriesBasic:'20',
           one: '30',
           two: '80',
           three: '120',
@@ -187,6 +235,8 @@ export class GameService {
         },
         housesCounter:0,
         hotelCounter:0,
+        houseCost:50,
+        hotelCost:50,
       })
     }
     await setDoc(doc(this.db, "gameTables", "testMap"), {cards: cardsData});

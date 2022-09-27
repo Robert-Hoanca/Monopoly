@@ -106,10 +106,11 @@
             </mat-card>
         </div>
 
-
-        
-
-
+        <!---<div id="mapsContainer">
+            <mat-card *ngFor="let map of gameService.gameMaps">
+                <span>{{map}}</span>
+            </mat-card>
+        </div>-->
         <div id="startGame" fxLayoutAlign="center center">
             <button class="startGameBtn"  mat-raised-button (click)="gameService.startGame()" [disabled]="gameService.players.length<2">PLAY</button>
         </div>
