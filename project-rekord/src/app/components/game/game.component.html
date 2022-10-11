@@ -1,32 +1,36 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
-    <th-canvas  (onResize)=resizeCanvas($event) [style]="{background: this.gameService.sessionColor}" >
-        <th-scene [thStats]="false" >
-            <th-ambientLight></th-ambientLight>
-      
-                <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i"></app-card>
-
-
-                <th-object3D
-                    loadGLTF
-                    *ngFor="let player of gameService.players"
-                    [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '.gltf'"
-                    [position]="player.pawn.position"
-                    [scale]="player.pawn.scale"
-                >
-                </th-object3D>
-
-
+    <th-canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions"><!--[style]="{background: this.gameService.sessionColor}" -->
+        <th-scene [thStats]="true" [background]="['#ffff00']" >
             
+            <th-ambientLight [color]="['#808080']"> </th-ambientLight>
+            <th-pointLight
+            #light
+            [castShadow]="true"
+            [shadowMapHeight]="1024"
+            [shadowMapWidth]="1024"
+            [position]="[-10,5,-10]"
+            ></th-pointLight>
       
-                <th-perspectiveCamera
-                    [args]="[75, 2, 0.1, 1000]"
-                    [position]="gameService.cameraPosition"
-                >
-                    <!--<th-orbitControls></th-orbitControls>-->
-                    <th-mapControls></th-mapControls>
-                </th-perspectiveCamera>
-          
+            <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i"></app-card>
+            <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
+
+            <th-object3D
+                    loadGLTF
+                    [url]="'/assets/blenderModels/Maps/islandMap.gltf'"
+                    [position]="[10,0,10]"
+                    [receiveShadow]="true"
+            >
+            </th-object3D>
+
+            <th-perspectiveCamera
+                [args]="[75, 2, 0.1, 1000]"
+                [lookAt]="[0, 0, 0]"
+                [position]="gameService.cameraPosition"
+            >
+                <!--<th-orbitControls></th-orbitControls>-->
+                <th-mapControls></th-mapControls>
+            </th-perspectiveCamera>
         </th-scene>
       </th-canvas>
       

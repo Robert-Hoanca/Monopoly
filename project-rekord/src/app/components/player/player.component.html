@@ -1,0 +1,11 @@
+<th-object3D
+    loadGLTF
+    [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '.gltf'"
+    [position]="player.pawn.position"
+    [scale]="player.pawn.scale"
+    [receiveShadow]="true"
+    [castShadow]="true"
+    [onBeforeRender]="enableShadow(playerRef.objRef, this)"
+    #playerRef
+>
+</th-object3D>
