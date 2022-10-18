@@ -107,15 +107,46 @@ export class GameService {
   }
 
   rollTheDice(){
-    const num = Math.round(Math.random() * (12 - 1) + 1);
-    this.diceNumber =( num + this.actualTurnPlayer.actualCard);
-    if(this.diceNumber && this.diceNumber > this.gameTable.cards.length){
-      this.diceNumber = 0 + ((num-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
+    if(!this.actualTurnPlayer.inPrison){
+      const dice1 = Math.round(Math.random() * (6 - 1) + 1);
+      const dice2 = Math.round(Math.random() * (6 - 1) + 1);
+      if(dice1==dice1){
+        this.actualTurnPlayer.prison.doubleDiceCounter++;
+      }else{
+        this.actualTurnPlayer.prison.doubleDiceCounter=0;
+      }
+      this.diceNumber =( (dice1+dice2) + this.actualTurnPlayer.actualCard);
+      if(this.diceNumber && this.diceNumber > this.gameTable.cards.length){
+        this.diceNumber = 0 + (((dice1+dice2)-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
+      }
+      this.actualTurnPlayer.actualCard = this.diceNumber;
+      this.getCardPosition$.next(this.diceNumber);
+      this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].cardType)
+      this.actualTurnPlayer.canDice = false;
+    }else{
+     this.whatToDoInprison('prisonRoll')
     }
-    this.actualTurnPlayer.actualCard = this.diceNumber;
-    this.getCardPosition$.next(this.diceNumber);
-    this.actualTurnPlayer.canDice = false;
+  }
 
+  whatToDoInprison(action:string){
+    if(action == 'payToExit'){
+      this.actualTurnPlayer.money-=50;
+      this.actualTurnPlayer.prison.inPrison=false;
+      this.actualTurnPlayer.prison.doubleDiceCounter=0;
+      //this.actualTurnPlayer.canDice = true;
+    }else if(action == 'prisonRoll'){
+      const num1 = Math.round(Math.random() * (6 - 1) + 1);
+      const num2 = Math.round(Math.random() * (6 - 1) + 1);
+      if(num1 == num2){
+        this.actualTurnPlayer.prison.inPrison=false;
+        this.actualTurnPlayer.actualCard = (num1+num2);
+        this.getCardPosition$.next(num1+num2);
+        this.actualTurnPlayer.canDice = false;
+      }else{
+        this.actualTurnPlayer.canDice = false;
+        this.nextTurn();
+      }
+    }
   }
   payTaxes(cardIndex:number){
     if(this.gameTable.cards[cardIndex].owner){
@@ -144,6 +175,17 @@ export class GameService {
       }
     }else if(!this.gameTable.cards[cardIndex].completedSeries){
       return this.gameTable.cards[cardIndex].rentCosts.normal;
+    }
+  }
+
+  whichPropertyAmI(propType:string){
+    if(propType == 'goToPrison' || this.actualTurnPlayer.prison.doubleDiceCounter == 3){
+      alert("going to prison")
+      this.actualTurnPlayer.prison.inPrison = true;
+      this.actualTurnPlayer.actualCard = 10;
+      this.getCardPosition$.next(10);
+      this.actualTurnPlayer.canDice=false;
+      this.nextTurn()
     }
   }
 
@@ -207,6 +249,7 @@ export class GameService {
 
   //BANKRUPT
   checkBankrupt(){
+    //NGONCHANGES DI ANGULAR PER VEDERE QUANDO (VARIABILE = actualplayer.money) E' CAMBIATA
     if(!this.actualTurnPlayer.properties.length && this.actualTurnPlayer.money ==0){}
   }
 
@@ -215,31 +258,133 @@ export class GameService {
   async setDB(){
     let cardsData = [];
     for (let index = 0; index < 40; index++) {
-      cardsData.push({
-        canBuy: true,
-        cost: 50,
-        distrained: false,
-        distrainedCost: 60,
-        name: "Cella " + index,
-        owner: "",
-        exchangeSelected: false,
-        completedSeries: false,
-        rentCosts : {
-          normal: '10',
-          completedSeriesBasic:'20',
-          one: '30',
-          two: '80',
-          three: '120',
-          four:'200',
-          hotel:'350'
-        },
-        housesCounter:0,
-        hotelCounter:0,
-        houseCost:50,
-        hotelCost:50,
-      })
+
+      //NORMAL PROPERTIES
+      if(index != 0 && index !=2 && index != 4 && index != 5 && index != 7 && index != 10 &&
+        index != 12 &&index != 15 &&index != 17 &&index != 20 && index != 22 &&index != 25 &&index != 28 &&
+        index != 30 &&index != 33 &&index != 35 &&index != 36 && index != 38){
+          cardsData.push({
+            canBuy: true,
+            cost: 50,
+            distrained: false,
+            distrainedCost: 60,
+            name: "Cella " + index,
+            owner: "",
+            cardType:'property',
+            exchangeSelected: false,
+            completedSeries: false,
+            rentCosts : {
+              normal: '10',
+              completedSeriesBasic:'20',
+              one: '30',
+              two: '80',
+              three: '120',
+              four:'200',
+              hotel:'350'
+            },
+            housesCounter:0,
+            hotelCounter:0,
+            houseCost:50,
+            hotelCost:50,
+          })
+      }else if(index == 7 || index == 22 || index == 36){//CHANCE
+        cardsData.push({
+          canBuy: false,
+          distrained: false,
+          name: "Chance " + index,
+          cardType:'chance',
+          chances : [
+
+          ],
+        })
+      }else if(index == 2 || index == 17 || index == 33){//CHESTS
+        cardsData.push({
+          canBuy: false,
+          name: "Chest " + index,
+          cardType:'chest',
+          chests : [
+            
+          ],
+        })
+      }else if(index == 30){//GO TO PRISON
+        cardsData.push({
+          canBuy: false,
+          name: "Prison " + index,
+          cardType:'goToPrison',
+        })
+      }else if(index == 20){//PARKING AREA
+        cardsData.push({
+          canBuy: false,
+          name: "Parking " + index,
+          cardType:'parkArea',
+        })
+      }else if(index == 4 || index == 38){//TAXES
+        cardsData.push({
+          canBuy: false,
+          name: "Taxes " + index,
+          cardType:'taxes',
+          taxesCost: 100,
+        })
+      }else if(index == 5 || index == 15 ||  index == 25 || index == 35){//unforeseen
+        cardsData.push({
+          canBuy: true,
+          cost: 200,
+          distrained: false,
+          distrainedCost: 60,
+          name: "Cella " + index,
+          owner: "",
+          cardType:'station',
+          exchangeSelected: false,
+          completedSeries: false,
+          rentCosts : {
+            one: '50',
+            two: '100',
+            three: '150',
+            four:'200',
+          },
+          numOfStations:0
+        })
+      }else if(index == 10){//PRISON
+        cardsData.push({
+          canBuy: false,
+          name: "Prison stay " + index,
+          cardType:'prison',
+        })
+      }else if(index == 12 || index == 28){//PLANT
+        cardsData.push({
+          canBuy: true,
+          cost: 150,
+          distrained: false,
+          distrainedCost: 60,
+          name: "Plant " + index,
+          owner: "",
+          cardType:'plant',
+          exchangeSelected: false,
+          completedSeries: false,
+          rentCosts : {
+            one: 4,
+            two: 10,
+          },
+          numOfPlants:0
+        })
+      }else if(index == 0){//START
+        cardsData.push({
+          canBuy: false,
+          name: "Start " + index,
+          cardType:'start',
+          reward: 200,
+        })
+      }
+
+
+      console.log(index)
     }
     await setDoc(doc(this.db, "gameTables", "testMap"), {cards: cardsData});
+  }
 
+  test(){
+    this.actualTurnPlayer.actualCard = 30;
+    this.getCardPosition$.next(30);
+    this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].cardType)
   }
 }

@@ -16,13 +16,13 @@ import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 export class CardComponent implements OnInit {
   @Input() card!: any;
   @Input() cardIndex!: any;
+  @Input() scene!: any;
   url:string='';
   position: [x: number, y: number, z: number] = [0, 0, 0];
   rotation: [x: number, y: number, z: number] = [0, 0, 0];
   meshColor:string='#ffff00';
   getCardPosition$: Subscription | undefined;
   castedShadow:boolean=false;
-
   fontLoader = new FontLoader();
   @ViewChild('cardRef', { static: true }) cardRef:any;
 
@@ -35,14 +35,15 @@ export class CardComponent implements OnInit {
       if(diceNumber == this.cardIndex){
         this.gameService.actualTurnPlayer.pawn.position =  this.position;
         this.gameService.actualTurnPlayer.pawn.position[1] = 0.2;
-        this.gameService.payTaxes(this.cardIndex);
+        //this.gameService.payTaxes(this.cardIndex);
         //this.gameService.cameraPosition = [  (this.gameService.cameraPosition[0] + 0.01), this.gameService.cameraPosition[1], this.position[2]]
       }
     });
+    
   }
 
   ngAfterViewInit(){
-    this.loadText()
+    //this.loadText()
   }
 
   enableShadow(element:any, that:any){
@@ -87,7 +88,8 @@ export class CardComponent implements OnInit {
   
 
   loadText(){
-    this.fontLoader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+    let that=this;
+    this.fontLoader.load( 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond&family=Spline+Sans:wght@400;700&display=swap', function (  this: any ,font: any) {
 
       const geometry = new TextGeometry( 'Hello three.js!', {
         font: font,
@@ -100,12 +102,24 @@ export class CardComponent implements OnInit {
         bevelOffset: 0,
         bevelSegments: 5
       } );
+      geometry.computeBoundingBox();
+      const material = new THREE.MeshBasicMaterial();
+      
+      const cube = new THREE.Mesh( geometry, material );
+      cube.position.x = 0;
+      cube.position.y = 5;
+      cube.position.z = 0;
+      this.scene.objRef.children.push(cube)
+      console.log("added")
+      console.log(this.scene)
     } );
+
+
   }
 
 
   test(){
-    console.log("card position: ", this.position)
-    console.log("card index:", this.cardIndex)
+   // console.log("card position: ", this.position)
+   // console.log("card index:", this.cardIndex)
   }
 }

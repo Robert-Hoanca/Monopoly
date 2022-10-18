@@ -1,7 +1,7 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
     <th-canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions"><!--[style]="{background: this.gameService.sessionColor}" -->
-        <th-scene [thStats]="true" [background]="['#ffff00']" >
+        <th-scene [thStats]="true" #scene> <!-- [background]="['#ffff00']" -->
             
             <th-ambientLight [color]="['#808080']"> </th-ambientLight>
             <th-pointLight
@@ -12,7 +12,7 @@
             [position]="[-10,5,-10]"
             ></th-pointLight>
       
-            <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i"></app-card>
+            <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
 
             <th-object3D
@@ -55,10 +55,12 @@
         <button mat-raised-button id="nextTurnBtn" *ngIf="gameService.diceNumber" (click)="gameService.nextTurn()">next turn</button>
 
         <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()"><mat-icon>casino</mat-icon></button>
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.inPrison && gameService.actualTurnPlayer.canDice" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
 
     </div>
 
     
+    <button mat-raised-button id="blblbl" (click)="gameService.test()">gotoprison</button>
     <!--
         DELETE
         <button mat-raised-button id="blblbl" (click)="gameService.test()">click me</button>

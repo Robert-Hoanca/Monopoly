@@ -3,7 +3,7 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name?  gameService.openCardDialog(card): '';test()"
+    (onClick)="((cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.name) && card.canBuy)?  gameService.openCardDialog(card): '';test()"
     [receiveShadow]="true"
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
