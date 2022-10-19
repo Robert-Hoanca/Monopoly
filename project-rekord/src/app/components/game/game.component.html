@@ -55,7 +55,7 @@
         <button mat-raised-button id="nextTurnBtn" *ngIf="gameService.diceNumber" (click)="gameService.nextTurn()">next turn</button>
 
         <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()"><mat-icon>casino</mat-icon></button>
-        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.inPrison && gameService.actualTurnPlayer.canDice" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
 
     </div>
 

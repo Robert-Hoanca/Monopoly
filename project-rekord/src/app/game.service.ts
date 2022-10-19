@@ -105,12 +105,14 @@ export class GameService {
     this.actualTurnPlayer.canDice = true;
     this.diceNumber = undefined;
   }
+  movePlayer(){
 
+  }
   rollTheDice(){
-    if(!this.actualTurnPlayer.inPrison){
+    if(!this.actualTurnPlayer.prison.inPrison){
       const dice1 = Math.round(Math.random() * (6 - 1) + 1);
       const dice2 = Math.round(Math.random() * (6 - 1) + 1);
-      if(dice1==dice1){
+      if(dice1==dice2){
         this.actualTurnPlayer.prison.doubleDiceCounter++;
       }else{
         this.actualTurnPlayer.prison.doubleDiceCounter=0;
@@ -121,8 +123,8 @@ export class GameService {
       }
       this.actualTurnPlayer.actualCard = this.diceNumber;
       this.getCardPosition$.next(this.diceNumber);
-      this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].cardType)
       this.actualTurnPlayer.canDice = false;
+      this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].cardType)
     }else{
      this.whatToDoInprison('prisonRoll')
     }
@@ -130,24 +132,39 @@ export class GameService {
 
   whatToDoInprison(action:string){
     if(action == 'payToExit'){
-      this.actualTurnPlayer.money-=50;
-      this.actualTurnPlayer.prison.inPrison=false;
-      this.actualTurnPlayer.prison.doubleDiceCounter=0;
-      //this.actualTurnPlayer.canDice = true;
+      this.exitFromPrison(true, false);
     }else if(action == 'prisonRoll'){
-      const num1 = Math.round(Math.random() * (6 - 1) + 1);
-      const num2 = Math.round(Math.random() * (6 - 1) + 1);
-      if(num1 == num2){
-        this.actualTurnPlayer.prison.inPrison=false;
-        this.actualTurnPlayer.actualCard = (num1+num2);
-        this.getCardPosition$.next(num1+num2);
-        this.actualTurnPlayer.canDice = false;
+      const dice1 = Math.round(Math.random() * (6 - 1) + 1);
+      const dice2 = Math.round(Math.random() * (6 - 1) + 1);
+      console.log(dice1)
+      console.log(dice2)
+      if(dice1 == dice2){
+        this.exitFromPrison(false, true,dice1,dice2);
+        
+      }else if(this.actualTurnPlayer.prison.inPrisonTurnCounter == 2){
+        console.log("three turns passed")
+        this.exitFromPrison(true, true,dice1,dice2);
       }else{
-        this.actualTurnPlayer.canDice = false;
-        this.nextTurn();
+        this.actualTurnPlayer.prison.inPrisonTurnCounter++;
       }
+      this.actualTurnPlayer.canDice = false;
+      this.nextTurn();
     }
   }
+
+  exitFromPrison(shouldPay:boolean, exitFromDice:boolean, dice1?:number, dice2?:number){
+    if(shouldPay){
+      this.actualTurnPlayer.money-=50;
+    }
+    if(exitFromDice && dice1 && dice2){
+      this.actualTurnPlayer.actualCard += (dice1+dice2);
+      this.getCardPosition$.next(this.actualTurnPlayer.actualCard);
+    }
+    this.actualTurnPlayer.prison.inPrison=false;
+    this.actualTurnPlayer.prison.doubleDiceCounter=0;
+    this.actualTurnPlayer.prison.inPrisonTurnCounter=0;
+  }
+
   payTaxes(cardIndex:number){
     if(this.gameTable.cards[cardIndex].owner){
       const amount = parseInt(this.calculateTaxesToPay(cardIndex));
