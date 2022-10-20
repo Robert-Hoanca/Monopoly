@@ -33,8 +33,9 @@ export class CardComponent implements OnInit {
     this.setCardPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
       if(diceNumber == this.cardIndex){
-        this.gameService.actualTurnPlayer.pawn.position =  this.position;
-        this.gameService.actualTurnPlayer.pawn.position[1] = 0.2;
+        this.gameService.setPlayerPosition(this.position);
+        //this.gameService.actualTurnPlayer.pawn.position =  this.position;
+        //this.gameService.actualTurnPlayer.pawn.position[1] = 0.2;
         //this.gameService.payTaxes(this.cardIndex);
         //this.gameService.cameraPosition = [  (this.gameService.cameraPosition[0] + 0.01), this.gameService.cameraPosition[1], this.position[2]]
       }

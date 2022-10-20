@@ -110,16 +110,15 @@ export class GameService {
   }
   rollTheDice(){
     if(!this.actualTurnPlayer.prison.inPrison){
-      const dice1 = Math.round(Math.random() * (6 - 1) + 1);
-      const dice2 = Math.round(Math.random() * (6 - 1) + 1);
-      if(dice1==dice2){
+      const diceRes = this.getDiceRoll();
+      if(diceRes[0]==diceRes[1]){
         this.actualTurnPlayer.prison.doubleDiceCounter++;
       }else{
         this.actualTurnPlayer.prison.doubleDiceCounter=0;
       }
-      this.diceNumber =( (dice1+dice2) + this.actualTurnPlayer.actualCard);
+      this.diceNumber =( (diceRes[0]+diceRes[1]) + this.actualTurnPlayer.actualCard);
       if(this.diceNumber && this.diceNumber > this.gameTable.cards.length){
-        this.diceNumber = 0 + (((dice1+dice2)-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
+        this.diceNumber = 0 + (((diceRes[0]+diceRes[1])-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
       }
       this.actualTurnPlayer.actualCard = this.diceNumber;
       this.getCardPosition$.next(this.diceNumber);
@@ -130,20 +129,29 @@ export class GameService {
     }
   }
 
+  getDiceRoll(){
+    //ADD doubleDiceCounter COLORING TO THE DICE
+    const dice1 = Math.round(Math.random() * (6 - 1) + 1);
+    const dice2 = Math.round(Math.random() * (6 - 1) + 1);
+    return [dice1,dice2];
+  }
+
+  setPlayerPosition(cardPosition:Array<number>){
+    this.actualTurnPlayer.pawn.position =  cardPosition;
+    this.actualTurnPlayer.pawn.position[1] = 0.2;
+
+  }
+
   whatToDoInprison(action:string){
     if(action == 'payToExit'){
       this.exitFromPrison(true, false);
     }else if(action == 'prisonRoll'){
-      const dice1 = Math.round(Math.random() * (6 - 1) + 1);
-      const dice2 = Math.round(Math.random() * (6 - 1) + 1);
-      console.log(dice1)
-      console.log(dice2)
-      if(dice1 == dice2){
-        this.exitFromPrison(false, true,dice1,dice2);
+      const diceRes = this.getDiceRoll();
+      if(diceRes[0] == diceRes[1]){
+        this.exitFromPrison(false, true,diceRes[0],diceRes[1]);
         
       }else if(this.actualTurnPlayer.prison.inPrisonTurnCounter == 2){
-        console.log("three turns passed")
-        this.exitFromPrison(true, true,dice1,dice2);
+        this.exitFromPrison(true, true,diceRes[0],diceRes[1]);
       }else{
         this.actualTurnPlayer.prison.inPrisonTurnCounter++;
       }
