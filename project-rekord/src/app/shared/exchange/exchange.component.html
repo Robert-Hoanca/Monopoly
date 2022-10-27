@@ -6,7 +6,7 @@
         </button>
     </div>
 
-    <div *ngIf="playerToExchangeWith" fxLayout="row" fxLayoutAlign="space-around center">
+    <div *ngIf="playerToExchangeWith && !startExchange" fxLayout="row" fxLayoutAlign="space-around center">
 
         <button mat-raised-button (click)="goBackToSelection()" class="exchangeGoBackBtn"><mat-icon>arrow_back</mat-icon></button>
 
@@ -15,7 +15,7 @@
                 <span>{{gameService.actualTurnPlayer.name}}</span>
     
                 <div>
-                    <mat-card *ngFor="let property of gameService.actualTurnPlayer.properties" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
+                    <mat-card *ngFor="let property of actualPlayerProps" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
                 </div>
     
                 <mat-form-field appearance="fill">
@@ -28,7 +28,7 @@
                 <span>{{playerToExchangeWith.name}}</span>
     
                 <div>
-                    <mat-card *ngFor="let property of playerToExchangeWith.properties" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
+                    <mat-card *ngFor="let property of playerToExchangeProps" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
                 </div>
                 <mat-form-field appearance="fill">
                     <mat-label>Player 2</mat-label>
@@ -36,8 +36,16 @@
                 </mat-form-field>
             </mat-card>
         </div>
-
-        <button mat-raised-button (click)="finaliseExchange()" class="exchangeFinaliseBtn"> <mat-icon>currency_exchange</mat-icon> </button>
+        <button mat-raised-button (click)="startExchange = true"> <mat-icon>currency_exchange</mat-icon> </button>
+        
     </div>
+
+
+
+    <div *ngIf="startExchange">
+        <button mat-raised-button (click)="finaliseExchange('refuse')"> <mat-icon>close</mat-icon> </button>
+        <button mat-raised-button (click)="finaliseExchange('accept')"> <mat-icon>done</mat-icon> </button>
+    </div>
+
 
 </div>

@@ -44,28 +44,26 @@
     </div>
 
     <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
-        <button mat-raised-button id="seeProperties" *ngIf="gameService.diceNumber" [matMenuTriggerFor]="propertiesMenu" [disabled]="!gameService.actualTurnPlayer.properties.length"><mat-icon>view_carousel</mat-icon></button>
+        <button mat-raised-button id="seeProperties" *ngIf="!gameService.actualTurnPlayer.canDice" [matMenuTriggerFor]="propertiesMenu" [disabled]="!getActualPlayerProps().length"><mat-icon>view_carousel</mat-icon></button>
         <mat-menu #propertiesMenu="matMenu">
-            <button mat-menu-item *ngFor="let property of gameService.actualTurnPlayer.properties" (click)="gameService.openCardDialog(property)">{{property.name}}</button>
+            <button mat-menu-item *ngFor="let property of getActualPlayerProps()" (click)="gameService.openCardDialog(property)">{{property.name}}</button>
         </mat-menu>
 
 
-          <button mat-raised-button id="openExchange" *ngIf="gameService.diceNumber" (click)="gameService.openExchangeDialog()"><mat-icon>currency_exchange</mat-icon></button>
+          <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()"><mat-icon>currency_exchange</mat-icon></button>
 
-        <button mat-raised-button id="nextTurnBtn" *ngIf="gameService.diceNumber" (click)="gameService.nextTurn()">next turn</button>
+        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.nextTurn()">next turn</button>
 
         <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()"><mat-icon>casino</mat-icon></button>
         <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
 
     </div>
-
-    
     
     <!--
         DELETE
+    <button mat-raised-button id="blblbl" (click)="gameService.test()">buy properties</button>
+    <button mat-raised-button (click)="gameService.setDB()">Set db</button>
         <button mat-raised-button id="blblbl" (click)="gameService.test()">click me</button>
-        <button mat-raised-button (click)="gameService.setDB()">Set db</button>
-        <button mat-raised-button id="blblbl" (click)="gameService.test()">gotoprison</button>
     -->
         
        

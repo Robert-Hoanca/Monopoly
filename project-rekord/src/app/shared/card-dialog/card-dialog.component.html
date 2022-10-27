@@ -4,11 +4,11 @@
 
 
     <button mat-raised-button (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy">Compra</button>
-    <button mat-raised-button  *ngIf="data.card.owner == gameService.actualTurnPlayer.name" (click)="gameService.sellProperty(data.card);close()">Vendi</button>
+    <button mat-raised-button  *ngIf="data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.sellProperty(data.card);close()">Vendi</button>
    
-    <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.actualTurnPlayer.name" (click)="gameService.distrainProperty(data.card);close()">Pignora</button>
+    <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.distrainProperty(data.card);close()">Pignora</button>
 
-    <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.actualTurnPlayer.name" (click)="gameService.cancelDistrainedFromProperty(data.card)">Remove pignora</button>
+    <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.cancelDistrainedFromProperty(data.card)">Remove pignora</button>
 
     <div *ngIf="data.card.completedSeries">
         <span>Manage Houses</span>

@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 
 @Component({
@@ -9,12 +10,17 @@ import { GameService } from 'src/app/game.service';
 })
 export class ExchangeComponent implements OnInit {
   playerToExchangeWith:any= '';
-  propertyToExchange:Array<any> = [[],[],];
+  playerToExchangeProps:Array<any> = [];
+  actualPlayerProps:Array<any> = [];
   moneyToExchange:Array<any> = [[0],[0],];
+  startExchange:boolean=false;
 
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<ExchangeComponent>, public gameService: GameService) { }
 
   ngOnInit(): void {
+   
+  }
+  ngAfterViewInit(){
   }
 
   close(): void {
@@ -25,48 +31,52 @@ export class ExchangeComponent implements OnInit {
     this.playerToExchangeWith = '';
     this.moneyToExchange[0]= 0;
     this.moneyToExchange[1]= 0;
+    this.startExchange = false;
   }
 
   getPlayersToExchangeWith(){
-    return this.gameService.players.filter(player => player.name !== this.gameService.actualTurnPlayer.name)
+    return this.gameService.players.filter(player => player.id !== this.gameService.actualTurnPlayer.id)
   }
 
   selectPlayerToExchange(player:any){
     this.playerToExchangeWith = player;
+    this.actualPlayerProps = this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.gameService.actualTurnPlayer.id)
+    this.playerToExchangeProps = this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == player.id)
   }
 
-  finaliseExchange(){
-    if(this.playerToExchangeWith.properties.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
-      this.playerToExchangeWith.properties.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).forEach((property: { name: any; }) => {
-        const propIndex =  this.playerToExchangeWith.properties.findIndex((propertyI: any) => propertyI.name == property.name);
-        if(propIndex>-1){
-          this.gameService.actualTurnPlayer.properties.push(this.playerToExchangeWith.properties.splice(propIndex, 1)[0]);
-          this.gameService.actualTurnPlayer.properties[this.gameService.actualTurnPlayer.properties.length - 1].exchangeSelected = false;
-        }
-        
-      });
-    }
-    if(this.gameService.actualTurnPlayer.properties.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
-      this.gameService.actualTurnPlayer.properties.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).forEach((property: { name: any; }) => {
-        const propIndex =  this.gameService.actualTurnPlayer.properties.findIndex((propertyI: any) => propertyI.name == property.name);
-        if(propIndex>-1){
-          this.playerToExchangeWith.properties.push(this.gameService.actualTurnPlayer.properties.splice(propIndex, 1)[0]);
-          this.playerToExchangeWith.properties[this.playerToExchangeWith.properties.length - 1].exchangeSelected = false;
-        }
-        
-      });
-    }
+  finaliseExchange(answer:string){
 
-    if(this.moneyToExchange[0]>0){
-        this.gameService.actualTurnPlayer.money -= this.moneyToExchange[0];
-        this.playerToExchangeWith.money += this.moneyToExchange[0];
-    }
-    if(this.moneyToExchange[1]>0){
-      this.gameService.actualTurnPlayer.money += this.moneyToExchange[1];
-      this.playerToExchangeWith.money -= this.moneyToExchange[1];
+    if(answer=='accept'){
+      if(this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
+        this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).forEach((property: {completedSeries: any; name: any;}) => {
+          const card = this.gameService.gameTable.cards.find((card: { name: any; })=>card.name == property.name);
+          card.owner = this.gameService.actualTurnPlayer.id;
+          card.exchangeSelected = false
+          if(!property.completedSeries){
+            this.gameService.checkCompletedSeries(property);
+          }
+        });
+      }
+      if(this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
+        this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).forEach((property: {completedSeries: any; name: any; }) => {
+          const card = this.gameService.gameTable.cards.find((card: { name: any; })=>card.name == property.name);
+          card.owner = this.playerToExchangeWith.id;
+          card.exchangeSelected = false
+          if(!property.completedSeries){
+            this.gameService.checkCompletedSeries(property)
+          }
+        });
+      }
+      if(this.moneyToExchange[0]>0){
+          this.gameService.actualTurnPlayer.money -= this.moneyToExchange[0];
+          this.playerToExchangeWith.money += this.moneyToExchange[0];
+      }
+      if(this.moneyToExchange[1]>0){
+        this.gameService.actualTurnPlayer.money += this.moneyToExchange[1];
+        this.playerToExchangeWith.money -= this.moneyToExchange[1];
+      }
     }
     this.goBackToSelection();
     this.close();
   }
-
 }

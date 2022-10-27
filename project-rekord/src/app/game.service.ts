@@ -10,6 +10,7 @@ import { Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CardDialogComponent } from './shared/card-dialog/card-dialog.component';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
+import * as uuid from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class GameService {
 
   choosenMode:string = '';
   db = getFirestore();
-  chosenMap:string = 'testMap';
+  chosenMap:string = 'monopolyMap';
 
   cameraPosition: [x: number, y: number, z: number] = [-5,5,-5];
   gameTable:any = {};
@@ -73,6 +74,7 @@ export class GameService {
     const type = this.specialPawn != ''? 'special' : 'normal';
     const newPlayer = JSON.parse(JSON.stringify(this.playersModel));
     newPlayer.name = name;
+    newPlayer.id = uuid.v4();
     newPlayer.money = 1500;
     newPlayer.pawn.choosenPawnLabel = type == 'normal'? this.pawnTypes[pawnIndex].name : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).name;
     newPlayer.pawn.choosenPawnValue =  type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).value;
@@ -81,6 +83,12 @@ export class GameService {
     this.players.push(newPlayer);
     type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1); 
     this.specialPawn= '';
+  }
+
+  setPlayerPosition(cardPosition:Array<number>){
+    this.actualTurnPlayer.pawn.position =  cardPosition;
+    this.actualTurnPlayer.pawn.position[1] = 0.2;
+
   }
 
   startGame(){
@@ -105,9 +113,6 @@ export class GameService {
     this.actualTurnPlayer.canDice = true;
     this.diceNumber = undefined;
   }
-  movePlayer(){
-
-  }
   rollTheDice(){
     if(!this.actualTurnPlayer.prison.inPrison){
       const diceRes = this.getDiceRoll();
@@ -117,13 +122,16 @@ export class GameService {
         this.actualTurnPlayer.prison.doubleDiceCounter=0;
       }
       this.diceNumber =( (diceRes[0]+diceRes[1]) + this.actualTurnPlayer.actualCard);
-      if(this.diceNumber && this.diceNumber > this.gameTable.cards.length){
+      if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
         this.diceNumber = 0 + (((diceRes[0]+diceRes[1])-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
       }
+      
+      this.checkIfHasPassedStart(this.actualTurnPlayer.actualCard, this.diceNumber);
       this.actualTurnPlayer.actualCard = this.diceNumber;
       this.getCardPosition$.next(this.diceNumber);
       this.actualTurnPlayer.canDice = false;
-      this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].cardType)
+      this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)])
+      this.payTaxes(this.gameTable.cards[(this.actualTurnPlayer.actualCard)],diceRes);
     }else{
      this.whatToDoInprison('prisonRoll')
     }
@@ -134,12 +142,6 @@ export class GameService {
     const dice1 = Math.round(Math.random() * (6 - 1) + 1);
     const dice2 = Math.round(Math.random() * (6 - 1) + 1);
     return [dice1,dice2];
-  }
-
-  setPlayerPosition(cardPosition:Array<number>){
-    this.actualTurnPlayer.pawn.position =  cardPosition;
-    this.actualTurnPlayer.pawn.position[1] = 0.2;
-
   }
 
   whatToDoInprison(action:string){
@@ -173,44 +175,73 @@ export class GameService {
     this.actualTurnPlayer.prison.inPrisonTurnCounter=0;
   }
 
-  payTaxes(cardIndex:number){
-    if(this.gameTable.cards[cardIndex].owner){
-      const amount = parseInt(this.calculateTaxesToPay(cardIndex));
+  payTaxes(property:any, diceNumber:Array<number>){
+    if(property.owner && property.owner!=this.actualTurnPlayer.id){
+      const amount = this.calculateTaxesToPay(property,diceNumber);
       this.actualTurnPlayer.money -= amount;
-      const playerToPay = this.players.find(player => player.name == this.gameTable.cards[cardIndex].owner).money +=amount;;
+      this.players.find(player => player.id == property.owner).money +=amount;
+      console.log("amount payed", amount)
     }
   }
-  calculateTaxesToPay(cardIndex:number){
-    if(this.gameTable.cards[cardIndex].completedSeries){
-      if(this.gameTable.cards[cardIndex].hotelCounter){
-        this.gameTable.cards[cardIndex].rentCosts.hotel;
-      }else if(this.gameTable.cards[cardIndex].housesCounter){
-        switch(this.gameTable.cards[cardIndex].hotelCounter){
-          case 1:
-            return this.gameTable.cards[cardIndex].rentCosts.one;
-          case 2:
-            return this.gameTable.cards[cardIndex].rentCosts.two;
-          case 3:
-            return this.gameTable.cards[cardIndex].rentCosts.three;
-          case 4:
-            return this.gameTable.cards[cardIndex].rentCosts.four;
+  calculateTaxesToPay(property:any, diceNumber:Array<number>){
+    if(property.cardType == 'property'){
+      if(property.completedSeries){
+        if(property.hotelCounter){
+          return property.rentCosts.hotel;
+        }else if(property.housesCounter){
+          switch(property.housesCounter){
+            case 1:
+              return property.rentCosts.one;
+            case 2:
+              return property.rentCosts.two;
+            case 3:
+              return property.rentCosts.three;
+            case 4:
+              return property.rentCosts.four;
+          }
+        }else{
+          return property.rentCosts.completedSeriesBasic;
         }
-      }else{
-        return this.gameTable.cards[cardIndex].rentCosts.completedSeriesBasic;
+      }else if(!property.completedSeries){
+        return property.rentCosts.normal;
       }
-    }else if(!this.gameTable.cards[cardIndex].completedSeries){
-      return this.gameTable.cards[cardIndex].rentCosts.normal;
+    }else if(property.cardType == 'station'){
+      const numOfStations = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'station').length; 
+      switch(numOfStations){
+        case 1:
+          return property.rentCosts.one;
+        case 2:
+          return property.rentCosts.two;
+        case 3:
+          return property.rentCosts.three;
+        case 4:
+          return property.rentCosts.four;
+      }
+    }else if(property.cardType == 'plant'){
+      const numOfPlants = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'plant').length;
+      switch(numOfPlants){
+        case 1:
+          return ((diceNumber[0] + diceNumber[1]) *4);
+        case 2:
+          return ((diceNumber[0] + diceNumber[1]) * 10);
+      }
     }
   }
 
-  whichPropertyAmI(propType:string){
-    if(propType == 'goToPrison' || this.actualTurnPlayer.prison.doubleDiceCounter == 3){
+  whichPropertyAmI(property:any){
+    if(property.cardType == 'goToPrison' || this.actualTurnPlayer.prison.doubleDiceCounter == 3){
       alert("going to prison")
       this.actualTurnPlayer.prison.inPrison = true;
       this.actualTurnPlayer.actualCard = 10;
       this.getCardPosition$.next(10);
       this.actualTurnPlayer.canDice=false;
       this.nextTurn()
+    }else if(property.cardType == 'taxes'){
+      this.actualTurnPlayer.money-= property.taxesCost;
+    }else if(property.cardType == 'chance'){
+
+    }else if(property.cardType == 'chest'){
+
     }
   }
 
@@ -218,8 +249,11 @@ export class GameService {
   buyProperty(property:any){
     this.actualTurnPlayer.money -= property.cost;
     property.canBuy = false;
-    property.owner = this.players[this.turn].name;
-    this.actualTurnPlayer.properties.push(JSON.parse(JSON.stringify(property)))
+    property.owner = this.players[this.turn].id;
+    //this.actualTurnPlayer.properties.push(JSON.parse(JSON.stringify(property)))
+    if(!property.completedSeries){
+      this.checkCompletedSeries(property);
+    }
   }
   sellProperty(property:any){
     if(!property.distrained){
@@ -227,32 +261,45 @@ export class GameService {
     }else{
       this.actualTurnPlayer.money +=  property.distrainedCost - ((property.distrainedCost / 100) * 50);
     }
+    this.checkCompletedSeries(property);
     property.canBuy = true;
     property.owner = "";
-
+    //this.actualTurnPlayer.properties.splice(this.actualTurnPlayer.properties.findIndex((prop: { name: any; }) => prop.name == property.name),1)
   }
   distrainProperty(property:any){
     property.distrained = true;
     this.actualTurnPlayer.money += property.distrainedCost;
+    this.checkCompletedSeries(property);
   }
   cancelDistrainedFromProperty(property:any){
     property.distrained = false;
     this.actualTurnPlayer.money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
+    this.checkCompletedSeries(property);
   }
-
-  managePropertyHouses(action:string, propIndex:number, numHouses:number){
-    if(action == 'Add'){
-      this.gameTable.cards[propIndex].housesCounter += numHouses;
-    }else if(action == 'Remove'){
-      this.gameTable.cards[propIndex].housesCounter -= numHouses;
+  checkCompletedSeries(property:any){
+    const groupCards = this.gameTable.cards.filter((card: { district: any; }) => card.district == property.district) //ALL CARDS
+    const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == this.actualTurnPlayer.id)
+    if(groupCards.length == ownerCards.length && ownerCards.findIndex((cardI: { distrained: any; }) => cardI.distrained)<0){
+      groupCards.forEach((card: { completedSeries: boolean; }) => {
+        if(!card.completedSeries){  card.completedSeries = true;}
+      });
+    }else{
+      groupCards.forEach((card: { completedSeries: boolean; }) => {
+        if(card.completedSeries){  card.completedSeries = false;}
+      });
     }
   }
 
+  checkIfHasPassedStart(beforeMove:number, afterMove:number|undefined){
+    if(afterMove && (afterMove < beforeMove)){
+      this.actualTurnPlayer.money+=200;
+    }
+  }
   //DIALOGS
   openCardDialog(card:object){
     this.cardInfoRef = this.dialog.open(CardDialogComponent, {
       width: '450px',
-      panelClass: 'cardInfo',
+      panelClass: 'propertyInfo',
       hasBackdrop: true,
       autoFocus: false,
       data: {
@@ -262,9 +309,7 @@ export class GameService {
   }
   openExchangeDialog(){
     this.cardInfoRef = this.dialog.open(ExchangeComponent, {
-      width: '60%',
-      height: '80%',
-      panelClass: 'cardInfo',
+      panelClass: 'exchangePanel',
       hasBackdrop: true,
       autoFocus: false,
       data: {
@@ -293,19 +338,20 @@ export class GameService {
             cost: 50,
             distrained: false,
             distrainedCost: 60,
-            name: "Cella " + index,
-            owner: "",
+            name: '',
+            owner: '',
             cardType:'property',
             exchangeSelected: false,
             completedSeries: false,
+            district:'',
             rentCosts : {
-              normal: '10',
-              completedSeriesBasic:'20',
-              one: '30',
-              two: '80',
-              three: '120',
-              four:'200',
-              hotel:'350'
+              normal: 10,
+              completedSeriesBasic: 20,
+              one: 30,
+              two: 80,
+              three: 120,
+              four: 200,
+              hotel: 350
             },
             housesCounter:0,
             hotelCounter:0,
@@ -316,7 +362,7 @@ export class GameService {
         cardsData.push({
           canBuy: false,
           distrained: false,
-          name: "Chance " + index,
+          name: "Chance",
           cardType:'chance',
           chances : [
 
@@ -325,7 +371,7 @@ export class GameService {
       }else if(index == 2 || index == 17 || index == 33){//CHESTS
         cardsData.push({
           canBuy: false,
-          name: "Chest " + index,
+          name: "Chest",
           cardType:'chest',
           chests : [
             
@@ -334,45 +380,46 @@ export class GameService {
       }else if(index == 30){//GO TO PRISON
         cardsData.push({
           canBuy: false,
-          name: "Prison " + index,
+          name: "Prison",
           cardType:'goToPrison',
         })
       }else if(index == 20){//PARKING AREA
         cardsData.push({
           canBuy: false,
-          name: "Parking " + index,
+          name: "Parking Area",
           cardType:'parkArea',
         })
       }else if(index == 4 || index == 38){//TAXES
         cardsData.push({
           canBuy: false,
-          name: "Taxes " + index,
+          name: "Taxes",
           cardType:'taxes',
           taxesCost: 100,
         })
-      }else if(index == 5 || index == 15 ||  index == 25 || index == 35){//unforeseen
+      }else if(index == 5 || index == 15 ||  index == 25 || index == 35){//STATIONS
         cardsData.push({
           canBuy: true,
           cost: 200,
           distrained: false,
           distrainedCost: 60,
-          name: "Cella " + index,
+          name: "Train Station",
           owner: "",
           cardType:'station',
+          district:'station',
           exchangeSelected: false,
           completedSeries: false,
           rentCosts : {
-            one: '50',
-            two: '100',
-            three: '150',
-            four:'200',
+            one: 50,
+            two: 100,
+            three: 150,
+            four: 200,
           },
-          numOfStations:0
+          //numOfStations:0
         })
       }else if(index == 10){//PRISON
         cardsData.push({
           canBuy: false,
-          name: "Prison stay " + index,
+          name: "Prison Area",
           cardType:'prison',
         })
       }else if(index == 12 || index == 28){//PLANT
@@ -381,35 +428,93 @@ export class GameService {
           cost: 150,
           distrained: false,
           distrainedCost: 60,
-          name: "Plant " + index,
+          name: "",
           owner: "",
           cardType:'plant',
+          district:'plant',
           exchangeSelected: false,
           completedSeries: false,
-          rentCosts : {
-            one: 4,
-            two: 10,
-          },
-          numOfPlants:0
+          //numOfPlants:0
         })
       }else if(index == 0){//START
         cardsData.push({
           canBuy: false,
-          name: "Start " + index,
+          name: "Start",
           cardType:'start',
           reward: 200,
         })
       }
-
-
-      console.log(index)
     }
-    await setDoc(doc(this.db, "gameTables", "testMap"), {cards: cardsData});
+//DistrictName
+    cardsData[1].district = 'brown';
+    cardsData[3].district = 'brown';
+    cardsData[1].name = 'Old Kent Road';
+    cardsData[3].name = 'Whitechapel Road';
+
+    cardsData[6].district = 'cyan';
+    cardsData[8].district = 'cyan';
+    cardsData[9].district = 'cyan';
+    cardsData[6].name = 'The Angel Islington';
+    cardsData[8].name = 'Euston Road';
+    cardsData[9].name = 'Pentonville Road';
+
+    cardsData[11].district = 'magenta';
+    cardsData[13].district = 'magenta';
+    cardsData[14].district = 'magenta';
+    cardsData[11].name = 'Pall Mall';
+    cardsData[13].name = 'Whitehall';
+    cardsData[14].name = 'Northumberland Avenue';
+
+    cardsData[16].district = 'orange';
+    cardsData[18].district = 'orange';
+    cardsData[19].district = 'orange';
+    cardsData[16].name = 'Bow Street';
+    cardsData[18].name = 'Marlborough Street';
+    cardsData[19].name = 'Vine Street';
+
+    cardsData[21].district = 'red';
+    cardsData[23].district = 'red';
+    cardsData[24].district = 'red';
+    cardsData[21].name = 'The Strand';
+    cardsData[23].name = 'Fleet Street';
+    cardsData[24].name = 'Trafalgar Square';
+
+    cardsData[26].district = 'yellow';
+    cardsData[27].district = 'yellow';
+    cardsData[29].district = 'yellow';
+    cardsData[26].name = 'Leicester Square';
+    cardsData[27].name = 'Coventry Street';
+    cardsData[29].name = 'Piccadilli';
+    
+    cardsData[31].district = 'green';
+    cardsData[32].district = 'green';
+    cardsData[34].district = 'green';
+    cardsData[31].name = 'Regent Street';
+    cardsData[32].name = 'Oxford Street';
+    cardsData[34].name = 'Bond Street';
+
+    cardsData[37].district = 'blue';
+    cardsData[39].district = 'blue';
+    cardsData[37].name = 'Park Lan';
+    cardsData[39].name = 'Mayfair';
+
+    cardsData[12].name = 'Electric Company';
+    cardsData[28].name = 'Water Works';
+
+    cardsData[5].name = 'King Cross Station';
+    cardsData[15].name = 'Marylebone Station';
+    cardsData[25].name = 'Fenchurch St Station';
+    cardsData[35].name = 'Liverpool Street Station';
+
+    await setDoc(doc(this.db, "gameTables", "monopolyMap"), {cards: cardsData});
   }
 
   test(){
-    this.actualTurnPlayer.actualCard = 30;
-    this.getCardPosition$.next(30);
-    this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].cardType)
+   /* this.gameTable.cards.filter((card: { district: string; }) => card.district=='test2').forEach((card: {canBuy: any; owner: any; completedSeries: boolean; }) => {
+      card.canBuy = false;
+      card.owner = this.actualTurnPlayer.id;
+      card.completedSeries = true;
+      this.buyProperty(card)
+    });*/
   }
 }
