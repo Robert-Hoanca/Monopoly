@@ -11,27 +11,59 @@ import * as THREE from 'three'
 })
 export class GameComponent implements OnInit {
   @ViewChild('cardInfo', { static: true }) cardInfo:any;
+  @ViewChild('canvas', { static: true }) canvas:any;
   @ViewChild('scene', { static: true }) scene:any;
+  @ViewChild('camera', { static: true }) camera:any;
+  @ViewChild('light', { static: true }) light:any;
+  @ViewChild('ambientLight', { static: true }) ambientLight:any;
   actualPlayerProps:Array<any> = [];
 
-  rendererOptions:object={
-    shadowMapType: THREE.VSMShadowMap ,
+  //ADD OBJECTS TO SCENE
+  //this.scene.objRef.children.push( OBJECT );
+  rendererOptions:any={
+    /*shadowMap:{
+      enabled:true,
+      type:THREE.BasicShadowMap
+    },*/
     antialias: true,
+    outputEncoding: 3001,
+    toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
 
-  constructor(public gameService: GameService) { }
+  constructor(public gameService: GameService ) { }
 
   ngOnInit(): void {
     //let Sky = require('../../../assets/jsImports/Sky.js')
     //const sky =   new Sky();
     //console.log("sky", sky);
+
+   
   }
   ngAfterViewInit(){
+     //SetUp lights and shadow values
+     this.light.objRef.shadow.bias = -0.0009;//-0.0005
+     this.light.objRef.intensity=3;//2
+     this.ambientLight.objRef.intensity=2;//1
+
+     console.log(this.canvas)
+
+    // renderer.shadowMap.enabled = true;
+    //renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+
+     //const helper = new THREE.CameraHelper( this.camera.objRef );
+     
+     this.light.objRef.shadowMapHeight=2048; 
+     this.light.objRefshadowMapWidth=2048;
+     this.light.objRefshadowCameraLeft= -50;  
+     this.light.objRefshadowCameraRight= 50;
+     this.light.objRefshadowCameraBottom= -50; 
+      this.light.objRefshadowCameraTop= 50;
+
+
    // const sky = new Sky()
    // sky.scale.setScalar( 450000 );
-
    // this.scene.objRef.children.push( sky );
-  // console.log("scene: ", this.scene)
   }
 
   getActualPlayerProps(){

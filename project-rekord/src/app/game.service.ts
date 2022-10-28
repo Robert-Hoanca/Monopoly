@@ -5,12 +5,14 @@ import { Firestore, collectionData, collection, getFirestore, doc, getDoc, getDo
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
-import { FlexAlignStyleBuilder } from '@angular/flex-layout';
 import { Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CardDialogComponent } from './shared/card-dialog/card-dialog.component';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
 import * as uuid from 'uuid';
+import gsap from 'gsap'
+import { Vector3 } from 'three';
+import * as THREE from 'three';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +28,7 @@ export class GameService {
   db = getFirestore();
   chosenMap:string = 'monopolyMap';
 
-  cameraPosition: [x: number, y: number, z: number] = [-5,5,-5];
+  cameraPosition: Vector3 | [x: number, y: number, z: number] = [0,0,0];
   gameTable:any = {};
   gameMaps:any = [];
   cardsPositionCounter:number = 0;
@@ -51,11 +53,7 @@ export class GameService {
     const getMaps = await getDocs(collection(this.db, "gameTables"));
     getMaps.forEach((doc) => {
       this.gameMaps.push(doc.id)
-      
     });
-
-    const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
-    this.gameTable  = await (await getDoc(gameTableRef)).data();
 
     const playersModelRef = doc(this.db, "playerModel", 'playerModel');
     this.playersModel = await (await getDoc(playersModelRef)).data();
@@ -64,6 +62,8 @@ export class GameService {
     pawnTypesRef.forEach((doc) => {
       doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
     });
+
+    this.cameraPosition = new THREE.Vector3(-5,5,-5)
   }
 
   chooseSessionColor(){
@@ -87,11 +87,29 @@ export class GameService {
 
   setPlayerPosition(cardPosition:Array<number>){
     this.actualTurnPlayer.pawn.position =  cardPosition;
-    this.actualTurnPlayer.pawn.position[1] = 0.2;
+    
 
+    //console.log(this.cameraPosition)
+   // this.actualTurnPlayer.x= cardPosition[0]
+   // this.actualTurnPlayer.y= 0.2
+   // this.actualTurnPlayer.z= cardPosition[2]
+    //this.actualTurnPlayer.pawn.position.x = cardPosition[0];
+    //this.actualTurnPlayer.pawn.position.z = cardPosition[2];
+   // gsap.fromTo(this.cameraPosition, {x:-5}, {x:-15, duration: 1});
+    
+  /*  gsap.to(this.cameraPosition,{
+      x: 10,
+      y:0.2,
+      z:0,
+      duration: 5
+    })*/
+   // console.log( this.actualTurnPlayer.pawn.position)
   }
 
-  startGame(){
+  async startGame(){
+    const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
+    this.gameTable  = (await getDoc(gameTableRef)).data();
+
     this.router.navigateByUrl('game', { skipLocationChange: true })
     this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
     this.actualTurnPlayer = this.players[this.turn];

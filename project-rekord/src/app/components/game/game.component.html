@@ -1,32 +1,39 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
-    <th-canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions"><!--[style]="{background: this.gameService.sessionColor}" -->
+    <th-canvas #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions"><!--[style]="{background: this.gameService.sessionColor}" -->
         <th-scene [thStats]="true" #scene> <!-- [background]="['#ffff00']" -->
             
-            <th-ambientLight [color]="['#808080']"> </th-ambientLight>
+            <th-ambientLight [color]="['#808080']" #ambientLight> </th-ambientLight>
             <th-pointLight
             #light
             [castShadow]="true"
-            [shadowMapHeight]="1024"
-            [shadowMapWidth]="1024"
-            [position]="[-10,5,-10]"
+            [position]="[-15,10,-15]"
             ></th-pointLight>
-      
             <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
 
-            <th-object3D
+            <!--<th-object3D
                     loadGLTF
-                    [url]="'/assets/blenderModels/Maps/islandMap.gltf'"
+                    [url]="'/assets/blenderModels/card/island2.gltf'"
                     [position]="[10,0,10]"
+                    [scale]="[1,1,1]"
                     [receiveShadow]="true"
             >
-            </th-object3D>
+            </th-object3D>-->
+
+            <th-mesh
+            [position]="[0,-0.35,0]"
+                [scale]="[1000, 0.2, 1000]"
+                >
+                <th-boxGeometry></th-boxGeometry>
+                <th-meshBasicMaterial [args]="{color: '#A3F3F1'}"></th-meshBasicMaterial>
+            </th-mesh>
 
             <th-perspectiveCamera
                 [args]="[75, 2, 0.1, 1000]"
                 [lookAt]="[0, 0, 0]"
                 [position]="gameService.cameraPosition"
+                #camera
             >
                 <!--<th-orbitControls></th-orbitControls>-->
                 <th-mapControls></th-mapControls>

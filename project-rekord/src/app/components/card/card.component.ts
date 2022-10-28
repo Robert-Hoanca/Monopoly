@@ -29,7 +29,7 @@ export class CardComponent implements OnInit {
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
-    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/card_corner.gltf':'/assets/blenderModels/card/card.gltf';
+    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/testIslandCorner.gltf':'/assets/blenderModels/card/testIsland.gltf';
     this.setCardPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
       if(diceNumber == this.cardIndex){
@@ -49,12 +49,13 @@ export class CardComponent implements OnInit {
 
   enableShadow(element:any, that:any){
     element.traverse((child:any) => {
-      if (child.isMesh && !that.castedShadow) {
+      if (child.isMesh ) {//&& !that.castedShadow
         const material = new THREE.MeshStandardMaterial();
+        
         child.castShadow=true;
         child.receiveShadow=true;
-        child.material = material;
-        that.castedShadow = true;
+       // child.material = material;
+        //that.castedShadow = true;
       }
     })
     return element;
@@ -72,13 +73,14 @@ export class CardComponent implements OnInit {
       }
     }else  if(10 < this.cardIndex && this.cardIndex <= 20){
       this.position = [21,0,this.gameService.cardsPositionCounter];
-      this.rotation = [0,(Math.PI / 2),0]
+      //this.rotation = [0,(Math.PI / 2),0]
     }else  if(20 < this.cardIndex && this.cardIndex <= 30){
       this.position = [(21 - this.gameService.cardsPositionCounter),0,21];
     }else  if(30 < this.cardIndex && this.cardIndex <= 40){
       this.position = [0,0,(21-this.gameService.cardsPositionCounter)];
-      this.rotation = [0,(Math.PI / 2),0];
+     // this.rotation = [0,(Math.PI / 2),0];
     }
+    this.rotation = [0,(Math.PI / 2)* Math.round(Math.random() * (100 - 1) + 1),0];
     
     if(this.cardIndex == 9 || this.cardIndex == 19 || this.cardIndex == 29 || this.cardIndex == 39){
       this.gameService.cardsPositionCounter += 0.5
