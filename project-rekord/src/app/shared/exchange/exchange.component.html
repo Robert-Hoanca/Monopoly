@@ -1,21 +1,24 @@
 <div id="exchangeContainer" fxLayout="row" fxLayoutAlign="space-around center">
 
-    <div *ngIf="!playerToExchangeWith">
+    <div *ngIf="!playerToExchangeWith" class="choosePlayer">
         <button mat-raised-button *ngFor="let player of getPlayersToExchangeWith()" (click)="selectPlayerToExchange(player)" [disabled]="player.bankrupt">
             <span>{{player.name}}</span>
         </button>
     </div>
 
-    <div *ngIf="playerToExchangeWith && !startExchange" fxLayout="row" fxLayoutAlign="space-around center">
+    <div *ngIf="playerToExchangeWith && !startExchange" class="exchangeContainer" fxLayout="row" fxLayoutAlign="space-around center">
 
         <button mat-raised-button (click)="goBackToSelection()" class="exchangeGoBackBtn"><mat-icon>arrow_back</mat-icon></button>
 
-        <div class="exchangeCards" fxLayout="row" fxLayoutAlign="space-around center">
+        <div class="exchangeProperties" fxLayout="row" fxLayoutAlign="space-around center">
             <mat-card fxLayout="column" fxLayoutAlign="space-around center">
                 <span>{{gameService.actualTurnPlayer.name}}</span>
     
                 <div>
-                    <mat-card *ngFor="let property of actualPlayerProps" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
+                    <mat-card class="property" *ngFor="let property of actualPlayerProps" (click)="property.exchangeSelected = !property.exchangeSelected">
+                        <span class="chosenProperty" fxLayoutAlign="center center"><mat-icon *ngIf="property.exchangeSelected">check</mat-icon></span>
+                        {{property.name}}
+                    </mat-card>
                 </div>
     
                 <mat-form-field appearance="fill">
@@ -28,7 +31,10 @@
                 <span>{{playerToExchangeWith.name}}</span>
     
                 <div>
-                    <mat-card *ngFor="let property of playerToExchangeProps" (click)="property.exchangeSelected = !property.exchangeSelected">{{property.name}}</mat-card>
+                    <mat-card *ngFor="let property of playerToExchangeProps" fxLayout="row" (click)="property.exchangeSelected = !property.exchangeSelected">
+                        <span class="chosenProperty" fxLayoutAlign="center center"><mat-icon *ngIf="property.exchangeSelected">check</mat-icon></span>
+                        {{property.name}}
+                    </mat-card>
                 </div>
                 <mat-form-field appearance="fill">
                     <mat-label>Player 2</mat-label>

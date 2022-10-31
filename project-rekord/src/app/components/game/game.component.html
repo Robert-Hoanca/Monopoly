@@ -1,9 +1,9 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
     <th-canvas #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions"><!--[style]="{background: this.gameService.sessionColor}" -->
-        <th-scene [thStats]="true" #scene> <!-- [background]="['#ffff00']" -->
+        <th-scene [thStats]="true" [autoUpdate]="true" #scene> <!-- [background]="['#ffff00']" -->
             
-            <th-ambientLight [color]="['#808080']" #ambientLight> </th-ambientLight>
+            <th-ambientLight [color]="[gameService.ambientLightColor]" #ambientLight> </th-ambientLight>
             <th-pointLight
             #light
             [castShadow]="true"
@@ -12,14 +12,24 @@
             <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
 
-            <!--<th-object3D
+          <th-object3D
                     loadGLTF
-                    [url]="'/assets/blenderModels/card/island2.gltf'"
-                    [position]="[10,0,10]"
+                    [url]="'/assets/blenderModels/Maps/skyboxSimple/skyBoxEnv.gltf'"
+                    [position]="[10,-25,10]"
                     [scale]="[1,1,1]"
                     [receiveShadow]="true"
+                    #sky
             >
-            </th-object3D>-->
+            </th-object3D>
+
+            <th-object3D
+            loadGLTF
+            [url]="'/assets/blenderModels/Maps/skyboxSimple/skyBoxClouds.gltf'"
+            [position]="[10,35,10]"
+            [scale]="[1,1,1]"
+            [receiveShadow]="true"
+            >
+            </th-object3D>
 
             <th-mesh
             [position]="[0,-0.35,0]"
@@ -71,7 +81,10 @@
     <button mat-raised-button id="blblbl" (click)="gameService.test()">buy properties</button>
     <button mat-raised-button (click)="gameService.setDB()">Set db</button>
         <button mat-raised-button id="blblbl" (click)="gameService.test()">click me</button>
+
+         <mat-form-field>
+            <mat-label>Choose Your Name</mat-label>
+            <input matInput type="color" autocomplete="off" [ngModel]="gameService.ambientLightColor">
+        </mat-form-field>
     -->
-        
-       
 </div>

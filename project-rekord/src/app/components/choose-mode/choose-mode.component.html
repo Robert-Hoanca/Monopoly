@@ -33,11 +33,8 @@
                       
                     </th-scene>
                   </th-canvas>
-                  
-            
-                
-                <span>{{player.pawn.choosenPawnLabel}}</span>
                 <span>{{player.name}}</span>
+                <span>{{player.pawn.choosenPawnLabel}}</span>
                 <span>{{player.money}}</span>
     
             </mat-card>
@@ -72,7 +69,7 @@
                     <div class="pawnModel" *ngFor="let pawn of filterPawns();let i = index">
                        
                         <div *ngIf="i == pawnModelCounter">
-                            <div class="pawnChange">
+                            <div class="pawnChange"  fxLayout="row" fxLayoutAlign="space-between center">
                                 <button  mat-icon-button (click)="changeModel('minus')" [disabled]="pawnModelCounter==0"><mat-icon>chevron_left</mat-icon></button>
             
                                 <span>{{pawn.name}}</span>
@@ -86,18 +83,16 @@
     
                <div fxLayout="column" fxLayoutAlign="center space-around">
                     <mat-form-field>
-                        <mat-label>player Name</mat-label>
+                        <mat-label>Choose Your Name</mat-label>
                         <input matInput autocomplete="off" placeholder="Insert Here Your Name" [(ngModel)]="playerName">
                     </mat-form-field>
-                    
-                    <span>{{gameService.playersModel.money}}</span>
     
                     <button id="addSpecialPawn" [matMenuTriggerFor]="specialPawnMenu" mat-mini-fab fxLayoutAlign="center center"><mat-icon>add</mat-icon></button>
                     
                     <mat-menu #specialPawnMenu="matMenu">
-                        <mat-form-field >
+                        <mat-form-field class="specialPawnInput">
                             <mat-label>Special Code</mat-label>
-                            <input matInput autocomplete="off" (click)="$event.stopPropagation()" placeholder="Insert Here Your Name" [(ngModel)]="gameService.specialPawn">
+                            <input matInput autocomplete="off" (click)="$event.stopPropagation()" [(ngModel)]="gameService.specialPawn">
                         </mat-form-field>
                     </mat-menu>
                     <button mat-raised-button [disabled]="disableJoinButton()" (click)="gameService.createPlayer(playerName, pawnModelCounter);createPlayer()">Join</button>
@@ -106,8 +101,9 @@
             </mat-card>
         </div>
 
-        <div id="mapsContainer" fxLayout="row" fxLayoutAlign="center end">
-            <mat-card *ngFor="let map of gameService.gameMaps" (click)="gameService.chosenMap = map">
+        <div id="mapsContainer" fxLayout="row" fxLayoutAlign="flex-end center">
+            <mat-card class="map" *ngFor="let map of gameService.gameMaps" (click)="gameService.chosenMap = map">
+                <span class="chosenMap" fxLayoutAlign="center center"><mat-icon *ngIf="gameService.chosenMap==map">check</mat-icon></span>
                 <span>{{map}}</span>
             </mat-card>
         </div>

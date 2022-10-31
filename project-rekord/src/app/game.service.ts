@@ -23,12 +23,13 @@ export class GameService {
   sessionColor:string= '';
   players: Array<any> = [];
   actualTurnPlayer:any = {};
+  ambientLightColor:string='#ff8326'
 
   choosenMode:string = '';
   db = getFirestore();
   chosenMap:string = 'monopolyMap';
 
-  cameraPosition: Vector3 | [x: number, y: number, z: number] = [0,0,0];
+  cameraPosition: Vector3 | any;
   gameTable:any = {};
   gameMaps:any = [];
   cardsPositionCounter:number = 0;
@@ -45,6 +46,9 @@ export class GameService {
   exchangeRef: MatDialogRef<any> | undefined;
 
   turn:number= 0;
+
+
+  setted:boolean=false;
 
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
@@ -63,7 +67,7 @@ export class GameService {
       doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
     });
 
-    this.cameraPosition = new THREE.Vector3(-5,5,-5)
+    this.cameraPosition = new THREE.Vector3()
   }
 
   chooseSessionColor(){
@@ -83,6 +87,24 @@ export class GameService {
     this.players.push(newPlayer);
     type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1); 
     this.specialPawn= '';
+  }
+
+  setCameraPosition(camera:any,x:number, y:number,z:number){
+    
+   setTimeout(() => {
+   /* console.log("camera2",camera._objRef);
+    gsap.to(camera._objRef.position,{
+      x:-50,
+      z:-50,
+      duration: 10
+    })*/
+
+    gsap.fromTo(camera._objRef.position, {x: -50}, {x: -5, duration: 5});
+    gsap.fromTo(camera._objRef.position, {y: 20}, {y: 2, duration: 5});
+    gsap.fromTo(camera._objRef.position, {z: -50}, {z: -5, duration: 5});
+   }, 0);
+    
+
   }
 
   setPlayerPosition(cardPosition:Array<number>){
@@ -527,7 +549,20 @@ export class GameService {
     await setDoc(doc(this.db, "gameTables", "monopolyMap"), {cards: cardsData});
   }
 
-  test(){
+  test(event:any){
+    console.log(event)
+    if(this.setted==false){
+      setTimeout(() => {
+        gsap.to(event.camera.objRef.position,{
+          x:-50,
+          z:-50,
+          duration: 10
+        })
+       
+      }, 5000);
+      this.setted=true;
+    }
+    
    /* this.gameTable.cards.filter((card: { district: string; }) => card.district=='test2').forEach((card: {canBuy: any; owner: any; completedSeries: boolean; }) => {
       card.canBuy = false;
       card.owner = this.actualTurnPlayer.id;

@@ -45,6 +45,7 @@ export class CardComponent implements OnInit {
 
   ngAfterViewInit(){
     //this.loadText()
+    //this.enableShadow(this.cardRef.objRef, this)
   }
 
   enableShadow(element:any, that:any){

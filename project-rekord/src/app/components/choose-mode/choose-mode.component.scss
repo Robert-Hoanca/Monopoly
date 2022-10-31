@@ -1,13 +1,19 @@
 #chooseMode{
     width: 100%;
     height: 100%;
+    
 
     #startGame{
         position: absolute;
         bottom: 0;
         width: 100%;
     }
-
+    #createPlayer{
+      /*  ::ng-deep .specialPawnInput{
+            padding: 10px;
+            width: 100px;
+        }*/
+    }
     #addSpecialPawn{
         position: absolute;
         top: 0;
@@ -16,5 +22,24 @@
         background: #fff;
         width: 25px;
         height: 25px;
+        color: black;
+    }
+
+    #mapsContainer{
+        width: 100%;
+        height: 200px;
+        mat-card.map{
+            height: 100%;
+            width: 150px;
+            margin-right: 20px;
+            font-family: ailerons;
+        }
+
+        .chosenMap{
+            border: 1px solid black;
+            width: 25px;
+            height: 25px;
+            
+        }
     }
 }

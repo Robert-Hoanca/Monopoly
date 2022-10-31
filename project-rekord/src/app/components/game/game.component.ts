@@ -16,6 +16,7 @@ export class GameComponent implements OnInit {
   @ViewChild('camera', { static: true }) camera:any;
   @ViewChild('light', { static: true }) light:any;
   @ViewChild('ambientLight', { static: true }) ambientLight:any;
+  @ViewChild('sky', { static: true }) sky:any;
   actualPlayerProps:Array<any> = [];
 
   //ADD OBJECTS TO SCENE
@@ -36,7 +37,11 @@ export class GameComponent implements OnInit {
     //let Sky = require('../../../assets/jsImports/Sky.js')
     //const sky =   new Sky();
     //console.log("sky", sky);
-
+    this.gameService.setCameraPosition(this.camera, -5,5,-5)
+    /*setTimeout(() => {
+      this.gameService.setCameraPosition(-50,5,-50)
+      console.log(this.gameService.cameraPosition)
+    }, 5000);*/
    
   }
   ngAfterViewInit(){
@@ -45,7 +50,7 @@ export class GameComponent implements OnInit {
      this.light.objRef.intensity=3;//2
      this.ambientLight.objRef.intensity=2;//1
 
-     console.log(this.canvas)
+     console.log(this.sky)
 
     // renderer.shadowMap.enabled = true;
     //renderer.shadowMap.type = THREE.PCFSoftShadowMap;
