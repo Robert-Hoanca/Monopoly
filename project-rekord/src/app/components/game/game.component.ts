@@ -34,15 +34,11 @@ export class GameComponent implements OnInit {
   constructor(public gameService: GameService ) { }
 
   ngOnInit(): void {
+    this.gameService.camera = this.camera;
     //let Sky = require('../../../assets/jsImports/Sky.js')
     //const sky =   new Sky();
     //console.log("sky", sky);
-    this.gameService.setCameraPosition(this.camera, -5,5,-5)
-    /*setTimeout(() => {
-      this.gameService.setCameraPosition(-50,5,-50)
-      console.log(this.gameService.cameraPosition)
-    }, 5000);*/
-   
+    this.gameService.setCameraPosition(this.camera, -5,5,-5, 5)   
   }
   ngAfterViewInit(){
      //SetUp lights and shadow values

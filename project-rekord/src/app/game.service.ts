@@ -29,7 +29,11 @@ export class GameService {
   db = getFirestore();
   chosenMap:string = 'monopolyMap';
 
+  //Camera
+  camera:any;
   cameraPosition: Vector3 | any;
+
+
   gameTable:any = {};
   gameMaps:any = [];
   cardsPositionCounter:number = 0;
@@ -40,9 +44,8 @@ export class GameService {
   diceNumber:number|undefined;
   getCardPosition$ = new Subject();
 
-  //CARD DIALOG
+  //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
-  //EXCHANGE DIALOG
   exchangeRef: MatDialogRef<any> | undefined;
 
   turn:number= 0;
@@ -89,43 +92,17 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  setCameraPosition(camera:any,x:number, y:number,z:number){
-    
+  setCameraPosition(camera:any,x:number, y:number,z:number, duration:number){
+    console.log(camera)
    setTimeout(() => {
-   /* console.log("camera2",camera._objRef);
-    gsap.to(camera._objRef.position,{
-      x:-50,
-      z:-50,
-      duration: 10
-    })*/
-
-    gsap.fromTo(camera._objRef.position, {x: -50}, {x: -5, duration: 5});
-    gsap.fromTo(camera._objRef.position, {y: 20}, {y: 2, duration: 5});
-    gsap.fromTo(camera._objRef.position, {z: -50}, {z: -5, duration: 5});
+    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: -5, duration: duration});
+    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: 5, duration: duration});
+    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: -5, duration: duration});
    }, 0);
-    
-
   }
 
   setPlayerPosition(cardPosition:Array<number>){
     this.actualTurnPlayer.pawn.position =  cardPosition;
-    
-
-    //console.log(this.cameraPosition)
-   // this.actualTurnPlayer.x= cardPosition[0]
-   // this.actualTurnPlayer.y= 0.2
-   // this.actualTurnPlayer.z= cardPosition[2]
-    //this.actualTurnPlayer.pawn.position.x = cardPosition[0];
-    //this.actualTurnPlayer.pawn.position.z = cardPosition[2];
-   // gsap.fromTo(this.cameraPosition, {x:-5}, {x:-15, duration: 1});
-    
-  /*  gsap.to(this.cameraPosition,{
-      x: 10,
-      y:0.2,
-      z:0,
-      duration: 5
-    })*/
-   // console.log( this.actualTurnPlayer.pawn.position)
   }
 
   async startGame(){
@@ -152,6 +129,7 @@ export class GameService {
     this.actualTurnPlayer = this.players[this.turn];
     this.actualTurnPlayer.canDice = true;
     this.diceNumber = undefined;
+    //this.setCameraPosition(this.camera, this.actualTurnPlayer.pawn.position[0],this.actualTurnPlayer.pawn.position[1],this.actualTurnPlayer.pawn.position[2], 5)
   }
   rollTheDice(){
     if(!this.actualTurnPlayer.prison.inPrison){
@@ -165,7 +143,6 @@ export class GameService {
       if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
         this.diceNumber = 0 + (((diceRes[0]+diceRes[1])-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
       }
-      
       this.checkIfHasPassedStart(this.actualTurnPlayer.actualCard, this.diceNumber);
       this.actualTurnPlayer.actualCard = this.diceNumber;
       this.getCardPosition$.next(this.diceNumber);
@@ -205,6 +182,7 @@ export class GameService {
   exitFromPrison(shouldPay:boolean, exitFromDice:boolean, dice1?:number, dice2?:number){
     if(shouldPay){
       this.actualTurnPlayer.money-=50;
+      this.checkBankrupt(this.actualTurnPlayer,50);
     }
     if(exitFromDice && dice1 && dice2){
       this.actualTurnPlayer.actualCard += (dice1+dice2);
@@ -219,8 +197,8 @@ export class GameService {
     if(property.owner && property.owner!=this.actualTurnPlayer.id){
       const amount = this.calculateTaxesToPay(property,diceNumber);
       this.actualTurnPlayer.money -= amount;
+      this.checkBankrupt(this.actualTurnPlayer,amount);
       this.players.find(player => player.id == property.owner).money +=amount;
-      console.log("amount payed", amount)
     }
   }
   calculateTaxesToPay(property:any, diceNumber:Array<number>){
@@ -278,6 +256,7 @@ export class GameService {
       this.nextTurn()
     }else if(property.cardType == 'taxes'){
       this.actualTurnPlayer.money-= property.taxesCost;
+    this.checkBankrupt(this.actualTurnPlayer,50);
     }else if(property.cardType == 'chance'){
 
     }else if(property.cardType == 'chest'){
@@ -290,7 +269,6 @@ export class GameService {
     this.actualTurnPlayer.money -= property.cost;
     property.canBuy = false;
     property.owner = this.players[this.turn].id;
-    //this.actualTurnPlayer.properties.push(JSON.parse(JSON.stringify(property)))
     if(!property.completedSeries){
       this.checkCompletedSeries(property);
     }
@@ -304,7 +282,6 @@ export class GameService {
     this.checkCompletedSeries(property);
     property.canBuy = true;
     property.owner = "";
-    //this.actualTurnPlayer.properties.splice(this.actualTurnPlayer.properties.findIndex((prop: { name: any; }) => prop.name == property.name),1)
   }
   distrainProperty(property:any){
     property.distrained = true;
@@ -358,9 +335,23 @@ export class GameService {
   }
 
   //BANKRUPT
-  checkBankrupt(){
-    //NGONCHANGES DI ANGULAR PER VEDERE QUANDO (VARIABILE = actualplayer.money) E' CAMBIATA
-    if(!this.actualTurnPlayer.properties.length && this.actualTurnPlayer.money ==0){}
+  checkBankrupt(player:any, moneyToSub:number){
+    const playerProps= this.gameTable.cards.filter((card: { owner: any; })=>card.owner == player.id);
+    let moneyFromDistrain = 0;
+
+    if((player.money - moneyToSub)<0 && playerProps.length<1){
+      alert(player.name + " has made bankrupt 1")
+    }else if(playerProps.length && (player.money - moneyToSub)<0){
+      //check if player can pay the debt
+      playerProps.forEach((prop: { distrained: any; distrainedCost: number; }) => {
+        if(!prop.distrained){
+          moneyFromDistrain+=prop.distrainedCost;
+        }
+      });
+      if(((player.money - moneyToSub) + moneyFromDistrain)<0){
+        alert(player.name + " has made bankrupt 2")
+      }
+    }
   }
 
   
@@ -549,20 +540,8 @@ export class GameService {
     await setDoc(doc(this.db, "gameTables", "monopolyMap"), {cards: cardsData});
   }
 
-  test(event:any){
-    console.log(event)
-    if(this.setted==false){
-      setTimeout(() => {
-        gsap.to(event.camera.objRef.position,{
-          x:-50,
-          z:-50,
-          duration: 10
-        })
-       
-      }, 5000);
-      this.setted=true;
-    }
-    
+  test(){
+    //this.checkBankrupt(1550)
    /* this.gameTable.cards.filter((card: { district: string; }) => card.district=='test2').forEach((card: {canBuy: any; owner: any; completedSeries: boolean; }) => {
       card.canBuy = false;
       card.owner = this.actualTurnPlayer.id;

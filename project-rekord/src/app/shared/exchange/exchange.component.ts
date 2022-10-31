@@ -70,10 +70,12 @@ export class ExchangeComponent implements OnInit {
       if(this.moneyToExchange[0]>0){
           this.gameService.actualTurnPlayer.money -= this.moneyToExchange[0];
           this.playerToExchangeWith.money += this.moneyToExchange[0];
+          this.gameService.checkBankrupt(this.gameService.actualTurnPlayer,this.moneyToExchange[0]);
       }
       if(this.moneyToExchange[1]>0){
         this.gameService.actualTurnPlayer.money += this.moneyToExchange[1];
         this.playerToExchangeWith.money -= this.moneyToExchange[1];
+        this.gameService.checkBankrupt(this.playerToExchangeWith,this.moneyToExchange[1]);
       }
     }
     this.goBackToSelection();

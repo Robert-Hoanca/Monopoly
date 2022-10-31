@@ -3,12 +3,13 @@
     <span class="cardCost"> {{data.card.cost}} €</span>
 
 
-    <button mat-raised-button (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy">Compra</button>
+    <button mat-raised-button (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy" [disabled]="gameService.actualTurnPlayer.money<data.card.cost">Compra</button>
+    <button mat-raised-button *ngIf="data.card.canBuy" [disabled]="true">Asta</button>
     <button mat-raised-button  *ngIf="data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.sellProperty(data.card);close()">Vendi</button>
    
     <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.distrainProperty(data.card);close()">Pignora</button>
 
-    <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.cancelDistrainedFromProperty(data.card)">Remove pignora</button>
+    <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.cancelDistrainedFromProperty(data.card)" [disabled]="gameService.actualTurnPlayer.money<data.card.distrainedCost">Remove pignora</button>
 
     <div *ngIf="data.card.completedSeries">
         <span>Manage Houses</span>
@@ -18,12 +19,12 @@
                 <mat-icon>home</mat-icon>
                 <button mat-icon-button (click)="removeHouse()">remove</button>
             </mat-card>
-            <mat-card *ngIf="houses.length<4" (click)="addHouse()">
+            <mat-card *ngIf="houses.length<4" (click)="addHouse()" [ngClass]="[gameService.actualTurnPlayer.money<data.card.houseCost ? 'enabled': 'disabled']">
                 <mat-icon>add</mat-icon>
                 <mat-icon>home</mat-icon>
             </mat-card>
 
-            <mat-card *ngIf="houses.length == 4" (click)="addHotel()">
+            <mat-card *ngIf="houses.length == 4" (click)="addHotel()" [ngClass]="[gameService.actualTurnPlayer.money<data.card.hotelCost ? 'enabled': 'disabled']">
                 <mat-icon>add</mat-icon>
                 <mat-icon>apartment</mat-icon>
             </mat-card>
