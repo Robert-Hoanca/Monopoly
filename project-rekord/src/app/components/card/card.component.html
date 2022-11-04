@@ -7,10 +7,23 @@
     [receiveShadow]="true"
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
-    [onBeforeRender]="enableShadow(cardRef.objRef, this)"
     #cardRef
 >
 </th-object3D>
+
+<app-house *ngFor="let item of [].constructor(card.housesCounter)" [card]="card" [cardPosition]="position" [cardRotation]="rotation"></app-house>
+
+<!--<th-object3D
+    loadGLTF
+    [url]="houseUrl"
+    [position]="position"
+    [rotation]="rotation"
+    [receiveShadow]="true"
+    [castShadow]="true"
+    *ngIf="card.hotelCounter"
+>
+</th-object3D>-->
+
 
 
 <!--<th-mesh

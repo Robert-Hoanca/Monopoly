@@ -38,6 +38,8 @@ import { ThObjLoaderDirective } from './th-obj-loader.directive';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
 import { PlayerComponent } from './components/player/player.component';
 import { MapComponent } from './components/map/map.component';
+import { HouseComponent } from './shared/house/house.component';
+import { HotelComponent } from './shared/hotel/hotel.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +55,8 @@ import { MapComponent } from './components/map/map.component';
     ExchangeComponent,
     PlayerComponent,
     MapComponent,
+    HouseComponent,
+    HotelComponent,
   ],
   imports: [
     BrowserModule,

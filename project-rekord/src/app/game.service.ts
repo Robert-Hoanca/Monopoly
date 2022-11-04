@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, TemplateRef } from '@angular/core';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { Firestore, collectionData, collection, getFirestore, doc, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
@@ -13,11 +13,20 @@ import * as uuid from 'uuid';
 import gsap from 'gsap'
 import { Vector3 } from 'three';
 import * as THREE from 'three';
+import { json } from 'stream/consumers';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
+
+  //Local Save
+  localSave:any = {
+    gameTable:{},
+    players: [],
+    actualTurnPlayer: {},
+  };
+  gamePaused:boolean=false;
   //Colors
   bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
   sessionColor:string= '';
@@ -31,7 +40,9 @@ export class GameService {
 
   //Camera
   camera:any;
+  cameraControls:any;
   cameraPosition: Vector3 | any;
+  cameraLookAt: Vector3 | any;
 
 
   gameTable:any = {};
@@ -42,10 +53,13 @@ export class GameService {
   specialPawnTypes: any = [];
   specialPawn:String='';
   diceNumber:number|undefined;
+
   getCardPosition$ = new Subject();
+  openTextDialog$ = new Subject();
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
+  moneyDialogRef: TemplateRef<any> | undefined;
   exchangeRef: MatDialogRef<any> | undefined;
 
   turn:number= 0;
@@ -56,21 +70,33 @@ export class GameService {
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
+    const localSaves:any = localStorage.getItem("rekordLocalSave");
+    if(localSaves){
+      const localSavesObj = JSON.parse(localSaves)
+      this.gameTable = localSavesObj.gameTable;
+      this.players = localSavesObj.players;
+      this.actualTurnPlayer = localSavesObj.actualTurnPlayer;
 
-    const getMaps = await getDocs(collection(this.db, "gameTables"));
-    getMaps.forEach((doc) => {
-      this.gameMaps.push(doc.id)
-    });
+      console.log("Setted position", this.actualTurnPlayer)
 
-    const playersModelRef = doc(this.db, "playerModel", 'playerModel');
-    this.playersModel = await (await getDoc(playersModelRef)).data();
-
-    const pawnTypesRef = await getDocs(collection(this.db, "pawnTypes"));
-    pawnTypesRef.forEach((doc) => {
-      doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
-    });
+      this.router.navigateByUrl('game', { skipLocationChange: true })
+    }else{
+      const getMaps = await getDocs(collection(this.db, "gameTables"));
+      getMaps.forEach((doc) => {
+        this.gameMaps.push(doc.id)
+      });
+  
+      const playersModelRef = doc(this.db, "playerModel", 'playerModel');
+      this.playersModel = await (await getDoc(playersModelRef)).data();
+  
+      const pawnTypesRef = await getDocs(collection(this.db, "pawnTypes"));
+      pawnTypesRef.forEach((doc) => {
+        doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
+      });
+    }
 
     this.cameraPosition = new THREE.Vector3()
+    this.cameraLookAt = new THREE.Vector3();
   }
 
   chooseSessionColor(){
@@ -93,12 +119,15 @@ export class GameService {
   }
 
   setCameraPosition(camera:any,x:number, y:number,z:number, duration:number){
-    console.log(camera)
    setTimeout(() => {
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: -5, duration: duration});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: 5, duration: duration});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: -5, duration: duration});
+    this.cameraControls._objRef.enabled = false;
    }, 0);
+   setTimeout(() => {
+    this.cameraControls._objRef.enabled = true; 
+   }, duration);
+   gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: x, duration: duration/1000});
+   gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: y, duration: duration/1000});
+   gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: z, duration: duration/1000});
   }
 
   setPlayerPosition(cardPosition:Array<number>){
@@ -182,10 +211,12 @@ export class GameService {
   exitFromPrison(shouldPay:boolean, exitFromDice:boolean, dice1?:number, dice2?:number){
     if(shouldPay){
       this.actualTurnPlayer.money-=50;
+      this.textDialog(this.actualTurnPlayer.name + ' has payed ' + 50 +' and exit from prison.', 1500);
       this.checkBankrupt(this.actualTurnPlayer,50);
     }
     if(exitFromDice && dice1 && dice2){
       this.actualTurnPlayer.actualCard += (dice1+dice2);
+      this.textDialog(this.actualTurnPlayer.name + ' has exit from prison.', 1500);
       this.getCardPosition$.next(this.actualTurnPlayer.actualCard);
     }
     this.actualTurnPlayer.prison.inPrison=false;
@@ -199,6 +230,7 @@ export class GameService {
       this.actualTurnPlayer.money -= amount;
       this.checkBankrupt(this.actualTurnPlayer,amount);
       this.players.find(player => player.id == property.owner).money +=amount;
+      this.textDialog(this.actualTurnPlayer.name + ' has payed ' + amount + '.', 1500)
     }
   }
   calculateTaxesToPay(property:any, diceNumber:Array<number>){
@@ -248,7 +280,7 @@ export class GameService {
 
   whichPropertyAmI(property:any){
     if(property.cardType == 'goToPrison' || this.actualTurnPlayer.prison.doubleDiceCounter == 3){
-      alert("going to prison")
+      this.textDialog(this.actualTurnPlayer.name + ' is going to prison.', 1500);
       this.actualTurnPlayer.prison.inPrison = true;
       this.actualTurnPlayer.actualCard = 10;
       this.getCardPosition$.next(10);
@@ -256,7 +288,8 @@ export class GameService {
       this.nextTurn()
     }else if(property.cardType == 'taxes'){
       this.actualTurnPlayer.money-= property.taxesCost;
-    this.checkBankrupt(this.actualTurnPlayer,50);
+      this.textDialog(this.actualTurnPlayer.name + ' has payed ' + property.taxesCost + ' of taxes.', 1500);
+      this.checkBankrupt(this.actualTurnPlayer,50);
     }else if(property.cardType == 'chance'){
 
     }else if(property.cardType == 'chest'){
@@ -308,8 +341,9 @@ export class GameService {
   }
 
   checkIfHasPassedStart(beforeMove:number, afterMove:number|undefined){
-    if(afterMove && (afterMove < beforeMove)){
+    if(afterMove && (afterMove < beforeMove) || afterMove == 0){
       this.actualTurnPlayer.money+=200;
+      this.textDialog(this.actualTurnPlayer.name + ' gained 200$', 1500)
     }
   }
   //DIALOGS
@@ -334,13 +368,21 @@ export class GameService {
     });
   }
 
+  textDialog(text:string, duration:number) {
+    const data = {
+      text,
+      duration,
+    }
+    this.openTextDialog$.next(data);
+  }
+
   //BANKRUPT
   checkBankrupt(player:any, moneyToSub:number){
     const playerProps= this.gameTable.cards.filter((card: { owner: any; })=>card.owner == player.id);
     let moneyFromDistrain = 0;
 
     if((player.money - moneyToSub)<0 && playerProps.length<1){
-      alert(player.name + " has made bankrupt 1")
+      this.textDialog(player.name + 'went bankrupt', 1500)
     }else if(playerProps.length && (player.money - moneyToSub)<0){
       //check if player can pay the debt
       playerProps.forEach((prop: { distrained: any; distrainedCost: number; }) => {
@@ -349,7 +391,7 @@ export class GameService {
         }
       });
       if(((player.money - moneyToSub) + moneyFromDistrain)<0){
-        alert(player.name + " has made bankrupt 2")
+        this.textDialog(player.name + 'went bankrupt', 1500)
       }
     }
   }

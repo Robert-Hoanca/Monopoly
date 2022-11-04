@@ -17,7 +17,9 @@ export class CardComponent implements OnInit {
   @Input() card!: any;
   @Input() cardIndex!: any;
   @Input() scene!: any;
+
   url:string='';
+
   position: [x: number, y: number, z: number] = [0, 0, 0];
   rotation: [x: number, y: number, z: number] = [0, 0, 0];
   meshColor:string='#ffff00';
@@ -29,7 +31,7 @@ export class CardComponent implements OnInit {
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
-    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/testIslandCorner.gltf':'/assets/blenderModels/card/testIsland.gltf';
+    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/Island.gltf':'/assets/blenderModels/card/Island.gltf';
     this.setCardPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
       if(diceNumber == this.cardIndex){
@@ -89,8 +91,6 @@ export class CardComponent implements OnInit {
     this.gameService.cardsPositionCounter += (this.cardIndex/10) % 1 == 0 ? 2.5 : 2;
   }
 
-  
-
   loadText(){
     let that=this;
     this.fontLoader.load( 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond&family=Spline+Sans:wght@400;700&display=swap', function (  this: any ,font: any) {
@@ -121,7 +121,7 @@ export class CardComponent implements OnInit {
 
   }
 
-
+  
   test(){
    // console.log("card position: ", this.position)
    // console.log("card index:", this.cardIndex)

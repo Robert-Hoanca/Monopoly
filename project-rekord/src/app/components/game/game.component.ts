@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three'
 //import {Sky} from '../../../assets/jsImports/Sky.js'
@@ -11,13 +13,24 @@ import * as THREE from 'three'
 })
 export class GameComponent implements OnInit {
   @ViewChild('cardInfo', { static: true }) cardInfo:any;
+
   @ViewChild('canvas', { static: true }) canvas:any;
   @ViewChild('scene', { static: true }) scene:any;
+
   @ViewChild('camera', { static: true }) camera:any;
+  @ViewChild('cameraControls', { static: true }) cameraControls:any;
+  
   @ViewChild('light', { static: true }) light:any;
   @ViewChild('ambientLight', { static: true }) ambientLight:any;
+
   @ViewChild('sky', { static: true }) sky:any;
+
+  @ViewChild('moneyDialog', { static: true }) moneyDialogRef!: TemplateRef<any>;
+
   actualPlayerProps:Array<any> = [];
+
+  openTextDialog$: Subscription | undefined;
+  textDialog:string='';
 
   //ADD OBJECTS TO SCENE
   //this.scene.objRef.children.push( OBJECT );
@@ -31,40 +44,39 @@ export class GameComponent implements OnInit {
     toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
 
-  constructor(public gameService: GameService ) { }
+  constructor(public gameService: GameService,private dialog: MatDialog ) { }
 
   ngOnInit(): void {
-    this.gameService.camera = this.camera;
-    //let Sky = require('../../../assets/jsImports/Sky.js')
-    //const sky =   new Sky();
-    //console.log("sky", sky);
-    this.gameService.setCameraPosition(this.camera, -5,5,-5, 5)   
+    this.openTextDialog$ = this.gameService.openTextDialog$.subscribe((data:any) =>{
+      this.openMoneyDialog(data)
+    });
   }
   ngAfterViewInit(){
+    this.gameService.camera = this.camera;
+    this.gameService.setCameraPosition(this.camera, -2.5,2.5,-2.5, 2500)   
+    this.gameService.cameraControls = this.cameraControls;
+
      //SetUp lights and shadow values
-     this.light.objRef.shadow.bias = -0.0009;//-0.0005
-     this.light.objRef.intensity=3;//2
-     this.ambientLight.objRef.intensity=2;//1
+    this.light.objRef.shadow.bias = -0.0009;//-0.0005
+    this.light.objRef.intensity=3;//2
+    this.ambientLight.objRef.intensity=2;//1
+    this.light.objRef.shadowMapHeight=2048; 
+    this.light.objRefshadowMapWidth=2048;
+    this.light.objRefshadowCameraLeft= -50;  
+    this.light.objRefshadowCameraRight= 50;
+    this.light.objRefshadowCameraBottom= -50; 
+    this.light.objRefshadowCameraTop= 50;
+    this.activateLocalSave();
+    
+  }
 
-     console.log(this.sky)
-
-    // renderer.shadowMap.enabled = true;
-    //renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-
-     //const helper = new THREE.CameraHelper( this.camera.objRef );
-     
-     this.light.objRef.shadowMapHeight=2048; 
-     this.light.objRefshadowMapWidth=2048;
-     this.light.objRefshadowCameraLeft= -50;  
-     this.light.objRefshadowCameraRight= 50;
-     this.light.objRefshadowCameraBottom= -50; 
-      this.light.objRefshadowCameraTop= 50;
-
-
-   // const sky = new Sky()
-   // sky.scale.setScalar( 450000 );
-   // this.scene.objRef.children.push( sky );
+  activateLocalSave(){
+    setInterval(() => {
+      this.gameService.localSave.gameTable = this.gameService.gameTable;
+      this.gameService.localSave.players = this.gameService.players;
+      this.gameService.localSave.actualTurnPlayer = this.gameService.actualTurnPlayer;
+      localStorage.setItem("rekordLocalSave", JSON.stringify(this.gameService.localSave));
+    }, 10000);
   }
 
   getActualPlayerProps(){
@@ -76,7 +88,14 @@ export class GameComponent implements OnInit {
   }
 
   onBeforeRender(element:any){
-
     return element; 
+  }
+
+  openMoneyDialog(data:any){
+    this.textDialog = data.text;
+    this.dialog.open(this.moneyDialogRef);
+    setTimeout(() => {
+      this.dialog.closeAll()
+    }, data.duration);
   }
 }

@@ -19,12 +19,12 @@
                 <mat-icon>home</mat-icon>
                 <button mat-icon-button (click)="removeHouse()">remove</button>
             </mat-card>
-            <mat-card *ngIf="houses.length<4" (click)="addHouse()" [ngClass]="[gameService.actualTurnPlayer.money<data.card.houseCost ? 'enabled': 'disabled']">
+            <mat-card *ngIf="houses.length<4" (click)="addHouse()" [ngClass]="[gameService.actualTurnPlayer.money<data.card.houseCost ? 'disabled': 'enabled']">
                 <mat-icon>add</mat-icon>
                 <mat-icon>home</mat-icon>
             </mat-card>
 
-            <mat-card *ngIf="houses.length == 4" (click)="addHotel()" [ngClass]="[gameService.actualTurnPlayer.money<data.card.hotelCost ? 'enabled': 'disabled']">
+            <mat-card *ngIf="houses.length == 4" (click)="addHotel()" [ngClass]="[gameService.actualTurnPlayer.money<data.card.hotelCost ? 'disabled': 'enabled']">
                 <mat-icon>add</mat-icon>
                 <mat-icon>apartment</mat-icon>
             </mat-card>

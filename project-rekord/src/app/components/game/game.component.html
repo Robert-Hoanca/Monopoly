@@ -1,7 +1,7 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
-    <th-canvas #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions"><!--[style]="{background: this.gameService.sessionColor}" -->
-        <th-scene [thStats]="true" [autoUpdate]="true" #scene> <!-- [background]="['#ffff00']" -->
+    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions">
+        <th-scene [thStats]="true" [autoUpdate]="true" #scene>
             
             <th-ambientLight [color]="[gameService.ambientLightColor]" #ambientLight> </th-ambientLight>
             <th-pointLight
@@ -32,7 +32,7 @@
             </th-object3D>
 
             <th-mesh
-            [position]="[0,-0.35,0]"
+            [position]="[0,-1,0]"
                 [scale]="[1000, 0.2, 1000]"
                 >
                 <th-boxGeometry></th-boxGeometry>
@@ -40,13 +40,13 @@
             </th-mesh>
 
             <th-perspectiveCamera
-                [args]="[75, 2, 0.1, 1000]"
-                [lookAt]="[0, 0, 0]"
+                [args]="[100, 2, 0.1, 1000]"
+                [lookAt]="gameService.cameraLookAt"
                 [position]="gameService.cameraPosition"
                 #camera
             >
                 <!--<th-orbitControls></th-orbitControls>-->
-                <th-mapControls></th-mapControls>
+                <th-mapControls #cameraControls></th-mapControls>
             </th-perspectiveCamera>
         </th-scene>
       </th-canvas>
@@ -54,7 +54,7 @@
 
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around center">
        
-        <mat-card *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center start">
+        <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center start">
             <span>{{player.name}}</span>
             <span>{{player.money}} €</span>
         </mat-card>
@@ -67,7 +67,7 @@
         </mat-menu>
 
 
-          <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()"><mat-icon>currency_exchange</mat-icon></button>
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()"><mat-icon>currency_exchange</mat-icon></button>
 
         <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.nextTurn()">next turn</button>
 
@@ -75,7 +75,17 @@
         <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
 
     </div>
+    <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
+    <div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
+        <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
+        <button mat-raised-button disabled="true">Options</button>
+        <button mat-raised-button disabled="true">Home</button>
+    </div>
     
+    <ng-template #moneyDialog>
+        <h1>{{textDialog}}</h1>
+    </ng-template>
+
     <!--
         DELETE
     <button mat-raised-button id="blblbl" (click)="gameService.test()">buy properties</button>
