@@ -3,7 +3,7 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="((cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.id) && card.canBuy)?  gameService.openCardDialog(card): '';test()"
+    (onClick)="(cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant')?  gameService.openCardDialog(card): '';test()"
     [receiveShadow]="true"
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
@@ -11,7 +11,14 @@
 >
 </th-object3D>
 
-<app-house *ngFor="let item of [].constructor(card.housesCounter)" [card]="card" [cardPosition]="position" [cardRotation]="rotation"></app-house>
+<div *ngIf="card.housesCounter && !card.hotelCounter">
+  <app-house *ngFor="let item of [].constructor(card.housesCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [houseIndex]="i"></app-house>
+</div>
+
+<div *ngIf="card.hotelCounter && card.housesCounter==4">
+  <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation"></app-hotel>
+</div>
+
 
 <!--<th-object3D
     loadGLTF

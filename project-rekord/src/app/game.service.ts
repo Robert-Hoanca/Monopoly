@@ -25,7 +25,9 @@ export class GameService {
     gameTable:{},
     players: [],
     actualTurnPlayer: {},
+    turn:0
   };
+  localSaves:any = {};
   gamePaused:boolean=false;
   //Colors
   bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
@@ -70,16 +72,11 @@ export class GameService {
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
-    const localSaves:any = localStorage.getItem("rekordLocalSave");
-    if(localSaves){
-      const localSavesObj = JSON.parse(localSaves)
-      this.gameTable = localSavesObj.gameTable;
-      this.players = localSavesObj.players;
-      this.actualTurnPlayer = localSavesObj.actualTurnPlayer;
-
-      console.log("Setted position", this.actualTurnPlayer)
-
-      this.router.navigateByUrl('game', { skipLocationChange: true })
+    const localStorageSave:any=localStorage.getItem("rekordLocalSave");
+    this.localSaves =  JSON.parse(localStorageSave)
+    if(this.localSaves){
+      this.players = this.localSaves.players;
+      this.startGame()
     }else{
       const getMaps = await getDocs(collection(this.db, "gameTables"));
       getMaps.forEach((doc) => {
@@ -135,14 +132,18 @@ export class GameService {
   }
 
   async startGame(){
-    const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
-    this.gameTable  = (await getDoc(gameTableRef)).data();
-
+    if(!this.localSaves){
+      const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
+      this.gameTable  = (await getDoc(gameTableRef)).data();
+      this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
+      this.actualTurnPlayer = this.players[this.turn];
+      this.actualTurnPlayer.canDice = true;
+    }else{
+      this.gameTable = this.localSaves.gameTable;
+      this.turn = this.localSaves.turn;
+      this.actualTurnPlayer = this.players[this.turn];
+    }
     this.router.navigateByUrl('game', { skipLocationChange: true })
-    this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
-    this.actualTurnPlayer = this.players[this.turn];
-    this.actualTurnPlayer.canDice = true;
-    
   }
 
   nextTurn(){
@@ -303,7 +304,7 @@ export class GameService {
     property.canBuy = false;
     property.owner = this.players[this.turn].id;
     if(!property.completedSeries){
-      this.checkCompletedSeries(property);
+      this.checkCompletedSeries(property,this.actualTurnPlayer.id);
     }
   }
   sellProperty(property:any){
@@ -312,21 +313,21 @@ export class GameService {
     }else{
       this.actualTurnPlayer.money +=  property.distrainedCost - ((property.distrainedCost / 100) * 50);
     }
-    this.checkCompletedSeries(property);
+    this.checkCompletedSeries(property,this.actualTurnPlayer.id);
     property.canBuy = true;
     property.owner = "";
   }
   distrainProperty(property:any){
     property.distrained = true;
     this.actualTurnPlayer.money += property.distrainedCost;
-    this.checkCompletedSeries(property);
+    this.checkCompletedSeries(property,this.actualTurnPlayer.id);
   }
   cancelDistrainedFromProperty(property:any){
     property.distrained = false;
     this.actualTurnPlayer.money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
-    this.checkCompletedSeries(property);
+    this.checkCompletedSeries(property, this.actualTurnPlayer.id);
   }
-  checkCompletedSeries(property:any){
+  checkCompletedSeries(property:any,playerId:string){
     const groupCards = this.gameTable.cards.filter((card: { district: any; }) => card.district == property.district) //ALL CARDS
     const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == this.actualTurnPlayer.id)
     if(groupCards.length == ownerCards.length && ownerCards.findIndex((cardI: { distrained: any; }) => cardI.distrained)<0){
@@ -583,6 +584,7 @@ export class GameService {
   }
 
   test(){
+    console.log("MMDWMDAWDWA")
     //this.checkBankrupt(1550)
    /* this.gameTable.cards.filter((card: { district: string; }) => card.district=='test2').forEach((card: {canBuy: any; owner: any; completedSeries: boolean; }) => {
       card.canBuy = false;

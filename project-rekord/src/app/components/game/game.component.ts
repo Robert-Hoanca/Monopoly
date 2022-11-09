@@ -39,7 +39,7 @@ export class GameComponent implements OnInit {
       enabled:true,
       type:THREE.BasicShadowMap
     },*/
-    antialias: true,
+    antialias: false,
     outputEncoding: 3001,
     toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
@@ -75,6 +75,7 @@ export class GameComponent implements OnInit {
       this.gameService.localSave.gameTable = this.gameService.gameTable;
       this.gameService.localSave.players = this.gameService.players;
       this.gameService.localSave.actualTurnPlayer = this.gameService.actualTurnPlayer;
+      this.gameService.localSave.turn=this.gameService.turn;
       localStorage.setItem("rekordLocalSave", JSON.stringify(this.gameService.localSave));
     }, 10000);
   }

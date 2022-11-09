@@ -121,7 +121,7 @@ export class CardComponent implements OnInit {
 
   }
 
-  
+
   test(){
    // console.log("card position: ", this.position)
    // console.log("card index:", this.cardIndex)

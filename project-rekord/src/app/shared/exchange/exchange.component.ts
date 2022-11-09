@@ -53,7 +53,7 @@ export class ExchangeComponent implements OnInit {
           card.owner = this.gameService.actualTurnPlayer.id;
           card.exchangeSelected = false
           if(!property.completedSeries){
-            this.gameService.checkCompletedSeries(property);
+            this.gameService.checkCompletedSeries(property, this.gameService.actualTurnPlayer.id);
           }
         });
       }
@@ -63,7 +63,7 @@ export class ExchangeComponent implements OnInit {
           card.owner = this.playerToExchangeWith.id;
           card.exchangeSelected = false
           if(!property.completedSeries){
-            this.gameService.checkCompletedSeries(property)
+            this.gameService.checkCompletedSeries(property, this.playerToExchangeWith.id)
           }
         });
       }
