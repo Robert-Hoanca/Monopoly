@@ -3,3 +3,71 @@
     color:grey;
     pointer-events: none;
 }
+#cardInfo{
+    .cardForm{
+        width: 220px;
+        height: 350px;
+        position: relative;
+        .propDistrict{
+            position: absolute;
+            top: 10px;
+            height: 50px;
+            width: 90%;
+        }
+        .cardCosts{
+            margin-top: 55px;
+            .rentsWithProps{
+                .props{
+                    .house, .hotel{
+                        height:20px;
+                        position: relative;
+                        margin-top: 5px;
+                        span{
+                            position: absolute;
+                            z-index: 2;
+                            font-size: 10px;
+                            color: #fff;
+                        }
+                    }
+                   .hotel{
+                        mat-icon{
+                            color: red;
+                        }
+                        span{
+                            background: red;
+                        }
+                    }
+                    .house{
+                        mat-icon{
+                            color: green;
+                        }
+                        span{
+                            background: green;
+                        }
+                    }
+                }
+                .rent{
+                    width: 100%;
+                    .house,.hotel{
+                        margin-top: 5px;
+                    }
+                }
+            }
+        }
+        .separator{
+            height: 0.5px;
+            width: 100%;
+            background: grey;
+        }
+    }
+    .cardBtns{
+        .housesManager{
+            .houseIcon{
+                color: green;
+            }
+            .hotelIcon{
+                color: red;
+            }
+        }
+    }
+}

@@ -40,8 +40,8 @@ export class ExchangeComponent implements OnInit {
 
   selectPlayerToExchange(player:any){
     this.playerToExchangeWith = player;
-    this.actualPlayerProps = this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.gameService.actualTurnPlayer.id)
-    this.playerToExchangeProps = this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == player.id)
+    this.actualPlayerProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.gameService.actualTurnPlayer.id));
+    this.playerToExchangeProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == player.id));
   }
 
   finaliseExchange(answer:string){

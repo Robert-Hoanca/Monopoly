@@ -20,6 +20,7 @@
                     [receiveShadow]="true"
                     #sky
             >
+            <!--<th-texture loadTexture url="/assets/blenderModels/Maps/skyboxSimple/SimpleSky.png"></th-texture>-->
             </th-object3D>
 
             <th-object3D
@@ -54,7 +55,7 @@
 
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around center">
        
-        <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center start">
+        <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.actualTurnPlayer.id == player.id? '100%': '120%'}" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
             <span>{{player.name}}</span>
             <span>{{player.money}} €</span>
         </mat-card>
@@ -63,13 +64,13 @@
     <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
         <button mat-raised-button id="seeProperties" *ngIf="!gameService.actualTurnPlayer.canDice" [matMenuTriggerFor]="propertiesMenu" [disabled]="!getActualPlayerProps().length"><mat-icon>view_carousel</mat-icon></button>
         <mat-menu #propertiesMenu="matMenu">
-            <button mat-menu-item *ngFor="let property of getActualPlayerProps()" (click)="gameService.openCardDialog(property)">{{property.name}}</button>
+            <button mat-menu-item class="actualPlayerProperty" *ngFor="let property of getActualPlayerProps()" (click)="gameService.openCardDialog(property)"><span [ngStyle]="{'background': property.district}" class="districtColor"></span>{{property.name}}</button>
         </mat-menu>
 
 
         <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()"><mat-icon>currency_exchange</mat-icon></button>
 
-        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.nextTurn()">next turn</button>
+        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.nextTurn()"><mat-icon>skip_next</mat-icon></button>
 
         <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()"><mat-icon>casino</mat-icon></button>
         <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>

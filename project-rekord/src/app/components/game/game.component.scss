@@ -11,16 +11,18 @@
         top: 0;
         left: 0;
         pointer-events: none;
-        #playerCard.bankRupt{
-            opacity: 0.7;
-            color: grey;
+        #playerCard{
+            transition: all 250ms ease;
+            &.bankRupt{
+                opacity: 0.7;
+                color: grey;
+            }
         }
     }
     #gameButtons{
         position: absolute;
         bottom: 0;
         width: 100%;
-        
     }
     #pauseBtn{
         position: absolute;
@@ -38,5 +40,16 @@
         button{
             margin-top: 20px;
         }
+    }
+}
+
+.actualPlayerProperty{
+    position: relative;
+    .districtColor{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 5px;
     }
 }

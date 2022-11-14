@@ -32,25 +32,34 @@ export class CardDialogComponent implements OnInit {
   }
   
   addHouse(){
-    this.houses.push('');
+    //this.houses.push('');
     this.data.card.housesCounter++;
     this.gameService.actualTurnPlayer.money -= this.data.card.houseCost;
   }
 
   removeHouse(){
-    this.houses.splice((this.houses.length -1),1);
+    //this.houses.splice((this.houses.length -1),1);
     this.data.card.housesCounter--;
     this.gameService.actualTurnPlayer.money += ((this.data.card.houseCost / 100) * 50);
   }
 
   addHotel(){
-    this.hotel = true;
+    //this.hotel = true;
     this.data.card.hotelCounter++;
     this.gameService.actualTurnPlayer.money -= this.data.card.hotelCost;
   }
   removeHotel(){
-    this.hotel = false;
+    //this.hotel = false;
     this.data.card.hotelCounter--;
     this.gameService.actualTurnPlayer.money += ((this.data.card.hotelCost / 100) * 50);
   }
+
+  getContrastColor(hexcolor:string){
+    hexcolor = hexcolor.replace("#", "");
+    var r = parseInt(hexcolor.substr(0,2),16);
+    var g = parseInt(hexcolor.substr(2,2),16);
+    var b = parseInt(hexcolor.substr(4,2),16);
+    var yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq >= 128) ? 'black' : 'white';
+}
 }

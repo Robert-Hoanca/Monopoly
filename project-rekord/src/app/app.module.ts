@@ -40,6 +40,7 @@ import { PlayerComponent } from './components/player/player.component';
 import { MapComponent } from './components/map/map.component';
 import { HouseComponent } from './shared/house/house.component';
 import { HotelComponent } from './shared/hotel/hotel.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { HotelComponent } from './shared/hotel/hotel.component';
     MatButtonModule,
     MatCardModule,
     MatMenuModule,
+    MatTooltipModule,
     FormsModule,
     MatDialogModule,
     FlexLayoutModule,

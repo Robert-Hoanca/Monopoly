@@ -3,12 +3,44 @@
 
     }
     .exchangeContainer{
+        .exchangeGoBackBtn{
+            align-self: start;
+            margin-right: 10px;
+            margin-top: -10px;
+        }
         .exchangeProperties{
-
+            .propertiesContainer{
+                flex-wrap: wrap;
+                width: 250px;
+                padding: 10px;
+                .property{
+                    width: 10px;
+                    height: 15px;
+                    position: relative;
+                    margin-left: 10px;
+                    margin-top: 10px;
+                    .propDistrict{
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        height: 15px;
+                        width: 100%;
+                        border-radius: 5px 5px 0px 0px;
+                    }
+                }
+            }
+            
             .chosenProperty{
-                border: 1px solid black;
-                width: 20px;
-                height: 20px;
+                width: 15px;
+                height: 15px;
+                position: absolute;
+                top: -5px;
+                left: -5px;
+                border-radius: 50%;
+                background: #97e997;
+                mat-icon{
+                    font-size: 14px;
+                }
             }
 
         }

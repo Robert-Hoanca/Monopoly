@@ -81,7 +81,7 @@ export class GameComponent implements OnInit {
   }
 
   getActualPlayerProps(){
-    return this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.actualTurnPlayer.id)
+    return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.actualTurnPlayer.id));
   }
 
   resizeCanvas(event:any){

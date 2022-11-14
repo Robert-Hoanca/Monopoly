@@ -327,6 +327,34 @@ export class GameService {
     this.actualTurnPlayer.money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
     this.checkCompletedSeries(property, this.actualTurnPlayer.id);
   }
+
+  sortProperties(properties:Array<any>){
+    let propDistrics:Array<any> = [];
+    let sortedProps:Array<any> = [];
+
+    properties.forEach(prop => {
+      if(!propDistrics.includes(prop.district)){
+        propDistrics.push(prop.district)
+      }
+    });
+
+    propDistrics.forEach(propDis => {
+      properties.filter((property:any) => property.district == propDis).forEach(founndProp => {
+        sortedProps.push(founndProp)
+      });
+    });
+    return sortedProps;
+  }
+  checkCardColorDistring(districtName:string){
+    if(districtName.includes('station')){
+      return '#000'
+    }else if(districtName.includes('plant')){
+      return 'grey'
+    }else{
+      return districtName
+    }
+  }
+
   checkCompletedSeries(property:any,playerId:string){
     const groupCards = this.gameTable.cards.filter((card: { district: any; }) => card.district == property.district) //ALL CARDS
     const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == this.actualTurnPlayer.id)
@@ -520,55 +548,55 @@ export class GameService {
       }
     }
 //DistrictName
-    cardsData[1].district = 'brown';
-    cardsData[3].district = 'brown';
+    cardsData[1].district = '#663300';
+    cardsData[3].district = '#663300';
     cardsData[1].name = 'Old Kent Road';
     cardsData[3].name = 'Whitechapel Road';
 
-    cardsData[6].district = 'cyan';
-    cardsData[8].district = 'cyan';
-    cardsData[9].district = 'cyan';
+    cardsData[6].district = '#0099CC';
+    cardsData[8].district = '#0099CC';
+    cardsData[9].district = '#0099CC';
     cardsData[6].name = 'The Angel Islington';
     cardsData[8].name = 'Euston Road';
     cardsData[9].name = 'Pentonville Road';
 
-    cardsData[11].district = 'magenta';
-    cardsData[13].district = 'magenta';
-    cardsData[14].district = 'magenta';
+    cardsData[11].district = '#FF3399';
+    cardsData[13].district = '#FF3399';
+    cardsData[14].district = '#FF3399';
     cardsData[11].name = 'Pall Mall';
     cardsData[13].name = 'Whitehall';
     cardsData[14].name = 'Northumberland Avenue';
 
-    cardsData[16].district = 'orange';
-    cardsData[18].district = 'orange';
-    cardsData[19].district = 'orange';
+    cardsData[16].district = '#FF9933';
+    cardsData[18].district = '#FF9933';
+    cardsData[19].district = '#FF9933';
     cardsData[16].name = 'Bow Street';
     cardsData[18].name = 'Marlborough Street';
     cardsData[19].name = 'Vine Street';
 
-    cardsData[21].district = 'red';
-    cardsData[23].district = 'red';
-    cardsData[24].district = 'red';
+    cardsData[21].district = '#FF3300';
+    cardsData[23].district = '#FF3300';
+    cardsData[24].district = '#FF3300';
     cardsData[21].name = 'The Strand';
     cardsData[23].name = 'Fleet Street';
     cardsData[24].name = 'Trafalgar Square';
 
-    cardsData[26].district = 'yellow';
-    cardsData[27].district = 'yellow';
-    cardsData[29].district = 'yellow';
+    cardsData[26].district = '#FFFF33';
+    cardsData[27].district = '#FFFF33';
+    cardsData[29].district = '#FFFF33';
     cardsData[26].name = 'Leicester Square';
     cardsData[27].name = 'Coventry Street';
     cardsData[29].name = 'Piccadilli';
     
-    cardsData[31].district = 'green';
-    cardsData[32].district = 'green';
-    cardsData[34].district = 'green';
+    cardsData[31].district = '#339933';
+    cardsData[32].district = '#339933';
+    cardsData[34].district = '#339933';
     cardsData[31].name = 'Regent Street';
     cardsData[32].name = 'Oxford Street';
     cardsData[34].name = 'Bond Street';
 
-    cardsData[37].district = 'blue';
-    cardsData[39].district = 'blue';
+    cardsData[37].district = '#000066';
+    cardsData[39].district = '#000066';
     cardsData[37].name = 'Park Lan';
     cardsData[39].name = 'Mayfair';
 
