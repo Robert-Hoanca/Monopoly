@@ -3,7 +3,7 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="(cardIndex == gameService.diceNumber || card.owner == gameService.actualTurnPlayer.id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant')?  gameService.openCardDialog(card): '';test()"
+    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.actualTurnPlayer.id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant')?  gameService.openCardDialog(card): '';test()"
     [receiveShadow]="true"
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"

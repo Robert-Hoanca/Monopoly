@@ -55,7 +55,7 @@
 
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around center">
        
-        <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.actualTurnPlayer.id == player.id? '100%': '120%'}" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
+        <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.actualTurnPlayer.id == player.id? '120%': '100%'}" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
             <span>{{player.name}}</span>
             <span>{{player.money}} €</span>
         </mat-card>

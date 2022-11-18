@@ -177,6 +177,7 @@ export class GameService {
       this.actualTurnPlayer.actualCard = this.diceNumber;
       this.getCardPosition$.next(this.diceNumber);
       this.actualTurnPlayer.canDice = false;
+      this.openCardDialog(this.gameTable.cards[this.actualTurnPlayer.actualCard])
       this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)])
       this.payTaxes(this.gameTable.cards[(this.actualTurnPlayer.actualCard)],diceRes);
     }else{
@@ -231,7 +232,7 @@ export class GameService {
       this.actualTurnPlayer.money -= amount;
       this.checkBankrupt(this.actualTurnPlayer,amount);
       this.players.find(player => player.id == property.owner).money +=amount;
-      this.textDialog(this.actualTurnPlayer.name + ' has payed ' + amount + '.', 1500)
+      this.textDialog(this.actualTurnPlayer.name + ' has payed ' + amount + '.', 2500)
     }
   }
   calculateTaxesToPay(property:any, diceNumber:Array<number>){
@@ -293,7 +294,7 @@ export class GameService {
       this.checkBankrupt(this.actualTurnPlayer,50);
     }else if(property.cardType == 'chance'){
 
-    }else if(property.cardType == 'chest'){
+    }else if(property.cardType == 'communityChest'){
 
     }
   }
@@ -346,9 +347,9 @@ export class GameService {
     return sortedProps;
   }
   checkCardColorDistring(districtName:string){
-    if(districtName.includes('station')){
+    if(districtName=='station'){
       return '#000'
-    }else if(districtName.includes('plant')){
+    }else if(districtName=='plant'){
       return 'grey'
     }else{
       return districtName
@@ -378,7 +379,6 @@ export class GameService {
   //DIALOGS
   openCardDialog(card:object){
     this.cardInfoRef = this.dialog.open(CardDialogComponent, {
-      width: '450px',
       panelClass: 'propertyInfo',
       hasBackdrop: true,
       autoFocus: false,
@@ -473,8 +473,8 @@ export class GameService {
       }else if(index == 2 || index == 17 || index == 33){//CHESTS
         cardsData.push({
           canBuy: false,
-          name: "Chest",
-          cardType:'chest',
+          name: "Community Chest",
+          cardType:'communityChest',
           chests : [
             
           ],
@@ -607,6 +607,174 @@ export class GameService {
     cardsData[15].name = 'Marylebone Station';
     cardsData[25].name = 'Fenchurch St Station';
     cardsData[35].name = 'Liverpool Street Station';
+
+
+    /*
+    "chance": [
+    {
+      "title": "Advance to Go (Collect $200)",
+      "action": "move",
+      "tileid": "go"
+    },
+    {
+      "title": "Advance to Illinois Avenue - If you pass Go, collect $200",
+      "action": "move",
+      "tileid": "illinoiseave"
+    },
+    {
+      "title": "Advance to St. Charles Place - If you pass Go, collect $200",
+      "action": "move",
+      "tileid": "stcharlesplace"
+    },
+    {
+      "title": "Advance token to nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total ten times the amount thrown.",
+      "action": "movenearest",
+      "groupid": "utility",
+      "rentmultiplier": 10
+    },
+    {
+      "title": "Advance token to the nearest Railroad and pay owner twice the rental to which he/she is otherwise entitled. If Railroad is unowned, you may buy it from the Bank.",
+      "action": "movenearest",
+      "groupid": "railroad",
+      "rentmultiplier": 2
+    },
+    {
+      "title": "Bank pays you dividend of $50",
+      "action": "addfunds",
+      "amount": 50
+    },
+    {
+      "title": "Get out of Jail Free - This card may be kept until needed, or traded/sold",
+      "action": "jail",
+      "subaction": "getout"
+    },
+    {
+      "title": "Go Back 3 Spaces",
+      "action": "move",
+      "count": -3
+    },
+    {
+      "title": "Go to Jail - Go directly to Jail - Do not pass Go, do not collect $200",
+      "action": "jail",
+      "subaction": "goto"
+    },
+    {
+      "title": "Make general repairs on all your property - For each house pay $25 - For each hotel $100",
+      "action": "propertycharges",
+      "buildings": 25,
+      "hotels": 100
+    },
+    {
+      "title": "Pay poor tax of $15",
+      "action": "removefunds",
+      "amount": 15
+    },
+    {
+      "title": "Take a trip to Reading Railroad - If you pass Go, collect $200",
+      "action": "move",
+      "tileid": "readingrailroad"
+    },
+    {
+      "title": "Take a walk on the Boardwalk - Advance token to Boardwalk",
+      "action": "move",
+      "tileid": "boardwalk"
+    },
+    {
+      "title": "You have been elected Chairman of the Board - Pay each player $50",
+      "action": "removefundstoplayers",
+      "amount": 50
+    },
+    {
+      "title": "Your building loan matures - Collect $150",
+      "action": "addfunds",
+      "amount": 50
+    }
+  ],
+  "communitychest": [
+    {
+      "title": "Advance to Go (Collect $200)",
+      "action": "move",
+      "tileid": "go"
+    },
+    {
+      "title": "Bank error in your favor - Collect $200 ",
+      "action": "addfunds",
+      "amount": 200
+    },
+    {
+      "title": "Doctor fee - Pay $50",
+      "action": "removefunds",
+      "amount": 50
+    },
+    {
+      "title": "From sale of stock you get $50",
+      "action": "addfunds",
+      "amount": 50
+    },
+    {
+      "title": "Get Out of Jail Free",
+      "action": "jail",
+      "subaction": "getout"
+    },
+    {
+      "title": "Go to Jail - Go directly to jail - Do not pass Go - Do not collect $200",
+      "action": "jail",
+      "subaction": "goto"
+    },
+    {
+      "title": "Grand Opera Night - Collect $50 from every player for opening night seats",
+      "action": "addfundsfromplayers",
+      "amount": 50
+    },
+    {
+      "title": "Holiday Fund matures - Receive $100",
+      "action": "addfunds",
+      "amount": 100
+    },
+    {
+      "title": "Income tax refund - Collect $20",
+      "action": "addfunds",
+      "amount": 20
+    },
+    {
+      "title": "Life insurance matures - Collect $100",
+      "action": "addfunds",
+      "amount": 100
+    },
+    {
+      "title": "Pay hospital fees of $100",
+      "action": "removefunds",
+      "amount": 100
+    },
+    {
+      "title": "Pay school fees of $150",
+      "action": "removefunds",
+      "amount": 150
+    },
+    {
+      "title": "Receive $25 consultancy fee",
+      "action": "addfunds",
+      "amount": 25
+    },
+    {
+      "title": "You are assessed for street repairs - $40 per house - $115 per hotel",
+      "action": "propertycharges",
+      "buildings": 40,
+      "hotels": 115
+    },
+    {
+      "title": "You have won second prize in a beauty contest - Collect $10",
+      "action": "addfunds",
+      "amount": 10
+    },
+    {
+      "title": "You inherit $100",
+      "action": "addfunds",
+      "amount": 100
+    }
+  ]
+    */
+
 
     await setDoc(doc(this.db, "gameTables", "monopolyMap"), {cards: cardsData});
   }

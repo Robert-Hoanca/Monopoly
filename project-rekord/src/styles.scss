@@ -50,3 +50,18 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   max-width: 60%;
   max-height: 80%;
 }
+.propertyInfo{
+    width: 100%;
+    pointer-events: none!important;
+    .mat-dialog-container{
+        transform: none;
+        background: none;
+        box-shadow: none;
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        app-card-dialog{
+          pointer-events: all;
+        }
+    }
+}
