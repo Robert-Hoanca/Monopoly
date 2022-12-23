@@ -41,6 +41,8 @@ import { MapComponent } from './components/map/map.component';
 import { HouseComponent } from './shared/house/house.component';
 import { HotelComponent } from './shared/hotel/hotel.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
+import { PlayerPropertiesComponent } from './shared/player-properties/player-properties.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +60,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MapComponent,
     HouseComponent,
     HotelComponent,
+    MessageDialogComponent,
+    PlayerPropertiesComponent,
   ],
   imports: [
     BrowserModule,

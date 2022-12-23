@@ -13,13 +13,24 @@
 </th-object3D>
 
 <div *ngIf="card.housesCounter && !card.hotelCounter">
-  <app-house *ngFor="let item of [].constructor(card.housesCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [houseIndex]="i"></app-house>
+  <app-house *ngFor="let item of [].constructor(card.housesCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [houseIndex]="i+1" [cardIndex]="cardIndex"></app-house>
 </div>
 
 <div *ngIf="card.hotelCounter && card.housesCounter==4">
-  <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation"></app-hotel>
+  <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [cardIndex]="cardIndex"></app-hotel>
 </div>
-
+<th-mesh
+  *ngIf="card.cardType=='property'"
+  [rotation]="rotation"
+  [position]="carpetPosistion"
+  [scale]="[2, 0.1, 0.4]"
+  [receiveShadow]="true"
+  [castShadow]="true"
+  #carpetRef
+>
+  <th-boxGeometry></th-boxGeometry>
+  <th-meshStandardMaterial [args]="{color: card.district}"></th-meshStandardMaterial>
+</th-mesh>
 
 <!--<th-object3D
     loadGLTF

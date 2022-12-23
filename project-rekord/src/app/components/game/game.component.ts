@@ -35,13 +35,13 @@ export class GameComponent implements OnInit {
   //ADD OBJECTS TO SCENE
   //this.scene.objRef.children.push( OBJECT );
   rendererOptions:any={
-    /*shadowMap:{
+    shadowMap:{
       enabled:true,
       type:THREE.BasicShadowMap
-    },*/
-    antialias: false,
+    },
+    antialias: true,
     outputEncoding: 3001,
-    toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
+    //toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
 
   constructor(public gameService: GameService,private dialog: MatDialog ) { }
@@ -58,14 +58,14 @@ export class GameComponent implements OnInit {
 
      //SetUp lights and shadow values
     this.light.objRef.shadow.bias = -0.0009;//-0.0005
-    this.light.objRef.intensity=3;//2
-    this.ambientLight.objRef.intensity=2;//1
-    this.light.objRef.shadowMapHeight=2048; 
+    //this.light.objRef.intensity=3;//2
+    //this.ambientLight.objRef.intensity=2;//1
+    /*this.light.objRef.shadowMapHeight=2048; 
     this.light.objRefshadowMapWidth=2048;
     this.light.objRefshadowCameraLeft= -50;  
     this.light.objRefshadowCameraRight= 50;
     this.light.objRefshadowCameraBottom= -50; 
-    this.light.objRefshadowCameraTop= 50;
+    this.light.objRefshadowCameraTop= 50;*/
     this.activateLocalSave();
     
   }
@@ -74,8 +74,13 @@ export class GameComponent implements OnInit {
     setInterval(() => {
       this.gameService.localSave.gameTable = this.gameService.gameTable;
       this.gameService.localSave.players = this.gameService.players;
-      this.gameService.localSave.actualTurnPlayer = this.gameService.actualTurnPlayer;
       this.gameService.localSave.turn=this.gameService.turn;
+      this.gameService.localSave.diceNumber = this.gameService.diceNumber;
+
+      this.gameService.localSave.debt.amountDebt = this.gameService.amountDebt;
+      this.gameService.localSave.debt.debtWithWho = this.gameService.debtWithWho;
+      this.gameService.localSave.debt.setDebt = this.gameService.setDebt;
+      this.gameService.localSave.playerWhoWonId = this.gameService.playerWhoWonId;
       localStorage.setItem("rekordLocalSave", JSON.stringify(this.gameService.localSave));
     }, 10000);
   }
@@ -95,8 +100,6 @@ export class GameComponent implements OnInit {
   openMoneyDialog(data:any){
     this.textDialog = data.text;
     this.dialog.open(this.moneyDialogRef);
-    setTimeout(() => {
-      this.dialog.closeAll()
-    }, data.duration);
+    //this.closeDialogs(data.duration)
   }
 }

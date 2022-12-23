@@ -25,7 +25,7 @@ export class PlayerComponent implements OnInit {
       if (child.isMesh && !that.castedShadow) {
           child.castShadow=true;
           child.receiveShadow=true;
-          child.material = material;
+          //child.material = material;
           that.castedShadow = true;
       }
     })
