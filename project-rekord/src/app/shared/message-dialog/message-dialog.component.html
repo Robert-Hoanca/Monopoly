@@ -1,0 +1,7 @@
+<div>
+    <h1 *ngIf="data.textData.text">{{data.textData.text}}</h1>
+    <h1 *ngIf="data.textData.title">{{data.textData.title}}</h1>
+    <button mat-raised-button (click)="executeAndClose()"> OK</button>
+
+    <app-player-properties *ngIf="data.textData.playerWhoWonId" [playerId]="data.textData.playerWhoWonId"></app-player-properties>
+</div>

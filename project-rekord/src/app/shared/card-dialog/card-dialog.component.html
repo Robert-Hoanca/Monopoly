@@ -1,7 +1,7 @@
 <div id="cardInfo" fxLayout="column" fxLayoutAlign="start start">
 
     <mat-card class="cardForm">
-        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistring(data.card.district)}" fxLayoutAlign="center center">
+        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(data.card.district)}" fxLayoutAlign="center center">
             <span class="cardName" [ngStyle]="{'color': getContrastColor(data.card.district?? data.card.cardType=='station'? '#000000':'#ebebe0')}">{{data.card.name}}</span>
         </span>
         
@@ -54,30 +54,30 @@
         
     </mat-card>
 
+    <div id="auctionContainer">
+
+    </div>
     <div class="cardBtns">
-       
-
-
         <button mat-raised-button (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy" [disabled]="gameService.actualTurnPlayer.money<data.card.cost">Compra</button>
         <button mat-raised-button *ngIf="data.card.canBuy" [disabled]="true">Asta</button>
-        <button mat-raised-button  *ngIf="data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.sellProperty(data.card);close()">Vendi</button>
+        <!-- <button mat-raised-button  *ngIf="data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.sellProperty(data.card);close()">Vendi</button> -->
     
         <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.distrainProperty(data.card);close()">Pignora</button>
 
         <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.actualTurnPlayer.id" (click)="gameService.cancelDistrainedFromProperty(data.card)" [disabled]="gameService.actualTurnPlayer.money<data.card.distrainedCost">Remove pignora</button>
 
-        <div class="housesManager" *ngIf="data.card.completedSeries">
+        <div class="housesManager" *ngIf="data.card.completedSeries && data.card.owner == gameService.players[gameService.turn].id">
             
             <div fxLayout="row" fxLayoutAlign="start center">
                 <div *ngIf="!data.card.hotelCounter" [fxFlex]="'100%'" class="houses">
-                    <button mat-raised-button (click)="removeHouse()" [fxFlex]="'50%'"><mat-icon>remove</mat-icon><mat-icon class="houseIcon">cottage</mat-icon></button>
-                    <button *ngIf="data.card.housesCounter<4" mat-raised-button (click)="addHouse()" [fxFlex]="'50%'"><mat-icon>add</mat-icon><mat-icon class="houseIcon">cottage</mat-icon></button>
-                    <button *ngIf="data.card.housesCounter==4" mat-raised-button (click)="addHotel()" [fxFlex]="'50%'"><mat-icon>add</mat-icon><mat-icon class="hotelIcon">cottage</mat-icon></button>
+                    <button mat-raised-button (click)="removeHouse()" [disabled]="!data.card.housesCounter" [fxFlex]="'50%'"><mat-icon>remove</mat-icon><mat-icon class="houseIcon">cottage</mat-icon></button>
+                    <button *ngIf="data.card.housesCounter<4" mat-raised-button (click)="addHouse()" [fxFlex]="'50%'" [disabled]="gameService.players[gameService.turn].money < data.card.houseCost"><mat-icon>add</mat-icon><mat-icon class="houseIcon">cottage</mat-icon></button>
+                    <button *ngIf="data.card.housesCounter==4" mat-raised-button (click)="addHotel()" [fxFlex]="'50%'" [disabled]="gameService.players[gameService.turn].money < data.card.hotelCost"><mat-icon>add</mat-icon><mat-icon class="hotelIcon">cottage</mat-icon></button>
                 </div>
 
                 <div *ngIf="data.card.hotelCounter" [fxFlex]="'100%'" class="hotel">
                     <button mat-raised-button (click)="removeHotel()" [fxFlex]="'50%'"><mat-icon>remove</mat-icon><mat-icon class="hotelIcon">cottage</mat-icon></button>
-                    <button mat-raised-button (click)="addHotel()" [fxFlex]="'50%'"><mat-icon>add</mat-icon><mat-icon class="hotelIcon">cottage</mat-icon></button>
+                    <button mat-raised-button (click)="addHotel()" [fxFlex]="'50%'" *ngIf="!data.card.hotelCounter"><mat-icon>add</mat-icon><mat-icon class="hotelIcon">cottage</mat-icon></button>
                 </div>
             </div>
         </div>

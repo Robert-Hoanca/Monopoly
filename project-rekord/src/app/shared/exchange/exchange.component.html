@@ -14,12 +14,13 @@
             <mat-card fxLayout="column" fxLayoutAlign="space-around center">
                 <span>{{gameService.actualTurnPlayer.name}}</span>
     
-                <div fxLayout="row" class="propertiesContainer">
+                <!-- <div fxLayout="row" class="propertiesContainer">
                     <mat-card class="property" *ngFor="let property of actualPlayerProps" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="property.exchangeSelected = !property.exchangeSelected">
-                        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistring(property.district)}"></span>
+                        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(property.district)}"></span>
                         <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center" >check</mat-icon></span>
                     </mat-card>
-                </div>
+                </div> -->
+                <app-player-properties [playerId]="gameService.players[gameService.turn].id"></app-player-properties>
     
                 <mat-form-field appearance="fill">
                     <mat-label>Money</mat-label>
@@ -30,12 +31,13 @@
             <mat-card fxLayout="column" fxLayoutAlign="space-around center">
                 <span>{{playerToExchangeWith.name}}</span>
     
-                <div fxLayout="row" class="propertiesContainer">
+                <!-- <div fxLayout="row" class="propertiesContainer">
                     <mat-card class="property" *ngFor="let property of playerToExchangeProps" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="property.exchangeSelected = !property.exchangeSelected">
-                        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistring(property.district)}"></span>
+                        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(property.district)}"></span>
                         <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center">check</mat-icon></span>
                     </mat-card>
-                </div>
+                </div> -->
+                <app-player-properties [playerId]="playerToExchangeWith.id"></app-player-properties>
                 <mat-form-field appearance="fill">
                     <mat-label>Money</mat-label>
                     <input matInput type="number" [(ngModel)]="moneyToExchange[1]">
