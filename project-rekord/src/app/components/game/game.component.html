@@ -3,7 +3,7 @@
     <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions">
         <th-scene [thStats]="true" [autoUpdate]="true" #scene>
             
-            <th-ambientLight #ambientLight> </th-ambientLight><!--[color]="[gameService.ambientLightColor]"-->
+            <th-ambientLight #ambientLight> </th-ambientLight>
             <th-pointLight
             #light
             [castShadow]="true"
@@ -21,7 +21,6 @@
                     [castShadow]="true"
                     #sky
             >
-            <!--<th-texture loadTexture url="/assets/blenderModels/Maps/skyboxSimple/SimpleSky.png"></th-texture>-->
             </th-object3D>
 
             <th-object3D
@@ -66,20 +65,19 @@
     </div>
 
     <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
-        <button mat-raised-button id="seeProperties" *ngIf="!gameService.actualTurnPlayer.canDice" [matMenuTriggerFor]="propertiesMenu" [disabled]="!getActualPlayerProps().length"><mat-icon>view_carousel</mat-icon></button>
-        <mat-menu #propertiesMenu="matMenu">
+        <button mat-raised-button id="seeProperties" *ngIf="!gameService.actualTurnPlayer.canDice" [disabled]="!getActualPlayerProps().length || gameService.playerWhoWonId != ''" (click)="gameService.showPlayerProps()"><mat-icon>view_carousel</mat-icon></button>
+        <!-- <mat-menu #propertiesMenu="matMenu">
             <button mat-menu-item class="actualPlayerProperty" *ngFor="let property of getActualPlayerProps()" (click)="gameService.openCardDialog(property)"><span [ngStyle]="{'background': property.district}" class="districtColor"></span>{{property.name}}</button>
-        </mat-menu>
+        </mat-menu> -->
 
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.goBankRupt()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>dangerous</mat-icon></button>
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>currency_exchange</mat-icon></button>
 
-        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()"><mat-icon>currency_exchange</mat-icon></button>
+        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>skip_next</mat-icon></button>
 
-        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.nextTurn()"><mat-icon>skip_next</mat-icon></button>
-        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice && gameService.amountDebt!=0" (click)="gameService.calculateAmountDebt()" ><mat-icon>skip_next</mat-icon></button>
-
-        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()"><mat-icon>casino</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" [disabled]="gameService.players[gameService.turn].money<50" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.prison.getOutCards" (click)="gameService.whatToDoInprison('freeExit')">free get out</button>
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>casino</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != ''" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.prison.getOutCards" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != ''">free get out</button>
 
     </div>
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
@@ -91,13 +89,6 @@
 
     <!--
         DELETE
-    <button mat-raised-button id="blblbl" (click)="gameService.test()">buy properties</button>
     <button mat-raised-button (click)="gameService.setDB()">Set db</button>
-        <button mat-raised-button id="blblbl" (click)="gameService.test()">click me</button>
-
-         <mat-form-field>
-            <mat-label>Choose Your Name</mat-label>
-            <input matInput type="color" autocomplete="off" [ngModel]="gameService.ambientLightColor">
-        </mat-form-field>
     -->
 </div>

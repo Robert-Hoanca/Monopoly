@@ -81,6 +81,10 @@ export class GameComponent implements OnInit {
       this.gameService.localSave.debt.debtWithWho = this.gameService.debtWithWho;
       this.gameService.localSave.debt.setDebt = this.gameService.setDebt;
       this.gameService.localSave.playerWhoWonId = this.gameService.playerWhoWonId;
+      this.gameService.localSave.debt.amountRent = this.gameService.amountRent;
+      this.gameService.localSave.time.begin = this.gameService.beginTime;
+      this.gameService.localSave.time.end = this.gameService.endTime;
+      this.gameService.localSave.time.gameAmountTime = this.gameService.gameAmountTime;
       localStorage.setItem("rekordLocalSave", JSON.stringify(this.gameService.localSave));
     }, 10000);
   }
@@ -100,6 +104,13 @@ export class GameComponent implements OnInit {
   openMoneyDialog(data:any){
     this.textDialog = data.text;
     this.dialog.open(this.moneyDialogRef);
-    //this.closeDialogs(data.duration)
+  }
+
+  tryToGoNextTurn(){
+    if(this.gameService.amountDebt!=0){
+      this.gameService.calculateAmountDebt();
+    }else{
+      this.gameService.nextTurn()
+    }
   }
 }

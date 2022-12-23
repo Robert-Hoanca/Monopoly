@@ -3,5 +3,7 @@
     <h1 *ngIf="data.textData.title">{{data.textData.title}}</h1>
     <button mat-raised-button (click)="executeAndClose()"> OK</button>
 
-    <app-player-properties *ngIf="data.textData.playerWhoWonId" [playerId]="data.textData.playerWhoWonId"></app-player-properties>
+    <app-player-properties *ngIf="gameService.playerWhoWonId != '' || data.textData.showPlayerProps" [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
+
+    <span *ngIf="gameService.playerWhoWonId != ''"> AMOUNT TIME : {{gameService.gameAmountTime}}</span>
 </div>

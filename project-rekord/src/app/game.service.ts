@@ -31,7 +31,13 @@ export class GameService {
     debt: {
       amountDebt: 0,
       debtWithWho: '',
-      setDebt: false
+      setDebt: false,
+      amountRent: 0,
+    },
+    time: {
+      begin: 0,
+      end: 0,
+      gameAmountTime:'',
     },
     playerWhoWonId : '',
   };
@@ -53,6 +59,10 @@ export class GameService {
   cameraControls:any;
   cameraPosition: Vector3 | any;
   cameraLookAt: Vector3 | any;
+
+  beginTime:number = 0;
+  endTime:number = 0;
+  gameAmountTime:string = '';
 
   gameTable:any = {};
   gameMaps:any = [];
@@ -157,6 +167,7 @@ export class GameService {
 
   async startGame(){
     if(!this.localSaves){
+      this.beginTime = Date.now();
       const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
       this.gameTable  = (await getDoc(gameTableRef)).data();
       this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
@@ -168,9 +179,18 @@ export class GameService {
       this.actualTurnPlayer = this.players[this.turn];
       this.diceNumber = this.localSaves.diceNumber;
       this.amountDebt = this.localSaves.debt.amountDebt;
+      this.amountRent = this.localSaves.amountRent;
       this.debtWithWho = this.localSaves.debt.debtWithWho;
-      this.setDebt = this.localSave.debt.setDebt;
-      this.playerWhoWonId = this.localSave.playerWhoWonId;
+      this.setDebt = this.localSaves.debt.setDebt;
+      this.beginTime = this.localSaves.time.begin;
+      this.endTime = this.localSaves.time.end;
+      this.gameAmountTime = this.localSaves.time.gameAmountTime;
+      console.log("endtime",this.endTime)
+      if(this.localSaves.playerWhoWonId){
+        this.playerWhoWonId = this.localSaves.playerWhoWonId;
+        this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!'}, 'finishGame')
+      }
+      
     }
     this.router.navigateByUrl('game', { skipLocationChange: true })
   }
@@ -284,9 +304,9 @@ export class GameService {
   async whichPropertyAmI(property:any){
     if(property.cardType == 'property' || property.cardType == 'station' || property.cardType == 'plant'){
       this.openCardDialog(this.gameTable.cards[this.actualTurnPlayer.actualCard]);
-      if(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].owner && this.gameTable.cards[(this.actualTurnPlayer.actualCard)].owner!=this.actualTurnPlayer.id){
+      if(this.gameTable.cards[(this.actualTurnPlayer.actualCard)].owner && this.gameTable.cards[(this.actualTurnPlayer.actualCard)].owner!=this.actualTurnPlayer.id && !this.gameTable.cards[(this.actualTurnPlayer.actualCard)].distrained){
         this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.actualTurnPlayer.actualCard)],this.diceRes);
-        this.textDialog({text:this.actualTurnPlayer.name + ' has payed ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.actualTurnPlayer.actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney'); 
+        this.textDialog({text:this.actualTurnPlayer.name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.actualTurnPlayer.actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney'); 
       }
     }else if(property.cardType == 'goToPrison' || this.actualTurnPlayer.prison.doubleDiceCounter == 3){
       this.textDialog({text: this.actualTurnPlayer.name + ' is going to prison.'}, 'goingToPrison');
@@ -302,6 +322,11 @@ export class GameService {
 
 
   //MANAGE PROPERTIES
+
+  showPlayerProps(){
+    this.textDialog({text: this.players[this.turn].name, showPlayerProps:true}, 'showPlayerProps')
+  }
+
   buyProperty(property:any){
     this.actualTurnPlayer.money -= property.cost;
     property.canBuy = false;
@@ -507,11 +532,28 @@ export class GameService {
     }
   }
 
+  goBankRupt(){
+    this.players[this.turn].bankrupt = true;
+    this.checkIfSomeoneWon();
+  }
+
   //Check if a player has won the game
   checkIfSomeoneWon(){
     if(this.players.filter(player => !player.bankrupt).length == 1){
+      this.endTime = Date.now();
+      this.playerWhoWonId = this.players.find(player => !player.bankrupt).id;
+      this.calculateGameTime()
       this.textDialog({text: this.players.find(player => !player.bankrupt).name + ' has won the game!', playerWhoWonId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
     }
+  }
+
+  calculateGameTime(){
+    var seconds = Math.round((this.endTime - this.beginTime)) / 1000;
+    var hours = Math.round(( seconds / 3600 )); // 3,600 seconds in 1 hour
+    seconds = seconds % 3600;
+    var minutes = Math.round(( seconds / 60 )); // 60 seconds in 1 minute
+    seconds = Math.round(seconds % 60);
+    this.gameAmountTime = hours + ':' + minutes + ':' + seconds;
   }
 
   //Calculate the amount of debt that a player have to pay to continue playing
