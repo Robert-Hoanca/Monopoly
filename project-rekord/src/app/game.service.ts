@@ -157,9 +157,10 @@ export class GameService {
   }
 
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
+    let oldCardPosition = this.actualTurnPlayer.actualCard;
     this.actualTurnPlayer.actualCard = newCardNum;
     this.actualTurnPlayer.pawn.position =  cardPosition;
-    this.checkIfHasPassedStart(this.actualTurnPlayer.actualCard, newCardNum);
+    this.checkIfHasPassedStart(oldCardPosition, newCardNum);
     this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)])
   }
 
@@ -223,7 +224,7 @@ export class GameService {
       if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
         this.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameTable.cards.length - 1) - this.actualTurnPlayer.actualCard)) - 1);
       }
-      this.checkIfHasPassedStart(this.players[this.turn].actualCard, (this.players[this.turn].actualCard + this.diceNumber) )
+      //this.checkIfHasPassedStart(this.players[this.turn].actualCard, (this.players[this.turn].actualCard + this.diceNumber) )
       this.getCardPosition(this.diceNumber)
       //this.actualTurnPlayer.canDice = false;
     }else{
@@ -469,6 +470,7 @@ export class GameService {
 
   //Check if the player has passet start, if so give him 200
   checkIfHasPassedStart(beforeMove:number, afterMove:number|undefined){
+    console.log("checking passed start", beforeMove, afterMove)
     if(afterMove!=undefined && (afterMove < beforeMove) || afterMove == 0){
       this.textDialog({text: this.actualTurnPlayer.name + ' gained 200', duration: 1000}, 'passedStart')
     }
