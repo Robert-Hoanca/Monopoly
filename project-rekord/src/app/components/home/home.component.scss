@@ -1,0 +1,29 @@
+#home{
+    width: 100%;
+    height: 100%;
+    font-family: mova;
+    #title{
+        width: 100%;
+        text-align: center;
+        font-size: 100px;
+        margin: 0;
+        pointer-events: none;
+    }
+    .playText{
+        position: absolute;
+        bottom: 100px;
+        width: 100%;
+        text-align: center;
+        font-size: 25px;
+        pointer-events: none;
+    }
+
+    .rightsSection{
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+        font-size: 15px;
+        pointer-events: none;
+    }
+}

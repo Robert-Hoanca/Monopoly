@@ -1,0 +1,33 @@
+.propertiesContainer{
+    flex-wrap: wrap;
+    width: 250px;
+    padding: 10px;
+    .property{
+        width: 10px;
+        height: 15px;
+        position: relative;
+        margin-left: 10px;
+        margin-top: 10px;
+        cursor: pointer;
+        .propDistrict{
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 15px;
+            width: 100%;
+            border-radius: 5px 5px 0px 0px;
+        }
+    }
+    .chosenProperty{
+        width: 15px;
+        height: 15px;
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        border-radius: 50%;
+        background: #97e997;
+        mat-icon{
+            font-size: 14px;
+        }
+    }
+}

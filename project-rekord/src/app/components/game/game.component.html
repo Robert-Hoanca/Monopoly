@@ -1,0 +1,93 @@
+<div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
+
+    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions">
+        <th-scene [thStats]="true" [autoUpdate]="true" #scene>
+            
+            <th-ambientLight #ambientLight> </th-ambientLight>
+            <th-pointLight
+            #light
+            [castShadow]="true"
+            [position]="[-15,10,-15]"
+            ></th-pointLight>
+            <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
+            <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
+
+          <th-object3D
+                    loadGLTF
+                    [url]="'/assets/blenderModels/Maps/skyboxSimple/skyBoxEnv.gltf'"
+                    [position]="[10,-25,10]"
+                    [scale]="[1,1,1]"
+                    [receiveShadow]="true"
+                    [castShadow]="true"
+                    #sky
+            >
+            </th-object3D>
+
+            <th-object3D
+            loadGLTF
+            [url]="'/assets/blenderModels/Maps/skyboxSimple/skyBoxClouds.gltf'"
+            [position]="[10,35,10]"
+            [scale]="[1,1,1]"
+            [receiveShadow]="true"
+            [castShadow]="true"
+            >
+            </th-object3D>
+
+            <th-mesh
+                [position]="[0,-1,0]"
+                [scale]="[1000, 0.2, 1000]"
+                >
+                <th-boxGeometry></th-boxGeometry><!--#4287f5-->
+                <th-meshBasicMaterial [args]="{color: '#87f5ea'}" [transparent]="true" [opacity]="1"></th-meshBasicMaterial>
+            </th-mesh>
+
+            <th-perspectiveCamera
+                [args]="[100, 2, 0.1, 1000]"
+                [lookAt]="gameService.cameraLookAt"
+                [position]="gameService.cameraPosition"
+                #camera
+            >
+                <!--<th-orbitControls></th-orbitControls>
+                normalArgs: [args]="[100, 2, 0.1, 1000]"
+                -->
+                <th-mapControls #cameraControls></th-mapControls>
+            </th-perspectiveCamera>
+        </th-scene>
+      </th-canvas>
+      
+
+    <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around center">
+       
+        <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.actualTurnPlayer.id == player.id? '120%': '100%'}" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
+            <span>{{player.name}}</span>
+            <span>{{player.money}} €</span>
+        </mat-card>
+    </div>
+
+    <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.askIfShouldGoBankrupt()" [disabled]="gameService.playerWhoWonId != ''" color="warn" [matTooltipPosition]="'above'" matTooltip="Go bankrupt"><mat-icon>dangerous</mat-icon></button>
+        <button mat-raised-button id="seeProperties" *ngIf="!gameService.actualTurnPlayer.canDice" [disabled]="!getActualPlayerProps().length || gameService.playerWhoWonId != ''" (click)="gameService.showPlayerProps()" [matTooltipPosition]="'above'" matTooltip="Properties"><mat-icon>view_carousel</mat-icon></button>
+        <!-- <mat-menu #propertiesMenu="matMenu">
+            <button mat-menu-item class="actualPlayerProperty" *ngFor="let property of getActualPlayerProps()" (click)="gameService.openCardDialog(property)"><span [ngStyle]="{'background': property.district}" class="districtColor"></span>{{property.name}}</button>
+        </mat-menu> -->
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Exchange"><mat-icon>currency_exchange</mat-icon></button>
+
+        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Next Turn"><mat-icon>skip_next</mat-icon></button>
+
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != ''" (click)="gameService.whatToDoInprison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.prison.getOutCards" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>
+
+    </div>
+    <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
+    <div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
+        <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
+        <button mat-raised-button disabled="true">Options</button>
+        <button mat-raised-button disabled="true">Home</button>
+    </div>
+
+    <!--
+        DELETE
+    <button mat-raised-button (click)="gameService.setDB()">Set db</button>
+    -->
+</div>
