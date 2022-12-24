@@ -1,9 +1,18 @@
-<div>
+<div id="messageContainer">
     <h1 *ngIf="data.textData.text">{{data.textData.text}}</h1>
     <h1 *ngIf="data.textData.title">{{data.textData.title}}</h1>
-    <button mat-raised-button (click)="executeAndClose()"> OK</button>
+    
+    <div *ngIf="gameService.playerWhoWonId != ''" class="winScreen">
+        <div>Player money: {{getPlayerWhoWin().money}} €</div>
+        <div>Time to finish the game:</div>
+        <div class="time">{{gameService.gameAmountTime}}</div>
+    </div>
 
     <app-player-properties *ngIf="gameService.playerWhoWonId != '' || data.textData.showPlayerProps" [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
-
-    <span *ngIf="gameService.playerWhoWonId != ''"> AMOUNT TIME : {{gameService.gameAmountTime}}</span>
+    <div class="finishWarning" fxLayoutAlign="end center">
+        <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt">Yes</button>
+        <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt" color="warn">No</button>
+        <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt">OK</button>
+    </div>
+    
 </div>

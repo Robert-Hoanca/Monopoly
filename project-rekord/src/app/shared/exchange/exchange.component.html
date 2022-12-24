@@ -20,7 +20,7 @@
                         <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center" >check</mat-icon></span>
                     </mat-card>
                 </div> -->
-                <app-player-properties [playerId]="gameService.players[gameService.turn].id"></app-player-properties>
+                <app-player-properties [playerId]="gameService.players[gameService.turn].id" [imInExchange]="true"></app-player-properties>
     
                 <mat-form-field appearance="fill">
                     <mat-label>Money</mat-label>
@@ -37,7 +37,7 @@
                         <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center">check</mat-icon></span>
                     </mat-card>
                 </div> -->
-                <app-player-properties [playerId]="playerToExchangeWith.id"></app-player-properties>
+                <app-player-properties [playerId]="playerToExchangeWith.id" [imInExchange]="true"></app-player-properties>
                 <mat-form-field appearance="fill">
                     <mat-label>Money</mat-label>
                     <input matInput type="number" [(ngModel)]="moneyToExchange[1]">

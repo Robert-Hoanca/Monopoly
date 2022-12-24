@@ -93,7 +93,8 @@ export class MessageDialogComponent implements OnInit {
         });
         this.gameService.checkIfSomeoneWon();
         break;
-      case 'finishGame':
+      case 'goBankRupt':
+        this.gameService.goBankRupt();
         break;
     }
     this.closeDialog();
@@ -127,7 +128,6 @@ export class MessageDialogComponent implements OnInit {
           this.closeDialog();
           this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' is going to prison.'}, 'goingToPrison');
         }
-
         break;
       case 'propertycharges':
         let amount = 0;
@@ -153,18 +153,13 @@ export class MessageDialogComponent implements OnInit {
         }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], amount)){
           this.gameService.calculateAmountDebt(amount);
         }
-        //this.gameService.players[this.gameService.turn].money < amount && !this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn],amount)? this.gameService.calculateAmountDebt(amount) : this.gameService.players[this.gameService.turn].money -= amount;
         break;
       case 'removefunds':
-
         if(this.gameService.players[this.gameService.turn].money >= data.amount){
           this.gameService.players[this.gameService.turn].money -= data.amount;
         }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], data.amount)){
           this.gameService.calculateAmountDebt(data.amount);
-        }
-       
-        //this.gameService.players[this.gameService.turn].money < data.amount && !this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn],data.amount)? this.gameService.calculateAmountDebt(data.amount) : this.gameService.players[this.gameService.turn].money -= data.amount;
-       
+        }       
         break;
       case 'removefundstoplayers':
         (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach((otherPlayer: { money: any; }) => {
@@ -174,36 +169,30 @@ export class MessageDialogComponent implements OnInit {
           }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], data.amount)){
             this.gameService.calculateAmountDebt(data.amount);
           }
-          //this.gameService.players[this.gameService.turn].money < data.amount && !this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn],data.amount) ? this.gameService.calculateAmountDebt(data.amount) : this.gameService.players[this.gameService.turn].money -= data.amount;
           otherPlayer.money += data.amount;
           
         });
         break;
       case 'addfundsfromplayers':
         (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach((otherPlayer:any ) => {
-            
           if(otherPlayer.money >= data.amount){
             otherPlayer.money -= data.amount
             this.gameService.players[this.gameService.turn].money += data.amount;
           }else if(!this.gameService.checkBankrupt(otherPlayer, data.amount)){
             this.gameService.calculateAmountDebt(data.amount)
           }
-          /*if(otherPlayer.money < data.amount && !this.gameService.checkBankrupt(this.gameService.players.find(player => player.id == otherPlayer.id),data.amount)){
-            this.gameService.calculateAmountDebt(data.amount)
-          }else{
-            otherPlayer.money -= data.amount
-            this.gameService.players[this.gameService.turn].money += data.amount;
-          }*/
         });
         break;
     }
   }
 
-
   closeDialog(){
     this.movedNearest = false;
     this.dialogRef.close();
   }
-}
 
+  getPlayerWhoWin(){
+    return this.gameService.players.find(player => player.id == this.gameService.playerWhoWonId)
+  }
+}
 

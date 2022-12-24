@@ -157,12 +157,10 @@ export class GameService {
   }
 
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
-   // this.actualTurnPlayer.actualCard = this.diceNumber;
     this.actualTurnPlayer.actualCard = newCardNum;
     this.actualTurnPlayer.pawn.position =  cardPosition;
     this.checkIfHasPassedStart(this.actualTurnPlayer.actualCard, newCardNum);
     this.whichPropertyAmI(this.gameTable.cards[(this.actualTurnPlayer.actualCard)])
-   // this.checkIfHasPassedStart(this.actualTurnPlayer.actualCard, this.diceNumber);
   }
 
   async startGame(){
@@ -185,7 +183,6 @@ export class GameService {
       this.beginTime = this.localSaves.time.begin;
       this.endTime = this.localSaves.time.end;
       this.gameAmountTime = this.localSaves.time.gameAmountTime;
-      console.log("endtime",this.endTime)
       if(this.localSaves.playerWhoWonId){
         this.playerWhoWonId = this.localSaves.playerWhoWonId;
         this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!'}, 'finishGame')
@@ -215,8 +212,12 @@ export class GameService {
        this.diceRes = this.getDiceRoll();
       if(this.diceRes[0]==this.diceRes[1]){
         this.actualTurnPlayer.prison.doubleDiceCounter++;
+        this.actualTurnPlayer.canDice = true;
+        console.log("double dice")
       }else{
         this.actualTurnPlayer.prison.doubleDiceCounter=0;
+        this.actualTurnPlayer.canDice = false;
+        console.log("normal dice")
       }
       this.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.actualTurnPlayer.actualCard);
       if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
@@ -224,7 +225,7 @@ export class GameService {
       }
       this.checkIfHasPassedStart(this.players[this.turn].actualCard, (this.players[this.turn].actualCard + this.diceNumber) )
       this.getCardPosition(this.diceNumber)
-      this.actualTurnPlayer.canDice = false;
+      //this.actualTurnPlayer.canDice = false;
     }else{
      this.whatToDoInprison('prisonRoll')
     }
@@ -318,8 +319,6 @@ export class GameService {
       this.getChestChance('communityChest');
     }
   }
-
-
 
   //MANAGE PROPERTIES
 
@@ -532,6 +531,10 @@ export class GameService {
     }
   }
 
+  askIfShouldGoBankrupt(){
+    this.textDialog({text: 'You are going to go bankrupt. Confirm?', goBankRupt:true}, 'goBankRupt')
+  }
+
   goBankRupt(){
     this.players[this.turn].bankrupt = true;
     this.checkIfSomeoneWon();
@@ -553,7 +556,7 @@ export class GameService {
     seconds = seconds % 3600;
     var minutes = Math.round(( seconds / 60 )); // 60 seconds in 1 minute
     seconds = Math.round(seconds % 60);
-    this.gameAmountTime = hours + ':' + minutes + ':' + seconds;
+    this.gameAmountTime = hours + ' : ' + minutes + ' : ' + seconds;
   }
 
   //Calculate the amount of debt that a player have to pay to continue playing

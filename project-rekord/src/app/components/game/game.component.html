@@ -65,19 +65,18 @@
     </div>
 
     <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
-        <button mat-raised-button id="seeProperties" *ngIf="!gameService.actualTurnPlayer.canDice" [disabled]="!getActualPlayerProps().length || gameService.playerWhoWonId != ''" (click)="gameService.showPlayerProps()"><mat-icon>view_carousel</mat-icon></button>
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.askIfShouldGoBankrupt()" [disabled]="gameService.playerWhoWonId != ''" color="warn" [matTooltipPosition]="'above'" matTooltip="Go bankrupt"><mat-icon>dangerous</mat-icon></button>
+        <button mat-raised-button id="seeProperties" *ngIf="!gameService.actualTurnPlayer.canDice" [disabled]="!getActualPlayerProps().length || gameService.playerWhoWonId != ''" (click)="gameService.showPlayerProps()" [matTooltipPosition]="'above'" matTooltip="Properties"><mat-icon>view_carousel</mat-icon></button>
         <!-- <mat-menu #propertiesMenu="matMenu">
             <button mat-menu-item class="actualPlayerProperty" *ngFor="let property of getActualPlayerProps()" (click)="gameService.openCardDialog(property)"><span [ngStyle]="{'background': property.district}" class="districtColor"></span>{{property.name}}</button>
         </mat-menu> -->
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Exchange"><mat-icon>currency_exchange</mat-icon></button>
 
-        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.goBankRupt()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>dangerous</mat-icon></button>
-        <button mat-raised-button id="openExchange" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>currency_exchange</mat-icon></button>
+        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Next Turn"><mat-icon>skip_next</mat-icon></button>
 
-        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.actualTurnPlayer.canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>skip_next</mat-icon></button>
-
-        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()" [disabled]="gameService.playerWhoWonId != ''"><mat-icon>casino</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != ''" (click)="gameService.whatToDoInprison('payToExit')"><mat-icon>payments</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.prison.getOutCards" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != ''">free get out</button>
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.actualTurnPlayer.canDice" (click)="gameService.rollTheDice()" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != ''" (click)="gameService.whatToDoInprison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.actualTurnPlayer.prison.inPrison && gameService.actualTurnPlayer.prison.getOutCards" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>
 
     </div>
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>

@@ -9,6 +9,8 @@ import { GameService } from 'src/app/game.service';
 export class PlayerPropertiesComponent implements OnInit {
   
   @Input() playerId: string = '';
+  @Input() imInExchange: boolean = false;
+
 
   constructor(public gameService: GameService) { }
 
@@ -19,4 +21,11 @@ export class PlayerPropertiesComponent implements OnInit {
     return  this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerId));
   }
 
+  selectProperty(property:any){
+    if(this.imInExchange){
+      property.exchangeSelected = !property.exchangeSelected;
+    }else if(this.gameService.playerWhoWonId == ''){
+      this.gameService.openCardDialog(property)
+    }
+  }
 }
