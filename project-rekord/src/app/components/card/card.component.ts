@@ -136,8 +136,6 @@ export class CardComponent implements OnInit {
       cube.position.y = 5;
       cube.position.z = 0;
       this.scene.objRef.children.push(cube)
-      console.log("added")
-      console.log(this.scene)
     } );
 
 
@@ -160,6 +158,5 @@ export class CardComponent implements OnInit {
 
 
   test(){
-    console.log(this.position)
   }
 }

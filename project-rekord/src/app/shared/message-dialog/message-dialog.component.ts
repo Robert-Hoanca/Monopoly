@@ -21,7 +21,6 @@ export class MessageDialogComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-    console.log("initd ata",this.data)
     if(this.data.textData.duration){
       setTimeout(() => {
         this.gameService.players[this.gameService.turn].money+=200;

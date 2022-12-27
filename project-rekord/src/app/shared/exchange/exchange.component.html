@@ -12,7 +12,7 @@
 
         <div class="exchangeProperties" fxLayout="row" fxLayoutAlign="start start">
             <mat-card fxLayout="column" fxLayoutAlign="space-around center">
-                <span>{{gameService.actualTurnPlayer.name}}</span>
+                <span>{{gameService.players[gameService.turn].name}}</span>
     
                 <!-- <div fxLayout="row" class="propertiesContainer">
                     <mat-card class="property" *ngFor="let property of actualPlayerProps" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="property.exchangeSelected = !property.exchangeSelected">

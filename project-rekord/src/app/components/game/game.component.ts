@@ -76,7 +76,6 @@ export class GameComponent implements OnInit {
       this.gameService.localSave.players = this.gameService.players;
       this.gameService.localSave.turn=this.gameService.turn;
       this.gameService.localSave.diceNumber = this.gameService.diceNumber;
-
       this.gameService.localSave.debt.amountDebt = this.gameService.amountDebt;
       this.gameService.localSave.debt.debtWithWho = this.gameService.debtWithWho;
       this.gameService.localSave.debt.setDebt = this.gameService.setDebt;
@@ -85,12 +84,18 @@ export class GameComponent implements OnInit {
       this.gameService.localSave.time.begin = this.gameService.beginTime;
       this.gameService.localSave.time.end = this.gameService.endTime;
       this.gameService.localSave.time.gameAmountTime = this.gameService.gameAmountTime;
-      localStorage.setItem("rekordLocalSave", JSON.stringify(this.gameService.localSave));
+      if(this.gameService.localSaves.gameName){
+        this.gameService.localSave.gameName = this.gameService.localSaves.gameName;
+      }
+      if(this.gameService.localSaves.localId){
+        this.gameService.localSave.localId = this.gameService.localSaves.localId;
+      }
+      localStorage.setItem(this.gameService.localSaveName, JSON.stringify(this.gameService.localSave));
     }, 10000);
   }
 
   getActualPlayerProps(){
-    return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.actualTurnPlayer.id));
+    return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.players[this.gameService.turn].id));
   }
 
   resizeCanvas(event:any){
@@ -112,5 +117,11 @@ export class GameComponent implements OnInit {
     }else{
       this.gameService.nextTurn()
     }
+  }
+
+  goBackHome(){
+    location.reload();
+    //this.gameService.localSaves = {};
+   // this.gameService.router.navigateByUrl('home', { skipLocationChange: true })
   }
 }

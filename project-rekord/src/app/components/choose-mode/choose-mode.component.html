@@ -2,9 +2,37 @@
 
     <div *ngIf="!gameService.choosenMode">
         <button mat-raised-button (click)="chooseMode('local')">Local</button>
-        <button mat-raised-button (click)="chooseMode('online')">Online</button>
+        <button mat-raised-button (click)="chooseMode('online')" [disabled]="true">Online</button>
     </div>
-    <div *ngIf="gameService.choosenMode">
+
+    <div *ngIf="gameService.choosenMode == 'local' && !gameService.localSaveName" id="localSaves" fxLayoutAlign="space-around center">
+        <mat-card *ngFor="let saveFile of gameService.retrieveSavesFromLocal(); let i = index"  class="localSave" (click)="createOrUploadGame(saveFile,i)">
+            <div *ngIf="saveFile == 'new'" fxLayoutAlign="center center" class="saveContainer" fxLayout="column">
+                <mat-icon *ngIf="gameService.localSave.localId != ('rekordLocalSave' + i)">add</mat-icon>
+                <mat-form-field *ngIf="gameService.localSave.localId == ('rekordLocalSave' + i)">
+                    <mat-label>Game Name:</mat-label>
+                    <input matInput autocomplete="off" (click)="$event.stopPropagation()" placeholder="Insert Here tha name of the game" [(ngModel)]="gameService.localSave.gameName">
+                </mat-form-field>
+
+                <button mat-raised-button (click)="gameService.selectLocalData(i)" *ngIf="gameService.localSave.localId == ('rekordLocalSave' + i)">Continue</button>
+
+            </div>
+            <div *ngIf="saveFile != 'new'" fxLayout="column" fxLayoutAlign="center center" class="saveContainer">
+                <span>{{saveFile.gameName}}</span>
+            </div>
+
+            <div class="contextMenu">
+                <button  mat-icon-button class="deleteBtn" [matMenuTriggerFor]="saveInfo" (click)="$event.stopPropagation()"> <mat-icon>more_vert</mat-icon> </button>
+                <mat-menu #saveInfo="matMenu">
+                    <button mat-menu-item (click)="deleteSaveFile(saveFile)"><mat-icon>delete</mat-icon> Delete File</button>
+                  </mat-menu>
+            </div>
+
+
+        </mat-card>
+    </div>
+
+    <div *ngIf="gameService.choosenMode && gameService.localSaveName">
 
         <div id="createdPlayers" fxLayout="row" fxLayoutAlign="center space-around">
             <mat-card *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around">

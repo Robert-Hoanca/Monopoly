@@ -73,6 +73,6 @@ export class HouseComponent implements OnInit {
   }
 
   test(){
-    console.log(this.cardIndex,this.houseIndex, this.housePosition)
+    //console.log(this.cardIndex,this.houseIndex, this.housePosition)
   }
 }
