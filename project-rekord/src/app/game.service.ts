@@ -43,6 +43,7 @@ export class GameService {
     localId: '',
   };
   localSaves:any = {};
+  allLocalSaves:Array<any> = [];
   localSaveName:string = '';
   gamePaused:boolean=false;
   //Colors
@@ -137,7 +138,7 @@ export class GameService {
     }else{
       localStorageAllSaves.push('new');
     }
-    return localStorageAllSaves;
+    this.allLocalSaves = localStorageAllSaves;
   }
 
   selectLocalData(index:number){

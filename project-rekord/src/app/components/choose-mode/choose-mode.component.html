@@ -6,7 +6,7 @@
     </div>
 
     <div *ngIf="gameService.choosenMode == 'local' && !gameService.localSaveName" id="localSaves" fxLayoutAlign="space-around center">
-        <mat-card *ngFor="let saveFile of gameService.retrieveSavesFromLocal(); let i = index"  class="localSave" (click)="createOrUploadGame(saveFile,i)">
+        <mat-card *ngFor="let saveFile of gameService.allLocalSaves; let i = index"  class="localSave" (click)="createOrUploadGame(saveFile,i)">
             <div *ngIf="saveFile == 'new'" fxLayoutAlign="center center" class="saveContainer" fxLayout="column">
                 <mat-icon *ngIf="gameService.localSave.localId != ('rekordLocalSave' + i)">add</mat-icon>
                 <mat-form-field *ngIf="gameService.localSave.localId == ('rekordLocalSave' + i)">
@@ -22,7 +22,7 @@
             </div>
 
             <div class="contextMenu">
-                <button  mat-icon-button class="deleteBtn" [matMenuTriggerFor]="saveInfo" (click)="$event.stopPropagation()"> <mat-icon>more_vert</mat-icon> </button>
+                <button *ngIf="saveFile != 'new'"  mat-icon-button class="deleteBtn" [matMenuTriggerFor]="saveInfo" (click)="$event.stopPropagation()"> <mat-icon>more_vert</mat-icon> </button>
                 <mat-menu #saveInfo="matMenu">
                     <button mat-menu-item (click)="deleteSaveFile(saveFile)"><mat-icon>delete</mat-icon> Delete File</button>
                   </mat-menu>

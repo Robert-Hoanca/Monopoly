@@ -73,6 +73,7 @@ export class ChooseModeComponent implements OnInit {
   deleteSaveFile(saveFile:any){
     if(saveFile != 'new'){
       localStorage.removeItem(saveFile.localId);
+      this.gameService.retrieveSavesFromLocal()
     }
   }
 
