@@ -113,7 +113,7 @@ export class GameService {
       doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
     });
 
-    this.cameraPosition = new THREE.Vector3()
+    this.cameraPosition = new THREE.Vector3(-10,10,-10);
     this.cameraLookAt = new THREE.Vector3();
   }
 
@@ -160,16 +160,23 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  setCameraPosition(camera:any,x:number, y:number,z:number, duration:number){
+  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean){
    setTimeout(() => {
     this.cameraControls._objRef.enabled = false;
    }, 0);
    setTimeout(() => {
     this.cameraControls._objRef.enabled = true; 
    }, duration);
-   gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: x, duration: duration/1000});
-   gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: y, duration: duration/1000});
-   gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: z, duration: duration/1000});
+
+   if(playerMoving != undefined){
+    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: duration/1000});
+   }else{
+    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: duration/1000});
+   }
   }
 
   getCardPosition(cardIndex:any){
@@ -180,8 +187,11 @@ export class GameService {
     let oldCardPosition = this.players[this.turn].actualCard;
     this.players[this.turn].actualCard = newCardNum;
     this.players[this.turn].pawn.position =  cardPosition;
-    this.checkIfHasPassedStart(oldCardPosition, newCardNum);
-    this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)])
+    this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 1500, 5, true);
+    setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
+      this.checkIfHasPassedStart(oldCardPosition, newCardNum);
+      this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)]);
+    }, 1500);
   }
 
   async startGame(){
@@ -225,7 +235,7 @@ export class GameService {
     this.players[this.turn] = this.players[this.turn];
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
-    //this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 5)
+    this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5);
   }
   async rollTheDice(){
     if(!this.players[this.turn].prison.inPrison){
