@@ -143,7 +143,6 @@ export class GameService {
 
   selectLocalData(index:number){
     this.localSaveName = 'rekordLocalSave' + index;
-    console.log(this.localSaveName)
   }
 
   createPlayer(name:string, pawnIndex:number){
@@ -242,9 +241,7 @@ export class GameService {
       if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
         this.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameTable.cards.length - 1) - this.players[this.turn].actualCard)) - 1);
       }
-      //this.checkIfHasPassedStart(this.players[this.turn].actualCard, (this.players[this.turn].actualCard + this.diceNumber) )
       this.getCardPosition(this.diceNumber)
-      //this.players[this.turn].canDice = false;
     }else{
      this.whatToDoInprison('prisonRoll')
     }
@@ -340,7 +337,6 @@ export class GameService {
   }
 
   //MANAGE PROPERTIES
-
   showPlayerProps(){
     this.textDialog({text: this.players[this.turn].name, showPlayerProps:true}, 'showPlayerProps')
   }
@@ -523,7 +519,7 @@ export class GameService {
   checkBankrupt(player:any, moneyToSub:number, playerToPay?:number){
     const playerProps= this.gameTable.cards.filter((card: { owner: any; })=>card.owner == player.id);
     let moneyFromDistrain = 0;
-    if((player.money - moneyToSub)<0 && playerProps.length<1){
+    if((player.money - moneyToSub - this.amountDebt)<0 && playerProps.length<1){
       this.textDialog({text: player.name + ' went bankrupt', player, playerToPay}, 'backrupt');
       return true;
     }else if(playerProps.length && (player.money - moneyToSub)<0){
@@ -537,8 +533,8 @@ export class GameService {
           }
         }
       });
-      if(((player.money - moneyToSub) + moneyFromDistrain)<0){
-        this.textDialog({text: player.name + 'went bankrupt', player, playerToPay},'backrupt');
+      if(((player.money - moneyToSub - this.amountDebt) + moneyFromDistrain)<0){
+        this.textDialog({text: player.name + ' went bankrupt', player, playerToPay},'backrupt');
         return true;
       }else{
         return false;
@@ -578,14 +574,23 @@ export class GameService {
 
   //Calculate the amount of debt that a player have to pay to continue playing
   calculateAmountDebt(specialEventAmount?:any, playerId?:string){
-    if(this.amountDebt==0 && !specialEventAmount){
+    console.log("calculating debt")
+    if(!specialEventAmount){
       this.debtWithWho = 'player';
       this.setDebt = true;
-      this.amountDebt = (this.amountRent - this.players[this.turn].money);
-    }else if(this.amountDebt==0 && specialEventAmount){
+      if(this.amountDebt == 0){
+        this.amountDebt = (this.amountRent - this.players[this.turn].money);
+      }else{
+        this.amountDebt = this.amountDebt + (this.amountRent - this.players[this.turn].money);
+      }
+    }else if(specialEventAmount){
       this.debtWithWho = 'bank';
       this.setDebt = true;
-      this.amountDebt = (specialEventAmount - (playerId??this.players[this.turn].money));
+      if(this.amountDebt==0){
+        this.amountDebt = (specialEventAmount - (playerId??this.players[this.turn].money))
+      }else{
+        this.amountDebt = this.amountDebt + (specialEventAmount - (playerId??this.players[this.turn].money))
+      }
     }
     if(this.debtWithWho == 'player'){
       this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountDebt + ' of debts to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)],amountDebt:this.amountDebt, playerRent:true, debtWithWho: this.debtWithWho}, 'payMoney');
