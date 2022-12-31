@@ -158,36 +158,49 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, playerRef?:any){
+  setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, playerRef?:any){
+    let xOffset = offset;
+    let zOffset = offset;
+    if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20 && xOffset){
+      xOffset+=0;
+    }else if(30 < this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 39 && xOffset){
+      xOffset-=10;
+    }
+    if(20 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 30 && zOffset){
+      zOffset+=0;
+    }else if(0 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 10 && zOffset){
+      zOffset-=10;
+    }
    setTimeout(() => {
     this.cameraControls._objRef.enabled = false;
    }, 0);
    setTimeout(() => {
-    this.cameraControls._objRef.enabled = true; 
+    this.cameraControls._objRef.enabled = true;
+    
    }, duration);
-
+   if(this.cameraControls){
+    gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: x, duration: 1000});
+    gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: y, duration: 1000});
+    gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: z, duration: 1000});
+   }
    if(playerMoving != undefined){
-    console.log("playerRef",playerRef)
     if((playerRef._objRef.position.x != 0 || playerRef._objRef.position.x != 10 || playerRef._objRef.position.x != 20 || playerRef._objRef.position.x != 30) && (x == 0 || x == 10  || x == 20 || x == 30)){
-      gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: 1250/1000});
+      gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset ) : x, duration: 1250/1000});
+      gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: 1250/1000});
       setTimeout(() => {
-        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: 1250/1000});
+        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: 1250/1000});
       }, 1250);
     }else{
-      gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: 1250/1000});
+      gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: 1250/1000});
+      gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: 1250/1000});
       setTimeout(() => {
-        gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: 1250/1000});
+        gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: 1250/1000});
       }, 1250);
     }
-    //gsap.fromTo(this.players[this.turn].pawn.position, {x: this.players[this.turn].pawn.position[0]}, {x: offset ? (x + offset) : x, duration: duration/1000});
-    //gsap.fromTo(this.players[this.turn].pawn.position, {y: this.players[this.turn].pawn.position[1]}, {y: offset ? (y + offset) : y, duration: duration/1000});
-    //gsap.fromTo(this.players[this.turn].pawn.position, {z: this.players[this.turn].pawn.position[2]}, {z: offset ? (z + offset) : z, duration: duration/1000});
    }else{
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: duration/1000});
     gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: duration/1000});
-    //camera._objRef.up.x = x;
-    //camera._objRef.up.z = z;
+    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: duration/1000});
    }
   }
 
@@ -200,12 +213,10 @@ export class GameService {
     this.players[this.turn].actualCard = newCardNum;
     this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next(cardPosition);
-    //this.players[this.turn].pawn.position =  cardPosition;
-    //this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 1500, 5, true);
     setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
       this.checkIfHasPassedStart(oldCardPosition, newCardNum);
       this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)]);
-    }, 1500);
+    }, 1250);
   }
 
   async startGame(){
@@ -465,7 +476,7 @@ export class GameService {
     this.players[this.turn].actualCard = 10;
     this.getCardPosition$.next(10);
     this.players[this.turn].canDice=false;
-    this.nextTurn();
+    //this.nextTurn();
   }
 
   whatToDoInprison(action:string){
