@@ -1,7 +1,5 @@
 import { Injectable, TemplateRef } from '@angular/core';
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { Firestore, collectionData, collection, getFirestore, doc, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
+import { collection, getFirestore, doc, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
@@ -13,7 +11,6 @@ import * as uuid from 'uuid';
 import gsap from 'gsap'
 import { Vector3 } from 'three';
 import * as THREE from 'three';
-import { json } from 'stream/consumers';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
 
 @Injectable({
@@ -78,6 +75,7 @@ export class GameService {
   playerWhoWonId:string = '';
 
   getCardPosition$ = new Subject();
+  setPlayerPosition$ = new Subject();
   openTextDialog$ = new Subject();
 
   //DIALOGS
@@ -160,7 +158,7 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean){
+  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, playerRef?:any){
    setTimeout(() => {
     this.cameraControls._objRef.enabled = false;
    }, 0);
@@ -169,13 +167,27 @@ export class GameService {
    }, duration);
 
    if(playerMoving != undefined){
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: duration/1000});
+    console.log("playerRef",playerRef)
+    if((playerRef._objRef.position.x != 0 || playerRef._objRef.position.x != 10 || playerRef._objRef.position.x != 20 || playerRef._objRef.position.x != 30) && (x == 0 || x == 10  || x == 20 || x == 30)){
+      gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: 1250/1000});
+      setTimeout(() => {
+        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: 1250/1000});
+      }, 1250);
+    }else{
+      gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: 1250/1000});
+      setTimeout(() => {
+        gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: 1250/1000});
+      }, 1250);
+    }
+    //gsap.fromTo(this.players[this.turn].pawn.position, {x: this.players[this.turn].pawn.position[0]}, {x: offset ? (x + offset) : x, duration: duration/1000});
+    //gsap.fromTo(this.players[this.turn].pawn.position, {y: this.players[this.turn].pawn.position[1]}, {y: offset ? (y + offset) : y, duration: duration/1000});
+    //gsap.fromTo(this.players[this.turn].pawn.position, {z: this.players[this.turn].pawn.position[2]}, {z: offset ? (z + offset) : z, duration: duration/1000});
    }else{
     gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: offset ? (x + offset) : x, duration: duration/1000});
     gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: duration/1000});
     gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: offset ? (z + offset) : z, duration: duration/1000});
+    //camera._objRef.up.x = x;
+    //camera._objRef.up.z = z;
    }
   }
 
@@ -187,7 +199,9 @@ export class GameService {
     let oldCardPosition = this.players[this.turn].actualCard;
     this.players[this.turn].actualCard = newCardNum;
     this.players[this.turn].pawn.position =  cardPosition;
-    this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 1500, 5, true);
+    this.setPlayerPosition$.next(cardPosition);
+    //this.players[this.turn].pawn.position =  cardPosition;
+    //this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 1500, 5, true);
     setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
       this.checkIfHasPassedStart(oldCardPosition, newCardNum);
       this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)]);
