@@ -9,7 +9,10 @@
     [name]="'cardNumber'+ cardIndex"
     #cardRef
 >
-<!-- OTHER EVENTS onMouseEnter   onMouseExit-->
+<!-- OTHER EVENTS onMouseEnter   onMouseExit
+    [onBeforeRender]="enableShadow(cardRef.objRef, this)"
+-->
+  <th-meshStandardMaterial [roughness]="1"></th-meshStandardMaterial>
 </th-object3D>
 
 <div *ngIf="card.housesCounter && !card.hotelCounter">
@@ -29,5 +32,5 @@
   #carpetRef
 >
   <th-boxGeometry></th-boxGeometry>
-  <th-meshStandardMaterial [args]="{color: card.district}"></th-meshStandardMaterial>
+  <th-meshStandardMaterial [args]="{color: card.district}" [roughness]="1"></th-meshStandardMaterial>
 </th-mesh>

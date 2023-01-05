@@ -37,7 +37,7 @@ export class GameComponent implements OnInit {
   rendererOptions:any={
     shadowMap:{
       enabled:true,
-      type:THREE.BasicShadowMap
+      type:THREE.PCFSoftShadowMap
     },
     antialias: true,
     outputEncoding: 3001,
@@ -57,17 +57,17 @@ export class GameComponent implements OnInit {
     this.gameService.cameraControls = this.cameraControls;
 
      //SetUp lights and shadow values
-    this.light.objRef.shadow.bias = -0.0009;//-0.0005
+    this.light.objRef.shadow.bias = -0.005;//-0.0005
     //this.light.objRef.intensity=3;//2
     //this.ambientLight.objRef.intensity=2;//1
-    /*this.light.objRef.shadowMapHeight=2048; 
+    this.light.objRef.shadowMapHeight=2048; 
     this.light.objRefshadowMapWidth=2048;
     this.light.objRefshadowCameraLeft= -50;  
     this.light.objRefshadowCameraRight= 50;
     this.light.objRefshadowCameraBottom= -50; 
-    this.light.objRefshadowCameraTop= 50;*/
+    this.light.objRefshadowCameraTop= 50;
     this.activateLocalSave();
-    
+    console.log(this.camera.objRef)
   }
 
   activateLocalSave(){
@@ -93,7 +93,6 @@ export class GameComponent implements OnInit {
       localStorage.setItem(this.gameService.localSaveName, JSON.stringify(this.gameService.localSave));
     }, 10000);
   }
-
   getActualPlayerProps(){
     return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.players[this.gameService.turn].id));
   }

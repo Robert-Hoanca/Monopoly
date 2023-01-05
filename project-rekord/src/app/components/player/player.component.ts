@@ -28,6 +28,7 @@ export class PlayerComponent implements OnInit {
         this.setPlayerPosition(data)
       }
     })
+    //this.enableShadow(this.playerRef.objRef, this);
   }
   ngAfterViewInit(){
   }
@@ -60,11 +61,10 @@ export class PlayerComponent implements OnInit {
   enableShadow(element:any, that:any){
     const material = new THREE.MeshStandardMaterial();
     element.traverse((child:any) => {
-      if (child.isMesh && !that.castedShadow) {
+      if (child.isMesh) {
           child.castShadow=true;
           child.receiveShadow=true;
           //child.material = material;
-          that.castedShadow = true;
       }
     })
     return element;

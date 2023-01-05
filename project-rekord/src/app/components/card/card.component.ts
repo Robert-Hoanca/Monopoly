@@ -48,20 +48,18 @@ export class CardComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-    this.enableShadow(this.cardRef.objRef, this)
+    this.enableShadow(this.cardRef._objRef, this)
   }
 
   enableShadow(element:any, that:any){
-    element.traverse((child:any) => {
-      if (child.isMesh ) {
-        const material = new THREE.MeshStandardMaterial();
-        
-        child.castShadow=true;
-        child.receiveShadow=true;
-        child.material = material;
-        //that.castedShadow = true;
-      }
-    })
+    const material = new THREE.MeshStandardMaterial({roughness:1});
+    this.cardRef._objRef.material = material;
+   /* element.traverse((child:any) => {
+      console.log(child.castShadow , child.receiveShadow)
+      child.castShadow=true;
+      child.receiveShadow=true;
+      child.material = material
+    })*/
   }
 
   setCardPosition(){
