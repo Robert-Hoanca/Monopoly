@@ -31,7 +31,7 @@
   <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [cardIndex]="cardIndex"></app-hotel>
 </div>
 <th-mesh
-  *ngIf="card.cardType=='property'"
+  *ngIf="card.cardType=='property' || card.cardType=='plant' || card.cardType=='station'"
   [rotation]="rotation"
   [position]="carpetPosistion"
   [scale]="[2, 0.1, 0.4]"
@@ -40,5 +40,15 @@
   #carpetRef
 >
   <th-boxGeometry></th-boxGeometry>
-  <th-meshBasicMaterial [args]="{color: card.district}"></th-meshBasicMaterial>
+  <th-meshBasicMaterial [args]="{color: gameService.checkCardColorDistrict(card.district)}"
+  ></th-meshBasicMaterial>
 </th-mesh>
+
+<th-object3D
+  *ngIf="card.cardType=='start'"
+    loadGLTF
+    [url]="'/assets/blenderModels/card/definitiveCard/startFlag.gltf'"
+    [position]="[0,0,0]"
+    [name]="'startFlag'"
+>
+</th-object3D>

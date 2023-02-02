@@ -453,7 +453,7 @@ export class GameService {
     if(districtName=='station'){
       return '#000'
     }else if(districtName=='plant'){
-      return 'grey'
+      return '#808080'
     }else{
       return districtName
     }
