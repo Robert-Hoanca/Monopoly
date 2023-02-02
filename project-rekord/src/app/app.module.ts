@@ -33,8 +33,6 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 
 //NGX THREE
 import { NgxThreeModule } from 'ngx-three';
-import { ThObjLoaderPipe } from './th-obj-loader.pipe';
-import { ThObjLoaderDirective } from './th-obj-loader.directive';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
 import { PlayerComponent } from './components/player/player.component';
 import { MapComponent } from './components/map/map.component';
@@ -53,8 +51,6 @@ import { PlayerPropertiesComponent } from './shared/player-properties/player-pro
     PawnComponent,
     CardDialogComponent,
     ChooseModeComponent,
-    ThObjLoaderPipe,
-    ThObjLoaderDirective,
     ExchangeComponent,
     PlayerComponent,
     MapComponent,
