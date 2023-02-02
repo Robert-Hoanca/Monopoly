@@ -3,7 +3,7 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): ''"
+    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): ''; test()"
     [receiveShadow]="true"
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
@@ -12,7 +12,15 @@
 <!-- OTHER EVENTS onMouseEnter   onMouseExit
     [onBeforeRender]="enableShadow(cardRef.objRef, this)"
 -->
-  <th-meshStandardMaterial [roughness]="1"></th-meshStandardMaterial>
+</th-object3D>
+
+<th-object3D
+    loadGLTF
+    [url]="url"
+    [position]="position"
+    [scale]="[1.1, 1.1, 1.1]"
+    [name]="'cardOutline'+ cardIndex"
+>
 </th-object3D>
 
 <div *ngIf="card.housesCounter && !card.hotelCounter">
@@ -32,5 +40,5 @@
   #carpetRef
 >
   <th-boxGeometry></th-boxGeometry>
-  <th-meshStandardMaterial [args]="{color: card.district}" [roughness]="1"></th-meshStandardMaterial>
+  <th-meshBasicMaterial [args]="{color: card.district}"></th-meshBasicMaterial>
 </th-mesh>

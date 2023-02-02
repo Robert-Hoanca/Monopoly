@@ -33,7 +33,7 @@ export class CardComponent implements OnInit {
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
-    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/islandM.gltf':'/assets/blenderModels/card/islandM.gltf';
+    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/definitiveCard/card.gltf':'/assets/blenderModels/card/definitiveCard/card.gltf';
     this.setCardPosition();
     this.setCarpetPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
@@ -48,50 +48,11 @@ export class CardComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-    this.enableShadow(this.cardRef._objRef, this)
   }
-
-  enableShadow(element:any, that:any){
-    const material = new THREE.MeshStandardMaterial({roughness:1});
-    this.cardRef._objRef.material = material;
-   /* element.traverse((child:any) => {
-      console.log(child.castShadow , child.receiveShadow)
-      child.castShadow=true;
-      child.receiveShadow=true;
-      child.material = material
-    })*/
-  }
-
   setCardPosition(){
-    //this.rotation = [0,(Math.PI / 2)* Math.round(Math.random() * (100 - 1) + 1),0];
-    /*if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
-      this.gameService.cardsPositionCounter = 0;
-      this.gameService.cardsPositionCounter += 2.5;
-    }
-    if(this.cardIndex <= 10){
-      this.position = [ this.gameService.cardsPositionCounter,0,0];
-      if(this.cardIndex == 0){
-        this.position = [ 0,0,0];
-      }
-    }else  if(10 < this.cardIndex && this.cardIndex <= 20){
-      this.position = [21,0,this.gameService.cardsPositionCounter];
-      this.rotation = [0,(Math.PI / 2),0]
-    }else  if(20 < this.cardIndex && this.cardIndex <= 30){
-      this.position = [(21 - this.gameService.cardsPositionCounter),0,21];
-    }else  if(30 < this.cardIndex && this.cardIndex <= 40){
-      this.position = [0,0,(21-this.gameService.cardsPositionCounter)];
-      this.rotation = [0,(Math.PI / 2),0];
-    }
-    
-    if(this.cardIndex == 9 || this.cardIndex == 19 || this.cardIndex == 29 || this.cardIndex == 39){
-      this.gameService.cardsPositionCounter += 0.5
-    }
-    this.gameService.cardsPositionCounter += (this.cardIndex/10) % 1 == 0 ? 2.5 : 2;*/
-
-
     if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
       this.gameService.cardsPositionCounter = 0;
-      this.gameService.cardsPositionCounter += 2;
+      this.gameService.cardsPositionCounter += 2.2;
     }
 
     if(this.cardIndex <= 10){
@@ -100,15 +61,15 @@ export class CardComponent implements OnInit {
         this.position = [0,0,0];
       }
     }else  if(10 < this.cardIndex && this.cardIndex <= 20){
-      this.position = [20,0,this.gameService.cardsPositionCounter];
+      this.position = [22,0,this.gameService.cardsPositionCounter];
       this.rotation = [0,(Math.PI / 2),0]
     }else  if(20 < this.cardIndex && this.cardIndex <= 30){
-      this.position = [(20 - this.gameService.cardsPositionCounter),0,20];
+      this.position = [(22 - this.gameService.cardsPositionCounter),0,22];
     }else  if(30 < this.cardIndex && this.cardIndex <= 40){
-      this.position = [0,0,(20-this.gameService.cardsPositionCounter)];
+      this.position = [0,0,(22-this.gameService.cardsPositionCounter)];
       this.rotation = [0,(Math.PI / 2),0];
     }
-    this.gameService.cardsPositionCounter += 2;
+    this.gameService.cardsPositionCounter += 2.2;
   }
 
   loadText(){
@@ -154,7 +115,7 @@ export class CardComponent implements OnInit {
     this.carpetPosistion[1]+=0.05;
   }
 
-
   test(){
+    console.log(this.cardRef._objRef)
   }
 }

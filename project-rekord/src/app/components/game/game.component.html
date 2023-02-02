@@ -1,55 +1,13 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
-    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions">
+    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions" [ngStyle]="{'background': 'radial-gradient(' + gameService.sessionColor + ',' +  gameService.LightenDarkenColor(this.gameService.sessionColor, -80)+ ')'}" (onRender)="changeCardColor()">
         <th-scene [thStats]="true" [autoUpdate]="true" #scene>
             
-            <th-ambientLight #ambientLight></th-ambientLight>
-            <th-pointLight
-                #light
-                [castShadow]="true"
-                [position]="[-10,10,-10]"
-            >
-            </th-pointLight>
-            <th-object3D
-            loadGLTF
-            [url]="'/assets/blenderModels/card/\IslandCenter/islandCenterDefault.gltf'"
-            [position]="[10,0,10]"
-            [scale]="[1,1,1]"
-            [receiveShadow]="true"
-            [castShadow]="true"
-            >
-            </th-object3D>
+            <th-ambientLight #ambientLight [intensity]="1"></th-ambientLight>
+            <th-hemisphereLight></th-hemisphereLight>
+
             <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
-
-            <th-object3D
-                    loadGLTF
-                    [url]="'/assets/blenderModels/Maps/skyboxSimple/skyBoxEnv.gltf'"
-                    [position]="[10,-25,10]"
-                    [scale]="[1,1,1]"
-                    #sky
-            >
-            </th-object3D>
-
-            <th-object3D
-            loadGLTF
-            [url]="'/assets/blenderModels/Maps/skyboxSimple/skyBoxClouds.gltf'"
-            [position]="[10,35,10]"
-            [scale]="[1,1,1]"
-            [receiveShadow]="true"
-            [castShadow]="true"
-            >
-            </th-object3D>
-
-            <th-mesh
-                [position]="[0,-1,0]"
-                [scale]="[1000, 0.2, 1000]"
-                [receiveShadow]="true"
-                [castShadow]="true"
-                >
-                <th-boxGeometry></th-boxGeometry><!--#4287f5-->
-                <th-meshBasicMaterial [args]="{color: '#87f5ea'}" [transparent]="true" [opacity]="1"></th-meshBasicMaterial>
-            </th-mesh>
 
             <th-perspectiveCamera
                 [args]="[100, 2, 0.1, 1000]"
@@ -57,9 +15,6 @@
                 [position]="gameService.cameraPosition"
                 #camera
             >
-                <!--<th-orbitControls></th-orbitControls>
-                normalArgs: [args]="[100, 2, 0.1, 1000]"
-                -->
                 <th-mapControls #cameraControls></th-mapControls>
             </th-perspectiveCamera>
         </th-scene>

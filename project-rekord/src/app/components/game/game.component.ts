@@ -19,8 +19,6 @@ export class GameComponent implements OnInit {
 
   @ViewChild('camera', { static: true }) camera:any;
   @ViewChild('cameraControls', { static: true }) cameraControls:any;
-  
-  @ViewChild('light', { static: true }) light:any;
   @ViewChild('ambientLight', { static: true }) ambientLight:any;
 
   @ViewChild('sky', { static: true }) sky:any;
@@ -31,17 +29,19 @@ export class GameComponent implements OnInit {
 
   openTextDialog$: Subscription | undefined;
   textDialog:string='';
+  cardChangedCounter:number = 0;
+  cardOutlineChangedCounter:number = 0;
 
   //ADD OBJECTS TO SCENE
   //this.scene.objRef.children.push( OBJECT );
   rendererOptions:any={
     shadowMap:{
-      enabled:true,
-      type:THREE.PCFSoftShadowMap
+      //enabled:true,
+      //type:THREE.PCFSoftShadowMap
     },
     antialias: true,
-    outputEncoding: 3001,
-    //toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
+    //outputEncoding: 3001,
+   // toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
 
   constructor(public gameService: GameService,private dialog: MatDialog ) { }
@@ -55,17 +55,6 @@ export class GameComponent implements OnInit {
     this.gameService.camera = this.camera;
     this.gameService.setCameraPosition(this.camera, -2.5,2.5,-2.5, 2500)   
     this.gameService.cameraControls = this.cameraControls;
-
-     //SetUp lights and shadow values
-    this.light.objRef.shadow.bias = -0.005;//-0.0005
-    //this.light.objRef.intensity=3;//2
-    //this.ambientLight.objRef.intensity=2;//1
-    this.light.objRef.shadowMapHeight=2048; 
-    this.light.objRefshadowMapWidth=2048;
-    this.light.objRefshadowCameraLeft= -50;  
-    this.light.objRefshadowCameraRight= 50;
-    this.light.objRefshadowCameraBottom= -50; 
-    this.light.objRefshadowCameraTop= 50;
     this.activateLocalSave();
     console.log(this.camera.objRef)
   }
@@ -130,5 +119,28 @@ export class GameComponent implements OnInit {
     location.reload();
     //this.gameService.localSaves = {};
    // this.gameService.router.navigateByUrl('home', { skipLocationChange: true })
+  }
+
+  changeCardColor(){
+    let color = new THREE.Color( this.gameService.sessionColor )
+    this.scene.objRef.children.forEach((child:any) => {
+      if( child.name.includes('cardNumber') && this.cardChangedCounter < this.gameService.gameTable.cards.length){
+        child.traverse((child:any) => {
+          if(child.isMesh ){
+            const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -20)});
+            child.material = material
+            this.cardChangedCounter++;
+          }
+        })
+      }else if( child.name.includes('cardOutline') && this.cardOutlineChangedCounter < this.gameService.gameTable.cards.length){
+        child.traverse((child:any) => {
+          if(child.isMesh ){
+            const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -40), side: THREE.BackSide});
+            child.material = material
+            this.cardOutlineChangedCounter++;
+          }
+        })
+      }
+    });
   }
 }
