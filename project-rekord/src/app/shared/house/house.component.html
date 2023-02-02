@@ -2,9 +2,12 @@
     loadGLTF
     [url]="houseUrl"
     [position]="housePosition"
-    [rotation]="cardRotation"
+    [rotation]="houseRotation"
     [receiveShadow]="true"
     [castShadow]="true"
+    #houseRef
 >
 </th-object3D>
-<!--(onClick)="test()"-->
+
+
+<!-- <app-decorative-element *ngFor="let item of [].constructor(1)" [url]="'/assets/blenderModels/card/island/trees/tree' + getRandomTreeNum() +  '.gltf'" [position]="housePosition" [rotation]="houseRotation"></app-decorative-element> -->

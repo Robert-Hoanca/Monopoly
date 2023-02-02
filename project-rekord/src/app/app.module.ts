@@ -43,6 +43,7 @@ import { HotelComponent } from './shared/hotel/hotel.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
 import { PlayerPropertiesComponent } from './shared/player-properties/player-properties.component';
+import { DecorativeElementComponent } from './shared/decorative-element/decorative-element.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { PlayerPropertiesComponent } from './shared/player-properties/player-pro
     HotelComponent,
     MessageDialogComponent,
     PlayerPropertiesComponent,
+    DecorativeElementComponent,
   ],
   imports: [
     BrowserModule,

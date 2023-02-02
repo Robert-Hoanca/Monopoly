@@ -1,6 +1,6 @@
 <th-object3D
     loadGLTF
-    [url]="url"
+    [url]="urlTop"
     [position]="position"
     [rotation]="rotation"
     (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): ''"
@@ -9,20 +9,19 @@
     [name]="'cardNumber'+ cardIndex"
     #cardRef
 >
+
 <!-- OTHER EVENTS onMouseEnter   onMouseExit
     [onBeforeRender]="enableShadow(cardRef.objRef, this)"
 -->
-  <th-meshStandardMaterial [roughness]="1"></th-meshStandardMaterial>
 </th-object3D>
-
 <div *ngIf="card.housesCounter && !card.hotelCounter">
-  <app-house *ngFor="let item of [].constructor(card.housesCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [houseIndex]="i+1" [cardIndex]="cardIndex"></app-house>
+  <app-house *ngFor="let item of [].constructor(card.housesCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [houseIndex]="i+1" [cardIndex]="cardIndex" [possiblePositions]="possibleHousePositions"></app-house>
 </div>
 
 <div *ngIf="card.hotelCounter && card.housesCounter==4">
   <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [cardIndex]="cardIndex"></app-hotel>
 </div>
-<th-mesh
+<!-- <th-mesh
   *ngIf="card.cardType=='property'"
   [rotation]="rotation"
   [position]="carpetPosistion"
@@ -33,4 +32,4 @@
 >
   <th-boxGeometry></th-boxGeometry>
   <th-meshStandardMaterial [args]="{color: card.district}" [roughness]="1"></th-meshStandardMaterial>
-</th-mesh>
+</th-mesh> -->

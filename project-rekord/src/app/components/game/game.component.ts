@@ -24,7 +24,6 @@ export class GameComponent implements OnInit {
   @ViewChild('ambientLight', { static: true }) ambientLight:any;
 
   @ViewChild('sky', { static: true }) sky:any;
-
   @ViewChild('moneyDialog', { static: true }) moneyDialogRef!: TemplateRef<any>;
 
   actualPlayerProps:Array<any> = [];
@@ -35,13 +34,14 @@ export class GameComponent implements OnInit {
   //ADD OBJECTS TO SCENE
   //this.scene.objRef.children.push( OBJECT );
   rendererOptions:any={
-    shadowMap:{
+    /*shadowMap:{
       enabled:true,
-      type:THREE.PCFSoftShadowMap
-    },
+      type:THREE.PCFSoftShadowMap,
+      autoUpdate:true,
+    },*/
     antialias: true,
     outputEncoding: 3001,
-    //toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
+    toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
 
   constructor(public gameService: GameService,private dialog: MatDialog ) { }
@@ -53,21 +53,22 @@ export class GameComponent implements OnInit {
   }
   ngAfterViewInit(){
     this.gameService.camera = this.camera;
-    this.gameService.setCameraPosition(this.camera, -2.5,2.5,-2.5, 2500)   
+    this.gameService.setCameraPosition(this.camera, -15,15,-15, 2500)
     this.gameService.cameraControls = this.cameraControls;
 
      //SetUp lights and shadow values
-    this.light.objRef.shadow.bias = -0.005;//-0.0005
+    this.light.objRef.shadow.normalBias = -0.0005;//-0.0005
+    this.light.objRef.shadow.bias = -0.00023; //00023
+    this.light.objRef.shadow.radius = 0.30; //0.30
     //this.light.objRef.intensity=3;//2
     //this.ambientLight.objRef.intensity=2;//1
     this.light.objRef.shadowMapHeight=2048; 
     this.light.objRefshadowMapWidth=2048;
-    this.light.objRefshadowCameraLeft= -50;  
-    this.light.objRefshadowCameraRight= 50;
-    this.light.objRefshadowCameraBottom= -50; 
-    this.light.objRefshadowCameraTop= 50;
+    this.light.objRef.shadow.camera.left= -25;  
+    this.light.objRef.shadow.camera.right= 25;
+    this.light.objRef.shadow.camera.bottom= -25; 
+    this.light.objRef.shadow.camera.top= 25;
     this.activateLocalSave();
-    console.log(this.camera.objRef)
   }
 
   activateLocalSave(){
@@ -90,6 +91,7 @@ export class GameComponent implements OnInit {
       if(this.gameService.localSaves.localId){
         this.gameService.localSave.localId = this.gameService.localSaves.localId;
       }
+      this.gameService.localSave.fancyGraphics = this.gameService.fancyGraphics;
       localStorage.setItem(this.gameService.localSaveName, JSON.stringify(this.gameService.localSave));
     }, 10000);
   }
@@ -128,7 +130,19 @@ export class GameComponent implements OnInit {
 
   goBackHome(){
     location.reload();
-    //this.gameService.localSaves = {};
-   // this.gameService.router.navigateByUrl('home', { skipLocationChange: true })
+  }
+
+  enableShadow(){
+    this.scene.objRef.children.forEach((child:any) => {
+        child.traverse((child:any) => {
+          if(child.isMesh && !child.castShadow){
+            let color = new THREE.Color( child.material.color.r, child.material.color.g, child.material.color.b )
+            const material = new THREE.MeshLambertMaterial({color: color});
+            child.castShadow=true;
+            child.receiveShadow=true;
+            child.material = material
+          }
+        })
+    });
   }
 }

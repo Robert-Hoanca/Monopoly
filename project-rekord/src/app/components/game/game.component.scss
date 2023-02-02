@@ -53,3 +53,17 @@
         width: 5px;
     }
 }
+
+#manopoleDebug{
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: end;
+    pointer-events: none;
+    &>*{
+        pointer-events: all;
+    }
+}

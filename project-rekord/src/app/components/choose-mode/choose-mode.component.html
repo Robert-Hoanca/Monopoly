@@ -138,6 +138,9 @@
         <div id="startGame" fxLayoutAlign="center center">
             <button class="startGameBtn"  mat-raised-button (click)="gameService.startGame()" [disabled]="gameService.players.length<2">PLAY</button>
         </div>
+
+
+        <mat-checkbox [(ngModel)]="gameService.fancyGraphics"></mat-checkbox>
     </div>
     
 </div>

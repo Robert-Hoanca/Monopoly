@@ -38,6 +38,7 @@ export class GameService {
     },
     playerWhoWonId : '',
     localId: '',
+    fancyGraphics: false,
   };
   localSaves:any = {};
   allLocalSaves:Array<any> = [];
@@ -47,6 +48,7 @@ export class GameService {
   bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
   sessionColor:string= '';
   players: Array<any> = [];
+  fancyGraphics:boolean = true;
   //actualTurnPlayer:any = {};
   ambientLightColor:string='#ff8326'
 

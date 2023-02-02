@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import { setInterval } from 'timers';
 
 @Component({
   selector: 'app-card',
@@ -18,11 +19,20 @@ export class CardComponent implements OnInit {
   @Input() cardIndex!: any;
   @Input() scene!: any;
 
-  url:string='';
+  urlTop:string='';
+  urlBottom:string='';
 
   position: [x: number, y: number, z: number] = [0, 0, 0];
+  bottomRotation: [x: number, y: number, z: number] = [0, 0, 0];
   rotation: [x: number, y: number, z: number] = [0, 0, 0];
   carpetPosistion: [x: number, y: number, z: number] = [0, 0, 0];
+
+  possibleHousePositions: Array<any> = [
+    1,
+    2,
+    3,
+    4,
+  ];
   
   meshColor:string='#ffff00';
   getCardPosition$: Subscription | undefined;
@@ -33,7 +43,9 @@ export class CardComponent implements OnInit {
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
-    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/islandM.gltf':'/assets/blenderModels/card/islandM.gltf';
+    //this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/islandM.gltf':'/assets/blenderModels/card/islandM.gltf';
+    this.urlTop= '/assets/blenderModels/card/island/island.gltf';
+    this.urlBottom= '/assets/blenderModels/card/island 2.0/Island_bottom.gltf';
     this.setCardPosition();
     this.setCarpetPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
@@ -48,22 +60,10 @@ export class CardComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-    this.enableShadow(this.cardRef._objRef, this)
-  }
-
-  enableShadow(element:any, that:any){
-    const material = new THREE.MeshStandardMaterial({roughness:1});
-    this.cardRef._objRef.material = material;
-   /* element.traverse((child:any) => {
-      console.log(child.castShadow , child.receiveShadow)
-      child.castShadow=true;
-      child.receiveShadow=true;
-      child.material = material
-    })*/
   }
 
   setCardPosition(){
-    //this.rotation = [0,(Math.PI / 2)* Math.round(Math.random() * (100 - 1) + 1),0];
+    this.bottomRotation = [0,(Math.PI / 2)* Math.round(Math.random() * (100 - 1) + 1),0];
     /*if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
       this.gameService.cardsPositionCounter = 0;
       this.gameService.cardsPositionCounter += 2.5;
@@ -109,6 +109,11 @@ export class CardComponent implements OnInit {
       this.rotation = [0,(Math.PI / 2),0];
     }
     this.gameService.cardsPositionCounter += 2;
+  }
+
+  choosePossibleHousePosition(){
+    let randomIndex = Math.round(Math.random() * ((this.possibleHousePositions.length - 1) - 0) + 0);
+    return this.possibleHousePositions[randomIndex];
   }
 
   loadText(){
