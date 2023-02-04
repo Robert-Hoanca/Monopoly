@@ -3,15 +3,14 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): ''; test()"
+    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): '';"
     [receiveShadow]="true"
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
+    (onMouseEnter)="hoverCard('enter')"
+    (onMouseExit)="hoverCard('exit')"
     #cardRef
 >
-<!-- OTHER EVENTS onMouseEnter   onMouseExit
-    [onBeforeRender]="enableShadow(cardRef.objRef, this)"
--->
 </th-object3D>
 
 <th-object3D
@@ -30,6 +29,7 @@
 <div *ngIf="card.hotelCounter && card.housesCounter==4">
   <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [cardIndex]="cardIndex"></app-hotel>
 </div>
+
 <th-mesh
   *ngIf="card.cardType=='property' || card.cardType=='plant' || card.cardType=='station'"
   [rotation]="rotation"
@@ -43,12 +43,10 @@
   <th-meshBasicMaterial [args]="{color: gameService.checkCardColorDistrict(card.district)}"
   ></th-meshBasicMaterial>
 </th-mesh>
-
 <th-object3D
-  *ngIf="card.cardType=='start'"
+  *ngIf="card.cardType=='start' || card.cardType=='parkArea' || card.cardType=='prison'"
     loadGLTF
-    [url]="'/assets/blenderModels/card/definitiveCard/startFlag.gltf'"
-    [position]="[0,0,0]"
-    [name]="'startFlag'"
+    [url]="returnSpecialCardUrl(card.cardType)"
+    [position]="position"
 >
 </th-object3D>

@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import gsap from 'gsap'
 
 @Component({
   selector: 'app-card',
@@ -48,6 +49,7 @@ export class CardComponent implements OnInit {
   }
 
   ngAfterViewInit(){
+    //this.scaleAnimation()
   }
   setCardPosition(){
     if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
@@ -115,7 +117,32 @@ export class CardComponent implements OnInit {
     this.carpetPosistion[1]+=0.05;
   }
 
+  returnSpecialCardUrl(cardType:string){
+    let url = '';
+    switch (cardType) {
+      case 'start':
+        url = '/assets/blenderModels/card/definitiveCard/startFlag.gltf'
+        break;
+      case 'prison':
+        url = '/assets/blenderModels/card/definitiveCard/prisonCage.gltf'
+        break;
+      case 'parkArea':
+        url = '/assets/blenderModels/card/definitiveCard/parkingArea.gltf'
+        break;
+    }
+    return url;
+  }
+  hoverCard(type:string){
+   //this.scaleAnimation()
+    //this.position[1] = type == 'enter' ? this.position[1] + 0.2 : this.position[1] -0.2;
+  }
+
   test(){
-    console.log(this.cardRef._objRef)
+    console.log(this.cardRef._objRef.position, this.cardRef)
+  }
+
+  scaleAnimation(){
+    console.log(this.cardRef._objRef.scale)
+    gsap.fromTo(this.cardRef._objRef.scale, {y: this.cardRef._objRef.scale.y}, {y: 2, duration: 10000});
   }
 }
