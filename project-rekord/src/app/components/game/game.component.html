@@ -26,6 +26,11 @@
         <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.players[gameService.turn].id == player.id? '120%': '100%'}" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
             <span>{{player.name}}</span>
             <span>{{player.money}} €</span>
+
+            <div id="passedStart" *ngIf="(player.addingMoney || player.removingMoney)" [@passedStartMoney]>
+                <span [ngStyle]="{'color': player.addingMoney ? 'green' : 'red'}"> <span [innerHTML]="player.addingMoney ? '+' : '-'"></span> {{gameService.playerMoneyChangeValue}}</span>
+            </div>
+
         </mat-card>
     </div>
 
@@ -41,8 +46,7 @@
 
         <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="gameService.rollTheDice()" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button>
         <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != ''" (click)="gameService.whatToDoInprison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>
-
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != ''" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>     
     </div>
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
     <div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">

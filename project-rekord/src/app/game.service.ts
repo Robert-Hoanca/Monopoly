@@ -73,6 +73,9 @@ export class GameService {
   specialPawn:String='';
   diceNumber:number|undefined;
   playerWhoWonId:string = '';
+  addingPlayerMoney:boolean=false;
+  removingPlayerMoney:boolean=false;
+  playerMoneyChangeValue:number= 0;
 
   getCardPosition$ = new Subject();
   setPlayerPosition$ = new Subject();
@@ -232,7 +235,7 @@ export class GameService {
     this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
     setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
-      this.checkIfHasPassedStart(oldCardPosition, newCardNum);
+      //his.checkIfHasPassedStart(oldCardPosition, newCardNum);
       this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)]);
     }, 2500);
   }
@@ -308,17 +311,22 @@ export class GameService {
   }
 
   payTaxes(property:any){
-    this.players[this.turn].money-= property.taxesCost;
+    //this.players[this.turn].money-= property.taxesCost;
+    this.addingRemovingMoney('remove', property.taxesCost, 1000)
   }
   payRentToPlayer(property:any, shouldPayDept?:boolean){
     if(property.owner && property.owner!=this.players[this.turn].id){
       if(this.players[this.turn].money >= this.amountRent || this.players[this.turn].money >= this.amountDebt){
         if(!shouldPayDept){
-          this.players[this.turn].money -= this.amountRent;
-          this.players.find(player => player.id == property.owner).money += this.amountRent;
+          //this.players[this.turn].money -= this.amountRent;
+          //this.players.find(player => player.id == property.owner).money += this.amountRent;
+          this.addingRemovingMoney('remove', this.amountRent, 1000);
+          this.addingRemovingMoney('add', this.amountRent, 1000, this.players.find(player => player.id == property.owner))
         }else{
-          this.players[this.turn].money -= this.amountDebt;
-          this.players.find(player => player.id == property.owner).money += this.amountDebt;
+          //this.players[this.turn].money -= this.amountDebt;
+          //this.players.find(player => player.id == property.owner).money += this.amountDebt;
+          this.addingRemovingMoney('remove', this.amountDebt, 1000);
+          this.addingRemovingMoney('add', this.amountDebt, 1000,this.players.find(player => player.id == property.owner));
         }
         if(this.amountDebt != 0){
           this.amountDebt = 0;
@@ -389,13 +397,33 @@ export class GameService {
     }
   }
 
+  addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
+    this.playerMoneyChangeValue = amount;
+    if(type=='add'){
+      player? player.addingMoney = true : this.players[this.turn].addingMoney = true;
+      player != undefined? player.money += amount : this.players[this.turn].money += amount;
+      setTimeout(() => {
+        player? player.addingMoney = false : this.players[this.turn].addingMoney = false;
+      }, duration);
+
+    }else if(type=='remove'){
+      player? player.removingMoney = true : this.players[this.turn].removingMoney = true;
+      player != undefined? player.money -= amount : this.players[this.turn].money -= amount;
+      setTimeout(() => {
+        player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
+      }, duration);
+    }
+    //this.playerMoneyChangeValue = 0;
+  }
+
   //MANAGE PROPERTIES
   showPlayerProps(){
     this.textDialog({text: this.players[this.turn].name, showPlayerProps:true}, 'showPlayerProps')
   }
 
   buyProperty(property:any){
-    this.players[this.turn].money -= property.cost;
+    //this.players[this.turn].money -= property.cost;
+    this.addingRemovingMoney('remove', property.cost, 1000);
     property.canBuy = false;
     property.owner = this.players[this.turn].id;
     if(!property.completedSeries){
@@ -404,9 +432,11 @@ export class GameService {
   }
   sellProperty(property:any){
     if(!property.distrained){
-      this.players[this.turn].money +=  property.cost - ((property.cost / 100) * 10);
+      //this.players[this.turn].money +=  property.cost - ((property.cost / 100) * 10);
+      this.addingRemovingMoney('add', (property.cost - ((property.cost / 100) * 10)), 1000);
     }else{
-      this.players[this.turn].money +=  property.distrainedCost - ((property.distrainedCost / 100) * 50);
+      //this.players[this.turn].money +=  property.distrainedCost - ((property.distrainedCost / 100) * 50);
+      this.addingRemovingMoney('add',(property.distrainedCost - ((property.distrainedCost / 100) * 50)), 1000);
     }
     this.checkCompletedSeries(property,this.players[this.turn].id);
     property.canBuy = true;
@@ -414,12 +444,14 @@ export class GameService {
   }
   distrainProperty(property:any){
     property.distrained = true;
-    this.players[this.turn].money += property.distrainedCost;
+    //this.players[this.turn].money += property.distrainedCost;
+    this.addingRemovingMoney('add', property.distrainedCost, 1000);
     this.checkCompletedSeries(property,this.players[this.turn].id);
   }
   cancelDistrainedFromProperty(property:any){
     property.distrained = false;
-    this.players[this.turn].money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
+   // this.players[this.turn].money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
+   this.addingRemovingMoney('remove', property.distrainedCost, 1000);
     this.checkCompletedSeries(property, this.players[this.turn].id);
   }
 
@@ -535,10 +567,10 @@ export class GameService {
     this.players[this.turn].prison.inPrisonTurnCounter=0;
   }
 
-  //Check if the player has passet start, if so give him 200
-  checkIfHasPassedStart(beforeMove:number, afterMove:number|undefined){
-    if((afterMove!=undefined && (afterMove < beforeMove) || afterMove == 0) && !this.players[this.turn].inPrison){
-      this.textDialog({text: this.players[this.turn].name + ' gained 200', duration: 1000}, 'passedStart')
+  playerPassedStart(){
+    if(!this.players[this.turn].prison.inPrison && this.players[this.turn].canReceiveMoneyFromStart){
+      this.addingRemovingMoney('add', 200, 1000);
+      //this.players[this.turn].money+=200;
     }
   }
 

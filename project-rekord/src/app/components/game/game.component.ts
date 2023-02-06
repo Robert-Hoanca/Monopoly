@@ -1,3 +1,4 @@
+import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
@@ -9,7 +10,47 @@ import * as THREE from 'three'
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.scss']
+  styleUrls: ['./game.component.scss'],
+  animations: [
+   /* trigger(
+      'passedStartMoney',
+      [
+        state('open', style({
+          opacity: 1,
+          top: '0px',
+        })),
+        state('close', style({
+          opacity: 0,
+          top: '-50px',
+        })),
+        transition('hide => show', [animate('300ms ease-in', keyframes([
+          style({ top: '-50px', opacity: 0, offset: 0 }),
+          style({ top: '0px', opacity: 1, offset: 1 }),
+        ]))]),
+        transition('show => hide', [animate('300ms ease-out', keyframes([
+          style({ top: '0px', opacity: 1, offset: 0 }),
+          style({ top: '-50px', opacity: 0, offset: 1 }),
+        ]))]),
+      ]
+
+    ),*/
+    trigger(
+      'passedStartMoney',
+      [
+        transition(
+          ':enter', [
+          style({ top: '-50px', opacity: 0 }),
+          animate('250ms ease-in', style({ top: '10px', 'opacity': 1 }))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({ top: '10px', 'opacity': 1 }),
+          animate('250ms ease-out', style({ top: '-50px', 'opacity': 0 }))
+        ])
+      ]
+    ),
+  ]
 })
 export class GameComponent implements OnInit {
   @ViewChild('cardInfo', { static: true }) cardInfo:any;
@@ -56,7 +97,6 @@ export class GameComponent implements OnInit {
     this.gameService.setCameraPosition(this.camera, -2.5,2.5,-2.5, 2500)   
     this.gameService.cameraControls = this.cameraControls;
     this.activateLocalSave();
-    console.log("mapcontrols", this.cameraControls)
   }
 
   activateLocalSave(){

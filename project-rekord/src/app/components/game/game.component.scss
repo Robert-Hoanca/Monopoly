@@ -13,9 +13,21 @@
         pointer-events: none;
         #playerCard{
             transition: all 250ms ease;
+            position: relative;
             &.bankRupt{
                 opacity: 0.7;
                 color: grey;
+            }
+
+            #passedStart{
+                position: absolute;
+                opacity: 1;
+                right: -60px;
+                top: 10px;
+                width: 50px;
+                transition: all 250ms ease;
+                font-weight: bold;
+                color: green;
             }
         }
     }

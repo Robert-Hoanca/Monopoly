@@ -34,24 +34,28 @@ export class CardDialogComponent implements OnInit {
   addHouse(){
     //this.houses.push('');
     this.data.card.housesCounter++;
-    this.gameService.players[this.gameService.turn].money -= this.data.card.houseCost;
+    this.gameService.addingRemovingMoney('remove', this.data.card.houseCost, 250);
+    //this.gameService.players[this.gameService.turn].money -= this.data.card.houseCost;
   }
 
   removeHouse(){
     //this.houses.splice((this.houses.length -1),1);
     this.data.card.housesCounter--;
-    this.gameService.players[this.gameService.turn].money += ((this.data.card.houseCost / 100) * 50);
+    this.gameService.addingRemovingMoney('add', ((this.data.card.houseCost / 100) * 50), 250);
+    //this.gameService.players[this.gameService.turn].money += ((this.data.card.houseCost / 100) * 50);
   }
 
   addHotel(){
     //this.hotel = true;
     this.data.card.hotelCounter++;
-    this.gameService.players[this.gameService.turn].money -= this.data.card.hotelCost;
+    this.gameService.addingRemovingMoney('remove', this.data.card.hotelCost, 250);
+    //this.gameService.players[this.gameService.turn].money -= this.data.card.hotelCost;
   }
   removeHotel(){
     //this.hotel = false;
     this.data.card.hotelCounter--;
-    this.gameService.players[this.gameService.turn].money += ((this.data.card.hotelCost / 100) * 50);
+    this.gameService.addingRemovingMoney('add', ((this.data.card.hotelCost / 100) * 50), 250);
+    //this.gameService.players[this.gameService.turn].money += ((this.data.card.hotelCost / 100) * 50);
   }
 
   getContrastColor(hexcolor:string){
