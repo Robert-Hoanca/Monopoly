@@ -9,6 +9,7 @@
     [name]="'cardNumber'+ cardIndex"
     (onMouseEnter)="hoverCard('enter')"
     (onMouseExit)="hoverCard('exit')"
+    [scale]="[1,1,1]"
     #cardRef
 >
 </th-object3D>
@@ -19,6 +20,7 @@
     [position]="position"
     [scale]="[1.1, 1.1, 1.1]"
     [name]="'cardOutline'+ cardIndex"
+    #cardOutlineRef
 >
 </th-object3D>
 

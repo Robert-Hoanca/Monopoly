@@ -30,7 +30,7 @@ export class PlayerComponent implements OnInit {
       }
     })
   }
-  ngAfterViewInit(){
+  async ngAfterViewInit(){
   }
 
   ngOnDestroy(){
@@ -79,10 +79,8 @@ export class PlayerComponent implements OnInit {
     }
   }
 
-
   async movePlayerGsap(position:any ,index:number){
     if(this.gameTableSides[index] == 'x'){
-
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, this.playerRef, 'x')
       if(position[0] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: position[0], duration: 1000/1000});
@@ -91,14 +89,12 @@ export class PlayerComponent implements OnInit {
       }
     }
     if(this.gameTableSides[index] == 'z'){
-
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, this.playerRef, 'z')
       if(position[2] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1000/1000});
       }else{
         await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: 22, duration: 1000/1000});
       }
-
     }
   }
 

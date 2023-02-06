@@ -8,6 +8,7 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import gsap from 'gsap'
+import { setTimeout } from 'timers';
 
 @Component({
   selector: 'app-card',
@@ -30,7 +31,12 @@ export class CardComponent implements OnInit {
   castedShadow:boolean=false;
   fontLoader = new FontLoader();
   @ViewChild('cardRef', { static: true }) cardRef:any;
+  @ViewChild('cardOutlineRef', { static: true }) cardOutlineRef:any;
   @ViewChild('carpetRef', { static: true }) carpetRef:any;
+  //@ViewChild('decorationRef', { static: true }) decorationRef:any;
+
+  
+  
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
@@ -40,16 +46,11 @@ export class CardComponent implements OnInit {
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
       if(diceNumber == this.cardIndex){
         this.gameService.setPlayerPosition(this.position, diceNumber);
-        //this.gameService.actualTurnPlayer.pawn.position =  this.position;
-        //this.gameService.actualTurnPlayer.pawn.position[1] = 0.2;
-        //this.gameService.payTaxes(this.cardIndex);
-        //this.gameService.cameraPosition = [  (this.gameService.cameraPosition[0] + 0.01), this.gameService.cameraPosition[1], this.position[2]]
       }
     });
   }
 
   ngAfterViewInit(){
-    //this.scaleAnimation()
   }
   setCardPosition(){
     if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
@@ -141,8 +142,23 @@ export class CardComponent implements OnInit {
     console.log(this.cardRef._objRef.position, this.cardRef)
   }
 
-  scaleAnimation(){
-    console.log(this.cardRef._objRef.scale)
-    gsap.fromTo(this.cardRef._objRef.scale, {y: this.cardRef._objRef.scale.y}, {y: 2, duration: 10000});
-  }
+  /* async scaleAnimation(){
+    this.cardRef._objRef.scale.x = 0;
+    this.cardRef._objRef.scale.y = 0;
+    this.cardRef._objRef.scale.z = 0;
+
+    this.cardOutlineRef._objRef.scale.x = 0;
+    this.cardOutlineRef._objRef.scale.y = 0;
+    this.cardOutlineRef._objRef.scale.z = 0;
+
+    await gsap.fromTo(this.cardOutlineRef._objRef.scale, {y: this.cardOutlineRef._objRef.scale.y}, {y: 1.1, duration: 0.5});
+    await gsap.fromTo(this.cardOutlineRef._objRef.scale, {x: this.cardOutlineRef._objRef.scale.x}, {x: 1.1, duration: 0.5});
+    await gsap.fromTo(this.cardOutlineRef._objRef.scale, {z: this.cardOutlineRef._objRef.scale.z}, {z: 1.1, duration: 0.5});
+    
+    await gsap.fromTo(this.cardRef._objRef.scale, {y: this.cardRef._objRef.scale.y}, {y: 1, duration: 0.2});
+    await gsap.fromTo(this.cardRef._objRef.scale, {x: this.cardRef._objRef.scale.x}, {x: 1, duration: 0.2});
+    await  gsap.fromTo(this.cardRef._objRef.scale, {z: this.cardRef._objRef.scale.z}, {z: 1, duration: 0.2});
+
+
+  }*/
 }

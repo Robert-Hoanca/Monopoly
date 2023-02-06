@@ -56,6 +56,7 @@ export class GameComponent implements OnInit {
     this.gameService.setCameraPosition(this.camera, -2.5,2.5,-2.5, 2500)   
     this.gameService.cameraControls = this.cameraControls;
     this.activateLocalSave();
+    console.log("mapcontrols", this.cameraControls)
   }
 
   activateLocalSave(){

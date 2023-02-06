@@ -205,11 +205,6 @@ export class GameService {
     this.cameraControls._objRef.enabled = true;
     
    }, duration);
-   if(this.cameraControls){
-    gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: x, duration: 1000});
-    gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: y, duration: 1000});
-    gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: z, duration: 1000});
-   }
    if(playerMoving != undefined){
     if(axis){
        if(axis == 'x'){
@@ -632,7 +627,6 @@ export class GameService {
 
   //Calculate the amount of debt that a player have to pay to continue playing
   calculateAmountDebt(specialEventAmount?:any, playerId?:string){
-    console.log("calculating debt")
     if(!specialEventAmount){
       this.debtWithWho = 'player';
       this.setDebt = true;
@@ -662,6 +656,12 @@ export class GameService {
       }
     }
   }
+
+ /* async objectPopAnimation(element:any, scaleValue:Array<number>, duration:number){
+    await gsap.fromTo(element._objRef.scale, {y: 0}, {y: scaleValue[0], duration: duration});
+    await gsap.fromTo(element._objRef.scale, {x: 0}, {x: scaleValue[1], duration: duration});
+    await gsap.fromTo(element._objRef.scale, {z: 0}, {z: scaleValue[2], duration: duration});
+  }*/
   
   /////////////////DELETE
   async setDB(){
