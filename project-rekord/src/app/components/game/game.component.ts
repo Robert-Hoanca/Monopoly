@@ -94,7 +94,7 @@ export class GameComponent implements OnInit {
   }
   ngAfterViewInit(){
     this.gameService.camera = this.camera;
-    this.gameService.setCameraPosition(this.camera, -2.5,2.5,-2.5, 2500)   
+    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5)   
     this.gameService.cameraControls = this.cameraControls;
     this.activateLocalSave();
   }
