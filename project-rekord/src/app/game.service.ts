@@ -413,7 +413,23 @@ export class GameService {
         player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
       }, duration);
     }
-    //this.playerMoneyChangeValue = 0;
+    setTimeout(() => {
+      this.addingRemovingMoneyProps()
+    }, (duration + 500))
+  }
+
+  addingRemovingMoneyProps(){
+    if(this.players.filter(player => player.addingMoney == true).length > 0){
+      this.players.filter(player => player.addingMoney == true).forEach(player => {
+        player.addingMoney = false;
+      });
+    }
+
+    if(this.players.filter(player => player.removingMoney == true).length > 0){
+      this.players.filter(player => player.removingMoney == true).forEach(player => {
+        player.removingMoney = false;
+      });
+    }
   }
 
   //MANAGE PROPERTIES
