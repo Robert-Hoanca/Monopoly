@@ -21,7 +21,7 @@ export class HotelComponent implements OnInit {
   }
 
   calculateHousePosition(){
-    this.hotelPosition = this.cardPosition;
+    this.hotelPosition = JSON.parse(JSON.stringify(this.cardPosition));
     if(this.cardIndex<= 10){
       this.hotelPosition[2]+=0.8;
     }else if(20 < this.cardIndex && this.cardIndex <= 30){
@@ -31,8 +31,6 @@ export class HotelComponent implements OnInit {
     } else if(30 < this.cardIndex && this.cardIndex <= 40){
       this.hotelPosition[0]+=0.8;
     }
-    
     this.hotelPosition[1]+=0.1;
   }
-
 }

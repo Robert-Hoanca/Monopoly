@@ -69,23 +69,23 @@ export class PlayerComponent implements OnInit {
         }
         if(actualSide < toGoSide){
           for (let index = actualSide; index < (toGoSide); index++) {
-            await this.movePlayerGsap(position, index)
+            await this.movePlayerGsap(position, index,oldCardPosition)
           }
         }else if(actualSide > toGoSide){
-          await this.movePlayerGsap(position, actualSide)
+          await this.movePlayerGsap(position, actualSide,oldCardPosition)
         }
-        await this.movePlayerGsap(position, this.gameService.players[this.gameService.turn].inPrison ? (actualSide += actualSide > 2 ? -1 : 1) : toGoSide)
+        await this.movePlayerGsap(position, this.gameService.players[this.gameService.turn].inPrison ? (actualSide += actualSide > 2 ? -1 : 1) : toGoSide,oldCardPosition)
       }
     }
   }
 
-  async movePlayerGsap(position:any ,index:number){
+  async movePlayerGsap(position:any ,index:number, oldCardPosition:number){
     if(this.gameTableSides[index] == 'x'){
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, this.playerRef, 'x')
       if(position[0] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: position[0], duration: 1000/1000,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position
-          if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
+          if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
         }}, );
@@ -98,7 +98,7 @@ export class PlayerComponent implements OnInit {
       if(position[2] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1000/1000,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position
-          if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0)  &&  !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
+          if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0  &&  !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
         }});

@@ -25,8 +25,6 @@ export class HouseComponent implements OnInit {
 
   calculateHousePosition(){
     this.housePosition = JSON.parse(JSON.stringify(this.cardPosition));
-    //this.housePosition[0]+=0.2;
-    //this.housePosition[2]+=0.1;
     if(this.cardIndex<= 10 || 20 < this.cardIndex && this.cardIndex <= 30){
       switch(this.houseIndex){
         case 1:
@@ -59,8 +57,6 @@ export class HouseComponent implements OnInit {
       }
     }
     this.housePosition[1]+=0.1;
-
-
     if(this.cardIndex<= 10){
       this.housePosition[2]+=0.8;
     }else if(20 < this.cardIndex && this.cardIndex <= 30){
