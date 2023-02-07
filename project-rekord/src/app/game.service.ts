@@ -59,6 +59,7 @@ export class GameService {
   cameraControls:any;
   cameraPosition: Vector3 | any;
   cameraLookAt: Vector3 | any;
+  movingCamera:boolean= false;
 
   beginTime:number = 0;
   endTime:number = 0;
@@ -188,7 +189,8 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, playerRef?:any, axis?:string){
+  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string){
+    this.movingCamera = true;
     let xOffset = offset;
     let zOffset = offset;
     if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20 && xOffset){
@@ -223,6 +225,10 @@ export class GameService {
     gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: duration/1000});
     gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: duration/1000});
    }
+
+   setTimeout(() => {
+    this.movingCamera = false;
+   }, duration);
   }
 
   getCardPosition(cardIndex:any){
