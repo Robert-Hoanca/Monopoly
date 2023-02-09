@@ -91,6 +91,7 @@ export class GameComponent implements OnInit {
     this.openTextDialog$ = this.gameService.openTextDialog$.subscribe((data:any) =>{
       this.openMoneyDialog(data)
     });
+    this.gameService.addingRemovingMoneyProps()
   }
   ngAfterViewInit(){
     this.gameService.camera = this.camera;
@@ -157,8 +158,6 @@ export class GameComponent implements OnInit {
 
   goBackHome(){
     location.reload();
-    //this.gameService.localSaves = {};
-   // this.gameService.router.navigateByUrl('home', { skipLocationChange: true })
   }
 
   changeCardColor(){

@@ -23,11 +23,11 @@
 
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around center">
        
-        <mat-card id="playerCard" *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.players[gameService.turn].id == player.id? '120%': '100%'}" [ngClass]="[player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
+        <mat-card *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.players[gameService.turn].id == player.id? '120%': '100%'}" [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
             <span>{{player.name}}</span>
             <span>{{player.money}} €</span>
 
-            <div id="passedStart" *ngIf="(player.addingMoney || player.removingMoney)" [@passedStartMoney]>
+            <div id="passedStart" *ngIf="(player.addingMoney || player.removingMoney) && !player.bankrupt" [@passedStartMoney]>
                 <span [ngStyle]="{'color': player.addingMoney ? 'green' : 'red'}"> <span [innerHTML]="player.addingMoney ? '+' : '-'"></span> {{gameService.playerMoneyChangeValue}}</span>
             </div>
 

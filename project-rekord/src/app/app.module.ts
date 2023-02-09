@@ -28,6 +28,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatSliderModule } from '@angular/material/slider';
 
 
 
@@ -77,6 +78,7 @@ import { PlayerPropertiesComponent } from './shared/player-properties/player-pro
     MatCheckboxModule,
     MatPaginatorModule,
     NgxThreeModule,
+    MatSliderModule,
     
     
   ],

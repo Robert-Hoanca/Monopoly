@@ -11,12 +11,21 @@
         top: 0;
         left: 0;
         pointer-events: none;
-        #playerCard{
+        .playerCard{
             transition: all 250ms ease;
             position: relative;
-            &.bankRupt{
+            &.bankrupt{
+                background: #c73b2f;
+                color: #fff;
                 opacity: 0.7;
-                color: grey;
+                &:after{
+                    content: "";
+                    position: absolute;
+                    width: 50%;
+                    height: 2px;
+                    background-color: #fff;
+                    transform: rotate(45deg);
+                }
             }
 
             #passedStart{

@@ -1,16 +1,35 @@
 #chooseMode{
     width: 100%;
     height: 100%;
-    
+    .chooseModeContainer{
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        button{
+            width: 100px;
+            height: 100px;
+        }
+    }
 
     #startGame{
         position: absolute;
-        bottom: 0;
+        bottom: 20px;
         width: 100%;
+        button{
+            width: 200px;
+            height: 50px;
+            background: #c4dfc4;
+            font-weight: bold;
+        }
     }
     #localSaves{
         height: 100vh;
         width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
         .localSave{
             height: 200px;
             width: 200px;
@@ -49,9 +68,26 @@
         color: black;
     }
 
+    #createdPlayers{
+        .creationContainer{
+            margin-top: 20px;
+        }
+        .createdPlayersContainer{
+            margin-top: 50px;
+            display: flex;
+            width: 90vw;
+            overflow-x: auto;
+            .playerCard:not(:first-child){
+                margin-left: 5px;
+            }
+        }
+    }
+
     #mapsContainer{
         width: 100%;
-        height: 200px;
+        height: 100px;
+        position: absolute;
+        bottom: 100px;
         mat-card.map{
             height: 100%;
             width: 150px;
@@ -64,6 +100,37 @@
             width: 25px;
             height: 25px;
             
+        }
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .chooseModeContainer{
+        flex-direction: column;
+        button{
+            margin-top: 50px;
+        }
+    }
+
+    #localSaves{
+        flex-direction: column;
+    }
+}
+@media screen and (min-width: 600px) {
+    .chooseModeContainer{
+        flex-direction: row;
+        button{
+            margin-left: 50px;
+        }
+    }
+
+    #localSaves{
+        flex-direction: row;
+    }
+
+    #createdPlayers{
+        .createdPlayersContainer{
+            justify-content: center;
         }
     }
 }

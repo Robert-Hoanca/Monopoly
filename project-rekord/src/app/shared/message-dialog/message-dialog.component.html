@@ -1,7 +1,7 @@
 <div id="messageContainer">
-    <h1 *ngIf="data.textData.text">{{data.textData.text}}</h1>
-    <h1 *ngIf="data.textData.title">{{data.textData.title}}</h1>
-    
+    <!-- <h1 *ngIf="data.textData.text">{{data.textData.text}}</h1>
+    <h1 *ngIf="data.textData.title">{{data.textData.title}}</h1> -->
+    <h1 >{{data.textData.text ?? data.textData.title}}</h1>
     <div *ngIf="gameService.playerWhoWonId != ''" class="winScreen">
         <div>Player money: {{getPlayerWhoWin().money}} €</div>
         <div>Time to finish the game:</div>

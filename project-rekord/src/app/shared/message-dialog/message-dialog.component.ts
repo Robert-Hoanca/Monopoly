@@ -21,6 +21,7 @@ export class MessageDialogComponent implements OnInit {
   }
 
   ngAfterViewInit(){
+   // console.log("MessageDialogData: ", this.data)
   }
 
   executeAndClose(){

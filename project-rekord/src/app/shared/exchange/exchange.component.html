@@ -6,45 +6,33 @@
         </button>
     </div>
 
-    <div *ngIf="playerToExchangeWith && !startExchange" class="exchangeContainer" fxLayout="row" fxLayoutAlign="space-around center">
-
-        <button mat-icon-button fxLayoutAlign="center center" (click)="goBackToSelection()" class="exchangeGoBackBtn"><mat-icon fxLayoutAlign="center center">arrow_back_ios_new</mat-icon></button>
-
-        <div class="exchangeProperties" fxLayout="row" fxLayoutAlign="start start">
+    <div *ngIf="playerToExchangeWith && !startExchange" class="exchangeContainer" fxLayout="column" fxLayoutAlign="space-around center">
+        <div class="exchangeProperties">
             <mat-card fxLayout="column" fxLayoutAlign="space-around center">
-                <span>{{gameService.players[gameService.turn].name}}</span>
-    
-                <!-- <div fxLayout="row" class="propertiesContainer">
-                    <mat-card class="property" *ngFor="let property of actualPlayerProps" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="property.exchangeSelected = !property.exchangeSelected">
-                        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(property.district)}"></span>
-                        <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center" >check</mat-icon></span>
-                    </mat-card>
-                </div> -->
-                <app-player-properties [playerId]="gameService.players[gameService.turn].id" [imInExchange]="true"></app-player-properties>
-    
+                <div class="titleContainer">
+                    <span>{{gameService.players[gameService.turn].name}}</span>
+                </div>
                 <mat-form-field appearance="fill">
-                    <mat-label>Money</mat-label>
+                    <mat-label>Amount of Money</mat-label>
                     <input matInput type="number" [(ngModel)]="moneyToExchange[0]">
                 </mat-form-field>
+                <app-player-properties [playerId]="gameService.players[gameService.turn].id" [imInExchange]="true"></app-player-properties>
             </mat-card>
     
             <mat-card fxLayout="column" fxLayoutAlign="space-around center">
-                <span>{{playerToExchangeWith.name}}</span>
-    
-                <!-- <div fxLayout="row" class="propertiesContainer">
-                    <mat-card class="property" *ngFor="let property of playerToExchangeProps" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="property.exchangeSelected = !property.exchangeSelected">
-                        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(property.district)}"></span>
-                        <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center">check</mat-icon></span>
-                    </mat-card>
-                </div> -->
-                <app-player-properties [playerId]="playerToExchangeWith.id" [imInExchange]="true"></app-player-properties>
+                <div class="titleContainer">
+                    <button mat-icon-button fxLayoutAlign="center center" (click)="goBackToSelection()" class="exchangeGoBackBtn" [matTooltipPosition]="'above'" matTooltip="Change Player"><mat-icon fxLayoutAlign="center center">arrow_back</mat-icon></button>
+                    <span>{{playerToExchangeWith.name}}</span>
+                </div>
                 <mat-form-field appearance="fill">
-                    <mat-label>Money</mat-label>
+                    <mat-label>Amount of Money</mat-label>
                     <input matInput type="number" [(ngModel)]="moneyToExchange[1]">
                 </mat-form-field>
+                <app-player-properties [playerId]="playerToExchangeWith.id" [imInExchange]="true"></app-player-properties>
+               
             </mat-card>
         </div>
-        <button mat-raised-button (click)="startExchange = true"> <mat-icon>handshake</mat-icon> </button>
+        <button mat-raised-button (click)="startExchange = true" class="handshakeButton" [matTooltipPosition]="'above'" matTooltip="Finalise Exchange"> <mat-icon>handshake</mat-icon> </button>
         
     </div>
 

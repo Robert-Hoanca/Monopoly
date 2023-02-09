@@ -1,11 +1,11 @@
 <div id="chooseMode" [style]="{background: gameService.sessionColor}">
 
-    <div *ngIf="!gameService.choosenMode">
+    <div *ngIf="!gameService.choosenMode" class="chooseModeContainer">
         <button mat-raised-button (click)="chooseMode('local')">Local</button>
         <button mat-raised-button (click)="chooseMode('online')" [disabled]="true">Online</button>
     </div>
 
-    <div *ngIf="gameService.choosenMode == 'local' && !gameService.localSaveName" id="localSaves" fxLayoutAlign="space-around center">
+    <div *ngIf="gameService.choosenMode == 'local' && !gameService.localSaveName" id="localSaves">
         <mat-card *ngFor="let saveFile of gameService.allLocalSaves; let i = index"  class="localSave" (click)="createOrUploadGame(saveFile,i)">
             <div *ngIf="saveFile == 'new'" fxLayoutAlign="center center" class="saveContainer" fxLayout="column">
                 <mat-icon *ngIf="gameService.localSave.localId != ('rekordLocalSave' + i)">add</mat-icon>
@@ -34,51 +34,84 @@
 
     <div *ngIf="gameService.choosenMode && gameService.localSaveName">
 
-        <div id="createdPlayers" fxLayout="row" fxLayoutAlign="center space-around">
-            <mat-card *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around">
+        <div id="createdPlayers" fxLayout="row" fxLayoutAlign="center space-around" fxLayout="column" fxLayoutAlign="center center">
 
-                <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '200px', width: '200px'}" >
-                    <th-scene [thStats]="false" >
-                        <th-ambientLight> </th-ambientLight>
-    
+            <div class="creationContainer">
+                <mat-card id="createPlayer" *ngIf="gameService.pawnTypes.length">
+
+                    <div class="choosePawn">
+                        <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '200px', width: '200px'}" >
+                            <th-scene [thStats]="false" >
+                                <th-ambientLight> </th-ambientLight>
+            
+                                <!--loadObj-->
+                                <th-object3D
+                                    loadGLTF
+                                    [url]="'/assets/blenderModels/pawns/' + this.gameService.pawnTypes[pawnModelCounter].value + '.gltf'"
+                                    [position]="[0,0,0]"
+                                >
+                                </th-object3D>
+            
+            
+                          
+                                <th-perspectiveCamera
+                                    [args]="[75, 2, 0.1, 1000]"
+                                    [position]="[3,5,8]"
+                                >
+                                <!--<th-mapControls></th-mapControls>-->
+                                </th-perspectiveCamera>
+                              
+                            </th-scene>
+                          </th-canvas>
+                      
+                        <div class="pawnModel" *ngFor="let pawn of filterPawns();let i = index">
+                           
+                            <div *ngIf="i == pawnModelCounter">
+                                <div class="pawnChange"  fxLayout="row" fxLayoutAlign="space-between center">
+                                    <button  mat-icon-button (click)="changeModel('minus')" [disabled]="pawnModelCounter==0"><mat-icon>chevron_left</mat-icon></button>
                 
-                        <th-object3D
-                            loadGLTF
-                            [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '.gltf'"
-                            [position]="[0,0,0]"
-                      
-                        >
-                        </th-object3D>
-    
-    
-                  
-                        <th-perspectiveCamera
-                            [args]="[75, 2, 0.1, 1000]"
-                            [position]="[15,15,15]"
-                        >
-                        <th-mapControls></th-mapControls>
-                        </th-perspectiveCamera>
-                      
-                    </th-scene>
-                  </th-canvas>
-                <span>{{player.name}}</span>
-                <span>{{player.pawn.choosenPawnLabel}}</span>
-                <span>{{player.money}}</span>
-    
-            </mat-card>
+                                    <span>{{pawn.name}}</span>
+                
+                                    <button  mat-icon-button (click)="changeModel('plus')" [disabled]="pawnModelCounter>=(filterPawns().length - 1)"><mat-icon>chevron_right</mat-icon></button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+        
+                   <div fxLayout="column" fxLayoutAlign="center space-around">
+                        <mat-form-field>
+                            <mat-label>Choose Your Name</mat-label>
+                            <input matInput autocomplete="off" placeholder="Insert Here Your Name" [(ngModel)]="playerName">
+                        </mat-form-field>
+        
+                        <button id="addSpecialPawn" [matMenuTriggerFor]="specialPawnMenu" mat-mini-fab fxLayoutAlign="center center"><mat-icon>add</mat-icon></button>
+                        
+                        <mat-menu #specialPawnMenu="matMenu">
+                            <mat-form-field class="specialPawnInput">
+                                <mat-label>Special Code</mat-label>
+                                <input matInput autocomplete="off" (click)="$event.stopPropagation()" [(ngModel)]="gameService.specialPawn">
+                            </mat-form-field>
+                        </mat-menu>
+                        <button mat-raised-button [disabled]="disableJoinButton()" (click)="gameService.createPlayer(playerName, pawnModelCounter);createPlayer()">Join</button>
+                   </div>
+        
+                </mat-card>
+            </div>
 
-            <mat-card id="createPlayer" *ngIf="gameService.pawnTypes.length">
+            <div class="createdPlayersContainer">
+                <mat-card class="playerCard" *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around">
 
-                <div class="choosePawn">
-                    <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '200px', width: '200px'}" >
+                    <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '150px', width: '150px'}" >
                         <th-scene [thStats]="false" >
                             <th-ambientLight> </th-ambientLight>
         
-                            <!--loadObj-->
+                    
                             <th-object3D
                                 loadGLTF
-                                [url]="'/assets/blenderModels/pawns/' + this.gameService.pawnTypes[pawnModelCounter].value + '.gltf'"
+                                [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '.gltf'"
                                 [position]="[0,0,0]"
+                          
                             >
                             </th-object3D>
         
@@ -86,51 +119,25 @@
                       
                             <th-perspectiveCamera
                                 [args]="[75, 2, 0.1, 1000]"
-                                [position]="[3,5,8]"
+                                [position]="[15,15,15]"
                             >
-                            <!--<th-mapControls></th-mapControls>-->
+                            <th-mapControls></th-mapControls>
                             </th-perspectiveCamera>
                           
                         </th-scene>
                       </th-canvas>
-                  
-                    <div class="pawnModel" *ngFor="let pawn of filterPawns();let i = index">
-                       
-                        <div *ngIf="i == pawnModelCounter">
-                            <div class="pawnChange"  fxLayout="row" fxLayoutAlign="space-between center">
-                                <button  mat-icon-button (click)="changeModel('minus')" [disabled]="pawnModelCounter==0"><mat-icon>chevron_left</mat-icon></button>
+                    <span>{{player.name}}</span>
+                    <span>{{player.pawn.choosenPawnLabel}}</span>
+                    <span>{{player.money}}</span>
+        
+                </mat-card>
+            </div>
+
             
-                                <span>{{pawn.name}}</span>
-            
-                                <button  mat-icon-button (click)="changeModel('plus')" [disabled]="pawnModelCounter>=(filterPawns().length - 1)"><mat-icon>chevron_right</mat-icon></button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-    
-               <div fxLayout="column" fxLayoutAlign="center space-around">
-                    <mat-form-field>
-                        <mat-label>Choose Your Name</mat-label>
-                        <input matInput autocomplete="off" placeholder="Insert Here Your Name" [(ngModel)]="playerName">
-                    </mat-form-field>
-    
-                    <button id="addSpecialPawn" [matMenuTriggerFor]="specialPawnMenu" mat-mini-fab fxLayoutAlign="center center"><mat-icon>add</mat-icon></button>
-                    
-                    <mat-menu #specialPawnMenu="matMenu">
-                        <mat-form-field class="specialPawnInput">
-                            <mat-label>Special Code</mat-label>
-                            <input matInput autocomplete="off" (click)="$event.stopPropagation()" [(ngModel)]="gameService.specialPawn">
-                        </mat-form-field>
-                    </mat-menu>
-                    <button mat-raised-button [disabled]="disableJoinButton()" (click)="gameService.createPlayer(playerName, pawnModelCounter);createPlayer()">Join</button>
-               </div>
-    
-            </mat-card>
         </div>
 
-        <div id="mapsContainer" fxLayout="row" fxLayoutAlign="flex-end center">
-            <mat-card class="map" *ngFor="let map of gameService.gameMaps" (click)="gameService.chosenMap = map">
+        <div id="mapsContainer" fxLayout="row" fxLayoutAlign="center center">
+            <mat-card class="map" *ngFor="let map of gameService.gameMaps" (click)="gameService.chosenMap = map" fxLayout="column" fxLayoutAlign="space-evenly center">
                 <span class="chosenMap" fxLayoutAlign="center center"><mat-icon *ngIf="gameService.chosenMap==map">check</mat-icon></span>
                 <span>{{map}}</span>
             </mat-card>

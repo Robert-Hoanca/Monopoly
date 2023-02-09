@@ -274,15 +274,21 @@ export class GameService {
   }
 
   nextTurn(){
-    if(this.turn == (this.players.filter(player => player.bankrupt == false).length - 1)){
+    if(this.turn == (this.players.length)){
       this.turn = 0;
     }else{
       this.turn++;
     }
 
     if(this.players[this.turn].bankrupt){
-      this.turn++;
+      while(this.players[this.turn].bankrupt){
+        this.turn++;
+        if(this.turn == (this.players.length)){
+          this.turn = 0;
+        }
+      }
     }
+    //console.log(this.turn)
     this.players[this.turn] = this.players[this.turn];
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
@@ -647,12 +653,25 @@ export class GameService {
   }
 
   //Check if a player has won the game
-  checkIfSomeoneWon(){
+  async checkIfSomeoneWon(){
     if(this.players.filter(player => !player.bankrupt).length == 1){
       this.endTime = Date.now();
       this.playerWhoWonId = this.players.find(player => !player.bankrupt).id;
       this.calculateGameTime()
       this.textDialog({text: this.players.find(player => !player.bankrupt).name + ' has won the game!', playerWhoWonId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
+    }else{
+      await this.gameTable.cards.filter((card:any) => card.owner == this.players[this.turn].id).forEach((foundCard:any) => {
+        foundCard.owner = '';
+        foundCard.canBuy = true;
+        if(foundCard.housesCounter>0){
+          foundCard.housesCounter = 0;
+          if(foundCard.hotelCounter>0){
+            foundCard.hotelCounter = 0;
+          }
+        }
+       
+      });
+      this.nextTurn()
     }
   }
 
