@@ -2,7 +2,7 @@
 
     <mat-card class="cardForm">
         <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(data.card.district)}" fxLayoutAlign="center center">
-            <span class="cardName" [ngStyle]="{'color': getContrastColor(data.card.district?? data.card.cardType=='station'? '#000000':'#ebebe0')}">{{data.card.name}}</span>
+            <span class="cardName" [ngStyle]="{'color': getContrastColor(gameService.checkCardColorDistrict(data.card.district))}">{{data.card.name}}</span>
         </span>
         
         <div class="cardCosts" fxLayout="column">

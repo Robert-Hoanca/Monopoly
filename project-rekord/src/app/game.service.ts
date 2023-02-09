@@ -241,7 +241,6 @@ export class GameService {
     this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
     setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
-      //his.checkIfHasPassedStart(oldCardPosition, newCardNum);
       this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)]);
     }, 2500);
   }
@@ -317,20 +316,15 @@ export class GameService {
   }
 
   payTaxes(property:any){
-    //this.players[this.turn].money-= property.taxesCost;
     this.addingRemovingMoney('remove', property.taxesCost, 1000)
   }
   payRentToPlayer(property:any, shouldPayDept?:boolean){
     if(property.owner && property.owner!=this.players[this.turn].id){
       if(this.players[this.turn].money >= this.amountRent || this.players[this.turn].money >= this.amountDebt){
         if(!shouldPayDept){
-          //this.players[this.turn].money -= this.amountRent;
-          //this.players.find(player => player.id == property.owner).money += this.amountRent;
           this.addingRemovingMoney('remove', this.amountRent, 1000);
           this.addingRemovingMoney('add', this.amountRent, 1000, this.players.find(player => player.id == property.owner))
         }else{
-          //this.players[this.turn].money -= this.amountDebt;
-          //this.players.find(player => player.id == property.owner).money += this.amountDebt;
           this.addingRemovingMoney('remove', this.amountDebt, 1000);
           this.addingRemovingMoney('add', this.amountDebt, 1000,this.players.find(player => player.id == property.owner));
         }
@@ -444,7 +438,6 @@ export class GameService {
   }
 
   buyProperty(property:any){
-    //this.players[this.turn].money -= property.cost;
     this.addingRemovingMoney('remove', property.cost, 1000);
     property.canBuy = false;
     property.owner = this.players[this.turn].id;
@@ -454,10 +447,8 @@ export class GameService {
   }
   sellProperty(property:any){
     if(!property.distrained){
-      //this.players[this.turn].money +=  property.cost - ((property.cost / 100) * 10);
       this.addingRemovingMoney('add', (property.cost - ((property.cost / 100) * 10)), 1000);
     }else{
-      //this.players[this.turn].money +=  property.distrainedCost - ((property.distrainedCost / 100) * 50);
       this.addingRemovingMoney('add',(property.distrainedCost - ((property.distrainedCost / 100) * 50)), 1000);
     }
     this.checkCompletedSeries(property,this.players[this.turn].id);
@@ -466,13 +457,11 @@ export class GameService {
   }
   distrainProperty(property:any){
     property.distrained = true;
-    //this.players[this.turn].money += property.distrainedCost;
     this.addingRemovingMoney('add', property.distrainedCost, 1000);
     this.checkCompletedSeries(property,this.players[this.turn].id);
   }
   cancelDistrainedFromProperty(property:any){
     property.distrained = false;
-   // this.players[this.turn].money -= property.distrainedCost + ((property.distrainedCost / 100) * 20);
    this.addingRemovingMoney('remove', property.distrainedCost, 1000);
     this.checkCompletedSeries(property, this.players[this.turn].id);
   }
@@ -545,10 +534,8 @@ export class GameService {
   //EVENTS
   goToPrison(){
     this.players[this.turn].prison.inPrison = true;
-    //this.players[this.turn].actualCard = 10;
     this.getCardPosition$.next(10);
     this.players[this.turn].canDice=false;
-    //this.nextTurn();
   }
 
   whatToDoInprison(action:string){
@@ -592,7 +579,6 @@ export class GameService {
   playerPassedStart(){
     if(!this.players[this.turn].prison.inPrison && this.players[this.turn].canReceiveMoneyFromStart){
       this.addingRemovingMoney('add', 200, 1000);
-      //this.players[this.turn].money+=200;
     }
   }
 
@@ -710,12 +696,6 @@ export class GameService {
       }
     }
   }
-
- /* async objectPopAnimation(element:any, scaleValue:Array<number>, duration:number){
-    await gsap.fromTo(element._objRef.scale, {y: 0}, {y: scaleValue[0], duration: duration});
-    await gsap.fromTo(element._objRef.scale, {x: 0}, {x: scaleValue[1], duration: duration});
-    await gsap.fromTo(element._objRef.scale, {z: 0}, {z: scaleValue[2], duration: duration});
-  }*/
   
   /////////////////DELETE
   async setDB(){

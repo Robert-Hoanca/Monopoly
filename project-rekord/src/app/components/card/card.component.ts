@@ -134,31 +134,9 @@ export class CardComponent implements OnInit {
     return url;
   }
   hoverCard(type:string){
-   //this.scaleAnimation()
-    //this.position[1] = type == 'enter' ? this.position[1] + 0.2 : this.position[1] -0.2;
   }
 
   test(){
     console.log(this.cardRef._objRef.position, this.cardRef)
   }
-
-  /* async scaleAnimation(){
-    this.cardRef._objRef.scale.x = 0;
-    this.cardRef._objRef.scale.y = 0;
-    this.cardRef._objRef.scale.z = 0;
-
-    this.cardOutlineRef._objRef.scale.x = 0;
-    this.cardOutlineRef._objRef.scale.y = 0;
-    this.cardOutlineRef._objRef.scale.z = 0;
-
-    await gsap.fromTo(this.cardOutlineRef._objRef.scale, {y: this.cardOutlineRef._objRef.scale.y}, {y: 1.1, duration: 0.5});
-    await gsap.fromTo(this.cardOutlineRef._objRef.scale, {x: this.cardOutlineRef._objRef.scale.x}, {x: 1.1, duration: 0.5});
-    await gsap.fromTo(this.cardOutlineRef._objRef.scale, {z: this.cardOutlineRef._objRef.scale.z}, {z: 1.1, duration: 0.5});
-    
-    await gsap.fromTo(this.cardRef._objRef.scale, {y: this.cardRef._objRef.scale.y}, {y: 1, duration: 0.2});
-    await gsap.fromTo(this.cardRef._objRef.scale, {x: this.cardRef._objRef.scale.x}, {x: 1, duration: 0.2});
-    await  gsap.fromTo(this.cardRef._objRef.scale, {z: this.cardRef._objRef.scale.z}, {z: 1, duration: 0.2});
-
-
-  }*/
 }
