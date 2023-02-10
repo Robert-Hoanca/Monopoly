@@ -203,13 +203,6 @@ export class GameService {
     }else if(0 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 10 && zOffset){
       zOffset-=10;
     }
-   setTimeout(() => {
-    this.cameraControls._objRef.enabled = false;
-   }, 0);
-   setTimeout(() => {
-    this.cameraControls._objRef.enabled = true;
-    
-   }, duration);
    if(playerMoving != undefined){
     if(axis){
        if(axis == 'x'){
