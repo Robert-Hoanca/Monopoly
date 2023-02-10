@@ -240,9 +240,9 @@ export class GameService {
     this.players[this.turn].actualCard = newCardNum;
     this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
-    setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
+   /* setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
       this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)]);
-    }, 2500);
+    }, 2500);*/
   }
 
   async startGame(){

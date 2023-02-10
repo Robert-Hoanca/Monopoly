@@ -74,7 +74,8 @@ export class PlayerComponent implements OnInit {
         }else if(actualSide > toGoSide){
           await this.movePlayerGsap(position, actualSide,oldCardPosition)
         }
-        await this.movePlayerGsap(position, this.gameService.players[this.gameService.turn].inPrison ? (actualSide += actualSide > 2 ? -1 : 1) : toGoSide,oldCardPosition)
+        await this.movePlayerGsap(position, this.gameService.players[this.gameService.turn].inPrison ? (actualSide += actualSide > 2 ? -1 : 1) : toGoSide,oldCardPosition);
+        this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)]);
       }
     }
   }

@@ -15,7 +15,7 @@
                 [position]="gameService.cameraPosition"
                 #camera
             >
-                <th-mapControls #cameraControls ></th-mapControls>
+                <th-mapControls #cameraControls [enabled]="gameService.movingCamera"></th-mapControls>
             </th-perspectiveCamera>
         </th-scene>
       </th-canvas>
