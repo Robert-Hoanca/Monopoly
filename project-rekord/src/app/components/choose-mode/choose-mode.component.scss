@@ -1,6 +1,6 @@
 #chooseMode{
-    width: 100%;
-    height: 100%;
+    min-height: 100vh;
+    min-width: 100vw;
     .chooseModeContainer{
         height: 100vh;
         width: 100vw;
@@ -14,9 +14,8 @@
     }
 
     #startGame{
-        position: absolute;
-        bottom: 20px;
         width: 100%;
+        margin-top: 20px;
         button{
             width: 200px;
             height: 50px;
@@ -76,18 +75,13 @@
             margin-top: 50px;
             display: flex;
             width: 90vw;
-            overflow-x: auto;
-            .playerCard:not(:first-child){
-                margin-left: 5px;
-            }
         }
     }
 
     #mapsContainer{
         width: 100%;
         height: 100px;
-        position: absolute;
-        bottom: 100px;
+        margin-top: 20px;
         mat-card.map{
             height: 100%;
             width: 150px;
@@ -111,6 +105,14 @@
             margin-top: 50px;
         }
     }
+    .createdPlayersContainer{
+        flex-wrap: wrap;
+        justify-content: space-between;
+        mat-card{
+            margin-top: 10px;
+        }
+    }
+    
 
     #localSaves{
         flex-direction: column;
@@ -131,6 +133,9 @@
     #createdPlayers{
         .createdPlayersContainer{
             justify-content: center;
+            .playerCard:not(:first-child){
+                margin-left: 5px;
+            }
         }
     }
 }

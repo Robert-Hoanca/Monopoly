@@ -11,7 +11,6 @@
 
             <th-perspectiveCamera
                 [args]="[100, 2, 0.1, 1000]"
-                [lookAt]="gameService.cameraLookAt"
                 [position]="gameService.cameraPosition"
                 #camera
             >
@@ -48,6 +47,8 @@
         <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera" (click)="gameService.whatToDoInprison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
         <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>     
     </div>
+
+    
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
     <div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
         <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>

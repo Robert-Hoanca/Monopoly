@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
@@ -6,7 +7,25 @@ import { GameService } from 'src/app/game.service';
 @Component({
   selector: 'app-exchange',
   templateUrl: './exchange.component.html',
-  styleUrls: ['./exchange.component.scss']
+  styleUrls: ['./exchange.component.scss'],
+  animations: [
+    trigger(
+      'mmAnimationGrowHeight',
+      [
+        transition(
+          ':enter', [
+          style({ height: '0', opacity: 0 }),
+          animate('300ms ease-in', style({ height: '*', 'opacity': 1 }))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({ height: '*', 'opacity': 1 }),
+          animate('300ms ease-out', style({ height: '0', 'opacity': 0 }))
+        ])
+      ]
+    ),
+  ]
 })
 export class ExchangeComponent implements OnInit {
   playerToExchangeWith:any= '';
@@ -14,6 +33,7 @@ export class ExchangeComponent implements OnInit {
   actualPlayerProps:Array<any> = [];
   moneyToExchange:Array<any> = [[0],[0],];
   startExchange:boolean=false;
+  actualExpanded:string = '';
 
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<ExchangeComponent>, public gameService: GameService) { }
 
@@ -42,6 +62,7 @@ export class ExchangeComponent implements OnInit {
     this.playerToExchangeWith = player;
     this.actualPlayerProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.gameService.players[this.gameService.turn].id));
     this.playerToExchangeProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == player.id));
+    this.actualExpanded = this.gameService.players[this.gameService.turn].id;
   }
 
   finaliseExchange(answer:string){
@@ -90,5 +111,9 @@ export class ExchangeComponent implements OnInit {
     }
     this.goBackToSelection();
     this.close();
+  }
+
+  changeActualExpanded(playerId:string){
+    this.actualExpanded = this.actualExpanded == playerId ? '' : playerId;
   }
 }

@@ -4,6 +4,7 @@ import { GameService } from 'src/app/game.service';
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import gsap from 'gsap'
+import { json } from 'stream/consumers';
 
 @Component({
   selector: 'app-player',
@@ -67,6 +68,7 @@ export class PlayerComponent implements OnInit {
         }else if(oldCardPosition >= 0 && oldCardPosition <=10){
           actualSide = 0;
         }
+        //console.log("oldCard", oldCardPosition, "actualCard",actualCardPosition,"actualSide", actualSide , "toGoSide", toGoSide)
         if(actualSide < toGoSide){
           for (let index = actualSide; index < (toGoSide); index++) {
             await this.movePlayerGsap(position, index,oldCardPosition)
@@ -83,6 +85,7 @@ export class PlayerComponent implements OnInit {
   async movePlayerGsap(position:any ,index:number, oldCardPosition:number){
     if(this.gameTableSides[index] == 'x'){
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'x')
+      //console.log("PlayerMoved X" , oldCardPosition , JSON.parse(JSON.stringify(position)))
       if(position[0] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: position[0], duration: 1000/1000,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position
@@ -96,6 +99,7 @@ export class PlayerComponent implements OnInit {
     }
     if(this.gameTableSides[index] == 'z'){
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'z')
+      //console.log("PlayerMoved z" , oldCardPosition , JSON.parse(JSON.stringify(position)))
       if(position[2] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1000/1000,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position

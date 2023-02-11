@@ -92,10 +92,17 @@ export class GameComponent implements OnInit {
       this.openMoneyDialog(data)
     });
     this.gameService.addingRemovingMoneyProps()
+    if(window.navigator.userAgent.includes('Android')){
+      this.gameService.userDevice = 'phone_android'
+    }else if(window.navigator.userAgent.includes('Windows')){
+      this.gameService.userDevice = 'computer_windows'
+    }else if(window.navigator.userAgent.includes('iPhone')){
+      this.gameService.userDevice = 'prone_ios'
+    }
   }
   ngAfterViewInit(){
     this.gameService.camera = this.camera;
-    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5)   
+    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.gameService.cameraControls = this.cameraControls;
     this.activateLocalSave();
   }

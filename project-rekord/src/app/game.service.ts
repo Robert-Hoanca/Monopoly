@@ -43,6 +43,8 @@ export class GameService {
   allLocalSaves:Array<any> = [];
   localSaveName:string = '';
   gamePaused:boolean=false;
+  userDevice:string='';
+
   //Colors
   bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
   sessionColor:string= '';
@@ -58,7 +60,6 @@ export class GameService {
   camera:any;
   cameraControls:any;
   cameraPosition: Vector3 | any;
-  cameraLookAt: Vector3 | any;
   movingCamera:boolean= false;
 
   beginTime:number = 0;
@@ -116,7 +117,6 @@ export class GameService {
     });
 
     this.cameraPosition = new THREE.Vector3(-10,10,-10);
-    this.cameraLookAt = new THREE.Vector3();
   }
 
   chooseSessionColor(){
@@ -190,6 +190,7 @@ export class GameService {
   }
 
   async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string){
+    let actualSide = 0;
     this.movingCamera = true;
     let xOffset = offset;
     let zOffset = offset;
@@ -203,7 +204,7 @@ export class GameService {
     }else if(0 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 10 && zOffset){
       zOffset-=10;
     }
-   if(playerMoving != undefined){
+   if(playerMoving){
     if(axis){
        if(axis == 'x'){
         gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: 1000/1000});
@@ -213,11 +214,13 @@ export class GameService {
         gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: 1000/1000});
        }
     }
-   }else{
+   }else if(!playerMoving){
     gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + (offset/2)) : y, duration: duration/1000});
     gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: duration/1000});
    }
+
+   camera._objRef.lookAt(this.players[this.turn].pawn.position)
 
    setTimeout(() => {
     this.movingCamera = false;
@@ -233,9 +236,6 @@ export class GameService {
     this.players[this.turn].actualCard = newCardNum;
     this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
-   /* setTimeout(() => { //SISTEMARE CHE E' ORRIBILE COSI'
-      this.whichPropertyAmI(this.gameTable.cards[(this.players[this.turn].actualCard)]);
-    }, 2500);*/
   }
 
   async startGame(){
@@ -267,7 +267,7 @@ export class GameService {
   }
 
   nextTurn(){
-    if(this.turn == (this.players.length)){
+    if(this.turn == (this.players.length - 1)){
       this.turn = 0;
     }else{
       this.turn++;
@@ -285,7 +285,7 @@ export class GameService {
     this.players[this.turn] = this.players[this.turn];
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
-    this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5);
+    this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
   }
   async rollTheDice(){
     if(!this.players[this.turn].prison.inPrison){

@@ -14,6 +14,7 @@
         .playerCard{
             transition: all 250ms ease;
             position: relative;
+            pointer-events: all;
             &.bankrupt{
                 background: #c73b2f;
                 color: #fff;
@@ -42,8 +43,12 @@
     }
     #gameButtons{
         position: absolute;
-        bottom: 0;
+        bottom: 20px;
         width: 100%;
+        pointer-events: none;
+        button{
+            pointer-events: all;
+        }
     }
     #pauseBtn{
         position: absolute;
@@ -59,7 +64,9 @@
         left: 0;
         z-index: 100;
         button{
-            margin-top: 20px;
+            margin-top: 30px;
+            width: 300px;
+            height: 50px;
         }
     }
 }
