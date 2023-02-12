@@ -46,9 +46,10 @@
   ></th-meshBasicMaterial>
 </th-mesh>
 <th-object3D
-  *ngIf="card.cardType=='start' || card.cardType=='parkArea' || card.cardType=='prison'"
+  *ngIf="card.cardType=='start' || card.cardType=='parkArea' || card.cardType=='prison' || card.cardType=='chance' || card.cardType=='communityChest' ||  card.cardType=='goToPrison'"
     loadGLTF
     [url]="returnSpecialCardUrl(card.cardType)"
     [position]="position"
+    [rotation]="returnSpecialCardObjRotation()"
 >
 </th-object3D>

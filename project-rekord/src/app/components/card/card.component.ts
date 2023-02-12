@@ -130,8 +130,34 @@ export class CardComponent implements OnInit {
       case 'parkArea':
         url = '/assets/blenderModels/card/definitiveCard/parkingArea.gltf'
         break;
+      case 'chance':
+        url = '/assets/blenderModels/card/definitiveCard/chance.gltf'
+        break;
+      case 'communityChest':
+        url = '/assets/blenderModels/card/definitiveCard/communityChest.gltf'
+        break;
+      case 'goToPrison':
+        url = '/assets/blenderModels/card/definitiveCard/policeStation.gltf'
+        break;
     }
     return url;
+  }
+
+  returnSpecialCardObjRotation():any{
+
+    if(this.card.cardType=='chance' || this.card.cardType=='communityChest'){
+      if((this.cardIndex >= 20 && this.cardIndex <= 30) ){
+        return [this.rotation[0], -(Math.PI), this.rotation[2]]
+      }else if( this.cardIndex >= 10 && this.cardIndex <= 20){
+        return [this.rotation[0], -(Math.PI / 2), this.rotation[2]]
+      }else{
+        return this.rotation;
+      }
+    }else{
+      return [0,0,0];
+    }
+
+   
   }
   hoverCard(type:string){
   }

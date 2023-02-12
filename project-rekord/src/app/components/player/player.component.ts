@@ -69,7 +69,7 @@ export class PlayerComponent implements OnInit {
           actualSide = 0;
         }
         //console.log("oldCard", oldCardPosition, "actualCard",actualCardPosition,"actualSide", actualSide , "toGoSide", toGoSide)
-        if(actualSide < toGoSide){
+        if(actualSide < toGoSide || oldCardPosition < actualCardPosition){
           for (let index = actualSide; index < (toGoSide); index++) {
             await this.movePlayerGsap(position, index,oldCardPosition)
           }
