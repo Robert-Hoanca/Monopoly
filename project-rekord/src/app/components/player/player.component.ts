@@ -63,20 +63,39 @@ export class PlayerComponent implements OnInit {
           actualSide = 3;
         }else if(oldCardPosition >= 20  && oldCardPosition <= 30){
           actualSide = 2;
-        }else if(oldCardPosition >10 && oldCardPosition < 20){
+        }else if(oldCardPosition >=10 && oldCardPosition <= 20){
           actualSide = 1;
         }else if(oldCardPosition >= 0 && oldCardPosition <=10){
           actualSide = 0;
         }
         //console.log("oldCard", oldCardPosition, "actualCard",actualCardPosition,"actualSide", actualSide , "toGoSide", toGoSide)
-        if(actualSide < toGoSide || oldCardPosition < actualCardPosition){
-          for (let index = actualSide; index < (toGoSide); index++) {
+       /* if(actualSide < toGoSide || oldCardPosition < actualCardPosition){
+          for (let index = actualSide; index <= (toGoSide); index++) {
             await this.movePlayerGsap(position, index,oldCardPosition)
           }
         }else if(actualSide > toGoSide){
           await this.movePlayerGsap(position, actualSide,oldCardPosition)
         }
-        await this.movePlayerGsap(position, this.gameService.players[this.gameService.turn].inPrison ? (actualSide += actualSide > 2 ? -1 : 1) : toGoSide,oldCardPosition);
+        await this.movePlayerGsap(position, this.gameService.players[this.gameService.turn].inPrison ? (actualSide += actualSide > 2 ? -1 : 1) : toGoSide,oldCardPosition);*/
+
+        if(actualSide > toGoSide){
+          if(toGoSide == 0){
+            await this.movePlayerGsap(position, actualSide, oldCardPosition);
+            await this.movePlayerGsap(position, (actualSide - 1), oldCardPosition);
+          }else{
+            for (let index = actualSide; index <= (toGoSide); index++) {
+              await this.movePlayerGsap(position, index,oldCardPosition);
+            }
+            await this.movePlayerGsap(position, (toGoSide +1),oldCardPosition);
+          }
+        }
+        if(actualSide == toGoSide){
+          await this.movePlayerGsap(position, actualSide, oldCardPosition)
+        }else if(actualSide < toGoSide){
+          for (let index = actualSide; index <= (toGoSide); index++) {
+            await this.movePlayerGsap(position, index,oldCardPosition);
+          }
+        }
         this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)]);
       }
     }
@@ -99,7 +118,7 @@ export class PlayerComponent implements OnInit {
     }
     if(this.gameTableSides[index] == 'z'){
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'z')
-     // console.log("PlayerMoved z" , oldCardPosition , JSON.parse(JSON.stringify(position)))
+      //console.log("PlayerMoved z" , oldCardPosition , JSON.parse(JSON.stringify(position)))
       if(position[2] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1000/1000,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position

@@ -139,13 +139,16 @@ export class CardComponent implements OnInit {
       case 'goToPrison':
         url = '/assets/blenderModels/card/definitiveCard/policeStation.gltf'
         break;
+      case 'taxes':
+        url = '/assets/blenderModels/card/definitiveCard/taxes.gltf'
+        break;
     }
     return url;
   }
 
   returnSpecialCardObjRotation():any{
 
-    if(this.card.cardType=='chance' || this.card.cardType=='communityChest'){
+    if(this.card.cardType=='chance' || this.card.cardType=='communityChest' || this.card.cardType=='taxes'){
       if((this.cardIndex >= 20 && this.cardIndex <= 30) ){
         return [this.rotation[0], -(Math.PI), this.rotation[2]]
       }else if( this.cardIndex >= 10 && this.cardIndex <= 20){

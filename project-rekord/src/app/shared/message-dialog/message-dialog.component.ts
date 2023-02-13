@@ -106,7 +106,7 @@ export class MessageDialogComponent implements OnInit {
         break;
       case 'movenearest': //Maybe add multiply option in future
         this.gameService.gameTable.cards.forEach((nearProp: { cardType: any; }, index: number) => {
-          if(nearProp.cardType == data.groupid && index > this.gameService.players[this.gameService.turn].actualCard && !this.movedNearest){
+          if((nearProp.cardType == data.groupid && index > this.gameService.players[this.gameService.turn].actualCard && !this.movedNearest) || (nearProp.cardType == data.groupid && this.gameService.players[this.gameService.turn].actualCard >= 30 && !this.movedNearest)){
             this.gameService.getCardPosition(index);
             this.movedNearest = true;
           }
