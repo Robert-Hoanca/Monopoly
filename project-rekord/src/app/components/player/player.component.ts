@@ -99,7 +99,7 @@ export class PlayerComponent implements OnInit {
     }
     if(this.gameTableSides[index] == 'z'){
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'z')
-      //console.log("PlayerMoved z" , oldCardPosition , JSON.parse(JSON.stringify(position)))
+     // console.log("PlayerMoved z" , oldCardPosition , JSON.parse(JSON.stringify(position)))
       if(position[2] != 22){
         await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1000/1000,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position

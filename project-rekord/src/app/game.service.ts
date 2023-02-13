@@ -46,7 +46,8 @@ export class GameService {
   userDevice:string='';
 
   //Colors
-  bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
+ // bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
+  bgColors = [];
   sessionColor:string= '';
   players: Array<any> = [];
   //actualTurnPlayer:any = {};
@@ -103,14 +104,25 @@ export class GameService {
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
+
+    //Maps
     const getMaps = await getDocs(collection(this.db, "gameTables"));
     getMaps.forEach((doc) => {
       this.gameMaps.push(doc.id)
     });
 
+    //bgColors
+    const getBgColors = doc(this.db, "colors", 'bgColors');
+    const colors = await (await getDoc(getBgColors)).data();
+    if(colors){
+      this.bgColors = colors['colors'];
+    }
+
+    //PlayerModel
     const playersModelRef = doc(this.db, "playerModel", 'playerModel');
     this.playersModel = await (await getDoc(playersModelRef)).data();
 
+    //Pawn Types
     const pawnTypesRef = await getDocs(collection(this.db, "pawnTypes"));
     pawnTypesRef.forEach((doc) => {
       doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
