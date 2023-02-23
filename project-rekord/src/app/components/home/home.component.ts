@@ -12,7 +12,7 @@ export class HomeComponent implements OnInit {
   constructor(public router: Router, public gameService: GameService) { }
 
   ngOnInit(): void {
-    this.gameService.chooseSessionColor();
+    this.gameService.retrieveSavesFromLocal()
   }
 
   goToChooseModeView(){

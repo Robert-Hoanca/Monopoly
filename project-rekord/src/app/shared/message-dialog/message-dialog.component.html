@@ -1,7 +1,7 @@
 <div id="messageContainer">
-    <h1 *ngIf="data.textData.text">{{data.textData.text}}</h1>
-    <h1 *ngIf="data.textData.title">{{data.textData.title}}</h1>
-    
+    <!-- <h1 *ngIf="data.textData.text">{{data.textData.text}}</h1>
+    <h1 *ngIf="data.textData.title">{{data.textData.title}}</h1> -->
+    <h1 >{{data.textData.text ?? data.textData.title}}</h1>
     <div *ngIf="gameService.playerWhoWonId != ''" class="winScreen">
         <div>Player money: {{getPlayerWhoWin().money}} €</div>
         <div>Time to finish the game:</div>
@@ -10,8 +10,8 @@
 
     <app-player-properties *ngIf="gameService.playerWhoWonId != '' || data.textData.showPlayerProps" [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
     <div class="finishWarning" fxLayoutAlign="end center">
-        <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt">Yes</button>
-        <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt" color="warn">No</button>
+        <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn">Yes</button>
+        <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt">No</button>
         <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt">OK</button>
     </div>
     

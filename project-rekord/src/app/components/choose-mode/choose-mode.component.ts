@@ -14,6 +14,8 @@ export class ChooseModeComponent implements OnInit {
   canAddSpecial:boolean=false;
   specialPawnExist:boolean = false;
 
+  chosenSaveName:string = '';
+
   url:string='';
 
   constructor(public gameService: GameService) { }
@@ -52,6 +54,27 @@ export class ChooseModeComponent implements OnInit {
 
   filterPawns(){
     return this.gameService.pawnTypes.filter((pawn: { specialPawn: any; }) => !pawn.specialPawn)
+  }
+
+  selectSaveName(index:number, saveFile:any){
+   
+  }
+
+  createOrUploadGame(saveFile:any,index:number){
+    if(saveFile == 'new'){
+      this.gameService.localSave.localId = 'rekordLocalSave' + index;
+      this.gameService.localSaves = saveFile;
+    }else{
+      this.gameService.localSaves = saveFile;
+      this.gameService.startGame()
+    }
+  }
+
+  deleteSaveFile(saveFile:any){
+    if(saveFile != 'new'){
+      localStorage.removeItem(saveFile.localId);
+      this.gameService.retrieveSavesFromLocal()
+    }
   }
 
 }

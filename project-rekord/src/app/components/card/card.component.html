@@ -3,13 +3,25 @@
     [url]="url"
     [position]="position"
     [rotation]="rotation"
-    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.actualTurnPlayer.id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): ''"
+    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): '';"
     [receiveShadow]="true"
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
+    (onMouseEnter)="hoverCard('enter')"
+    (onMouseExit)="hoverCard('exit')"
+    [scale]="[1,1,1]"
     #cardRef
 >
-<!-- OTHER EVENTS onMouseEnter   onMouseExit-->
+</th-object3D>
+
+<th-object3D
+    loadGLTF
+    [url]="url"
+    [position]="position"
+    [scale]="[1.1, 1.1, 1.1]"
+    [name]="'cardOutline'+ cardIndex"
+    #cardOutlineRef
+>
 </th-object3D>
 
 <div *ngIf="card.housesCounter && !card.hotelCounter">
@@ -19,8 +31,9 @@
 <div *ngIf="card.hotelCounter && card.housesCounter==4">
   <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [cardIndex]="cardIndex"></app-hotel>
 </div>
+
 <th-mesh
-  *ngIf="card.cardType=='property'"
+  *ngIf="card.cardType=='property' || card.cardType=='plant' || card.cardType=='station'"
   [rotation]="rotation"
   [position]="carpetPosistion"
   [scale]="[2, 0.1, 0.4]"
@@ -29,5 +42,14 @@
   #carpetRef
 >
   <th-boxGeometry></th-boxGeometry>
-  <th-meshStandardMaterial [args]="{color: card.district}"></th-meshStandardMaterial>
+  <th-meshBasicMaterial [args]="{color: gameService.checkCardColorDistrict(card.district)}"
+  ></th-meshBasicMaterial>
 </th-mesh>
+<th-object3D
+  *ngIf="card.cardType=='start' || card.cardType=='parkArea' || card.cardType=='prison' || card.cardType=='chance' || card.cardType=='communityChest' ||  card.cardType=='goToPrison' || card.cardType=='taxes'"
+    loadGLTF
+    [url]="returnSpecialCardUrl(card.cardType)"
+    [position]="position"
+    [rotation]="returnSpecialCardObjRotation()"
+>
+</th-object3D>

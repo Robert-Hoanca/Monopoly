@@ -1,0 +1,11 @@
+Model Information:
+* title:	Police Station
+* source:	https://sketchfab.com/3d-models/police-station-b3e4c2822d49461ebda1efa0204e2a13
+* author:	simonecazzaniga (https://sketchfab.com/simonecazzaniga)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Police Station" (https://sketchfab.com/3d-models/police-station-b3e4c2822d49461ebda1efa0204e2a13) by simonecazzaniga (https://sketchfab.com/simonecazzaniga) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

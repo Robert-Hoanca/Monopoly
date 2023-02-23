@@ -1,13 +1,95 @@
 #exchangeContainer{
     .choosePlayer{
-
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        button{
+            height: 65px;
+            min-width: 100px;
+        }
     }
     .exchangeContainer{
-        .exchangeGoBackBtn{
-            align-self: start;
-            margin-right: 10px;
-            margin-top: -10px;
+        .exchangeProperties{
+            display: flex;
+            align-items: start;
+            justify-content: start;
+            width: 100%;
+            .playerContainer{
+                width: 100%;
+                box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+                padding: 15px;
+                .titleContainer{
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: start;
+                    position: relative;
+                    height: 30px;
+                    .exchangeGoBackBtn, .expandMore{
+                        min-width: unset;
+                        width: 30px;
+                        height: 30px;
+                        min-width: unset;
+                        min-height: unset;
+                        border-radius: 3px;
+                    }
+                    .expandMore{
+                        position: absolute;
+                        right: 0;
+                    }
+                    span{
+                        font-weight: bold;
+                        margin-left: 10px;
+                    }
+                }
+
+                .exchangeOptions{
+                    margin-top: 20px;
+                }
+            }
+        }
+        
+        
+        .handshakeButton{
+            margin-top: 20px;
+            width: 200px;
+            height: 50px;
+            background: #7cb77c;
+            font-weight: bold;
+            color: #fff;
         }
     }
    
+}
+
+
+@media screen and (max-width: 600px) {
+    .exchangeProperties{
+        flex-direction: column;
+    }
+    .choosePlayer{
+        button{
+            &:not(:nth-child(1)):not(:nth-child(2)){
+                margin-top: 20px;
+            }
+        }
+    }
+    
+}
+@media screen and (min-width: 600px) {
+    .exchangeProperties{
+        flex-direction: row;
+        &>.playerContainer:nth-child(2){
+            margin-left: 20px;
+        }
+    }
+
+    .choosePlayer{
+        button{
+            &:not(:nth-child(1)){
+                margin-left: 20px;
+            }
+        }
+    }
+    
 }

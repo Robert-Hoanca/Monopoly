@@ -7,6 +7,8 @@ import * as THREE from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import gsap from 'gsap'
+import { setTimeout } from 'timers';
 
 @Component({
   selector: 'app-card',
@@ -29,71 +31,31 @@ export class CardComponent implements OnInit {
   castedShadow:boolean=false;
   fontLoader = new FontLoader();
   @ViewChild('cardRef', { static: true }) cardRef:any;
+  @ViewChild('cardOutlineRef', { static: true }) cardOutlineRef:any;
   @ViewChild('carpetRef', { static: true }) carpetRef:any;
+  //@ViewChild('decorationRef', { static: true }) decorationRef:any;
+
+  
+  
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
-    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/islandM.gltf':'/assets/blenderModels/card/islandM.gltf';
+    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/definitiveCard/card.gltf':'/assets/blenderModels/card/definitiveCard/card.gltf';
     this.setCardPosition();
     this.setCarpetPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
       if(diceNumber == this.cardIndex){
         this.gameService.setPlayerPosition(this.position, diceNumber);
-        //this.gameService.actualTurnPlayer.pawn.position =  this.position;
-        //this.gameService.actualTurnPlayer.pawn.position[1] = 0.2;
-        //this.gameService.payTaxes(this.cardIndex);
-        //this.gameService.cameraPosition = [  (this.gameService.cameraPosition[0] + 0.01), this.gameService.cameraPosition[1], this.position[2]]
       }
     });
   }
 
   ngAfterViewInit(){
-    this.enableShadow(this.cardRef.objRef, this)
   }
-
-  enableShadow(element:any, that:any){
-    element.traverse((child:any) => {
-      if (child.isMesh ) {
-        const material = new THREE.MeshStandardMaterial();
-        
-        child.castShadow=true;
-        child.receiveShadow=true;
-        child.material = material;
-        //that.castedShadow = true;
-      }
-    })
-  }
-
   setCardPosition(){
-    //this.rotation = [0,(Math.PI / 2)* Math.round(Math.random() * (100 - 1) + 1),0];
-    /*if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
-      this.gameService.cardsPositionCounter = 0;
-      this.gameService.cardsPositionCounter += 2.5;
-    }
-    if(this.cardIndex <= 10){
-      this.position = [ this.gameService.cardsPositionCounter,0,0];
-      if(this.cardIndex == 0){
-        this.position = [ 0,0,0];
-      }
-    }else  if(10 < this.cardIndex && this.cardIndex <= 20){
-      this.position = [21,0,this.gameService.cardsPositionCounter];
-      this.rotation = [0,(Math.PI / 2),0]
-    }else  if(20 < this.cardIndex && this.cardIndex <= 30){
-      this.position = [(21 - this.gameService.cardsPositionCounter),0,21];
-    }else  if(30 < this.cardIndex && this.cardIndex <= 40){
-      this.position = [0,0,(21-this.gameService.cardsPositionCounter)];
-      this.rotation = [0,(Math.PI / 2),0];
-    }
-    
-    if(this.cardIndex == 9 || this.cardIndex == 19 || this.cardIndex == 29 || this.cardIndex == 39){
-      this.gameService.cardsPositionCounter += 0.5
-    }
-    this.gameService.cardsPositionCounter += (this.cardIndex/10) % 1 == 0 ? 2.5 : 2;*/
-
-
     if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
       this.gameService.cardsPositionCounter = 0;
-      this.gameService.cardsPositionCounter += 2;
+      this.gameService.cardsPositionCounter += 2.2;
     }
 
     if(this.cardIndex <= 10){
@@ -102,15 +64,15 @@ export class CardComponent implements OnInit {
         this.position = [0,0,0];
       }
     }else  if(10 < this.cardIndex && this.cardIndex <= 20){
-      this.position = [20,0,this.gameService.cardsPositionCounter];
+      this.position = [22,0,this.gameService.cardsPositionCounter];
       this.rotation = [0,(Math.PI / 2),0]
     }else  if(20 < this.cardIndex && this.cardIndex <= 30){
-      this.position = [(20 - this.gameService.cardsPositionCounter),0,20];
+      this.position = [(22 - this.gameService.cardsPositionCounter),0,22];
     }else  if(30 < this.cardIndex && this.cardIndex <= 40){
-      this.position = [0,0,(20-this.gameService.cardsPositionCounter)];
+      this.position = [0,0,(22-this.gameService.cardsPositionCounter)];
       this.rotation = [0,(Math.PI / 2),0];
     }
-    this.gameService.cardsPositionCounter += 2;
+    this.gameService.cardsPositionCounter += 2.2;
   }
 
   loadText(){
@@ -136,8 +98,6 @@ export class CardComponent implements OnInit {
       cube.position.y = 5;
       cube.position.z = 0;
       this.scene.objRef.children.push(cube)
-      console.log("added")
-      console.log(this.scene)
     } );
 
 
@@ -158,8 +118,54 @@ export class CardComponent implements OnInit {
     this.carpetPosistion[1]+=0.05;
   }
 
+  returnSpecialCardUrl(cardType:string){
+    let url = '';
+    switch (cardType) {
+      case 'start':
+        url = '/assets/blenderModels/card/definitiveCard/startFlag.gltf'
+        break;
+      case 'prison':
+        url = '/assets/blenderModels/card/definitiveCard/prisonCage.gltf'
+        break;
+      case 'parkArea':
+        url = '/assets/blenderModels/card/definitiveCard/parkingArea.gltf'
+        break;
+      case 'chance':
+        url = '/assets/blenderModels/card/definitiveCard/chance.gltf'
+        break;
+      case 'communityChest':
+        url = '/assets/blenderModels/card/definitiveCard/communityChest.gltf'
+        break;
+      case 'goToPrison':
+        url = '/assets/blenderModels/card/definitiveCard/policeStation.gltf'
+        break;
+      case 'taxes':
+        url = '/assets/blenderModels/card/definitiveCard/taxes.gltf'
+        break;
+    }
+    return url;
+  }
+
+  returnSpecialCardObjRotation():any{
+
+    if(this.card.cardType=='chance' || this.card.cardType=='communityChest' || this.card.cardType=='taxes'){
+      if((this.cardIndex >= 20 && this.cardIndex <= 30) ){
+        return [this.rotation[0], -(Math.PI), this.rotation[2]]
+      }else if( this.cardIndex >= 10 && this.cardIndex <= 20){
+        return [this.rotation[0], -(Math.PI / 2), this.rotation[2]]
+      }else{
+        return this.rotation;
+      }
+    }else{
+      return [0,0,0];
+    }
+
+   
+  }
+  hoverCard(type:string){
+  }
 
   test(){
-    console.log(this.position)
+    console.log(this.cardRef._objRef.position, this.cardRef)
   }
 }

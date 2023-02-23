@@ -28,13 +28,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatSliderModule } from '@angular/material/slider';
 
 
 
 //NGX THREE
 import { NgxThreeModule } from 'ngx-three';
-import { ThObjLoaderPipe } from './th-obj-loader.pipe';
-import { ThObjLoaderDirective } from './th-obj-loader.directive';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
 import { PlayerComponent } from './components/player/player.component';
 import { MapComponent } from './components/map/map.component';
@@ -53,8 +52,6 @@ import { PlayerPropertiesComponent } from './shared/player-properties/player-pro
     PawnComponent,
     CardDialogComponent,
     ChooseModeComponent,
-    ThObjLoaderPipe,
-    ThObjLoaderDirective,
     ExchangeComponent,
     PlayerComponent,
     MapComponent,
@@ -81,6 +78,7 @@ import { PlayerPropertiesComponent } from './shared/player-properties/player-pro
     MatCheckboxModule,
     MatPaginatorModule,
     NgxThreeModule,
+    MatSliderModule,
     
     
   ],
