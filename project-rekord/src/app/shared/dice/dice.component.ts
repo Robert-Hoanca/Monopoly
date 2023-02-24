@@ -12,7 +12,7 @@ export class DiceComponent implements OnInit {
   diceMesh:any;
   diceBody = new CANNON.Body({
     mass: 10,
-    shape: new CANNON.Box(new CANNON.Vec3(1,1,1)),
+    shape: new CANNON.Box(new CANNON.Vec3(0.5,0.5,0.5)),
     sleepTimeLimit: 0.1 ,
   })
 
@@ -25,7 +25,16 @@ export class DiceComponent implements OnInit {
       mesh: this.diceMesh,
       body: this.diceBody
     })
-    //this.gamePhysicsService.createDice(this.diceBody)
+
+    this.gamePhysicsService.createDice({
+      mesh: this.diceMesh,
+      body: this.diceBody
+    })
+  }
+
+
+  ngOnDestroy(){
+    this.gamePhysicsService.diceArray.pop()
   }
 
 }

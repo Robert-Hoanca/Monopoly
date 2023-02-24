@@ -195,4 +195,47 @@ export class GameComponent implements OnInit {
       }
     });
   }
+
+
+  rollTheDice(){
+    if(this.gameService.startToDice){
+      this.gameService.startToDice = false;
+    }
+    if(!this.gameService.players[this.gameService.turn].prison.inPrison){
+      this.gameService.startToDice = true;
+      /* this.diceRes = this.getDiceRoll();
+      if(this.diceRes[0]==this.diceRes[1]){
+        this.players[this.turn].prison.doubleDiceCounter++;
+        this.players[this.turn].canDice = true;
+      }else{
+        this.players[this.turn].prison.doubleDiceCounter=0;
+        this.players[this.turn].canDice = false;
+      }
+      this.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.players[this.turn].actualCard);
+      if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
+        this.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameTable.cards.length - 1) - this.players[this.turn].actualCard)) - 1);
+      }*/
+      // this.getCardPosition(this.diceNumber)
+      this.gamePhysicsService.diceArray.forEach(dice => {
+        this.gamePhysicsService.diceRollTest(dice);
+      });
+     
+    }else{
+     this.whatToDoInPrison('prisonRoll')
+    }
+  }
+
+  whatToDoInPrison(action:string){
+    if(action == 'payToExit'){
+      this.gameService.exitFromPrison(true, false);
+    }if(action == 'freeExit'){
+      this.gameService.exitFromPrison(false, false);
+    }else if(action == 'prisonRoll'){
+      this.gameService.startToDice = true;
+      this.gamePhysicsService.diceArray.forEach(dice => {
+        this.gamePhysicsService.diceRollTest(dice);
+      });
+    }
+  }
+
 }

@@ -9,8 +9,8 @@
             <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
 
-            <app-dice></app-dice>
-            <app-dice></app-dice>
+            <app-dice *ngIf="gameService.startToDice"></app-dice>
+            <app-dice *ngIf="gameService.startToDice"></app-dice>
 
             <th-mesh
                 [position]="[0,0,0]"
@@ -56,11 +56,11 @@
 
         <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.players[gameService.turn].canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Next Turn"><mat-icon>skip_next</mat-icon></button>
 
-        <!-- <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="gameService.rollTheDice()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button> -->
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="rollTheDice()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button>
         
-        <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="gamePhysicsService.diceRollTest(gamePhysicsService.diceArray[0]) ; gamePhysicsService.diceRollTest(gamePhysicsService.diceArray[1])" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera" (click)="gameService.whatToDoInprison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="gameService.whatToDoInprison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>     
+        <!-- <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="gamePhysicsService.diceRollTest(gamePhysicsService.diceArray[0]) ; gamePhysicsService.diceRollTest(gamePhysicsService.diceArray[1])" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button> -->
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera" (click)="whatToDoInPrison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>     
     </div>
 
     

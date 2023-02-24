@@ -76,6 +76,7 @@ export class GameService {
   specialPawnTypes: any = [];
   specialPawn:String='';
   diceNumber:number|undefined;
+  startToDice:boolean = false;
   playerWhoWonId:string = '';
   addingPlayerMoney:boolean=false;
   removingPlayerMoney:boolean=false;
@@ -102,7 +103,7 @@ export class GameService {
 
   setted:boolean=false;
 
-  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
+  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
 
@@ -280,6 +281,9 @@ export class GameService {
   }
 
   nextTurn(){
+    if(this.startToDice){
+      this.startToDice = false;
+    }
     if(this.turn == (this.players.length - 1)){
       this.turn = 0;
     }else{
@@ -300,9 +304,12 @@ export class GameService {
     this.diceNumber = undefined;
     this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
   }
+  
+  //OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
   async rollTheDice(){
     if(!this.players[this.turn].prison.inPrison){
-       this.diceRes = this.getDiceRoll();
+      this.startToDice = true;
+      /* this.diceRes = this.getDiceRoll();
       if(this.diceRes[0]==this.diceRes[1]){
         this.players[this.turn].prison.doubleDiceCounter++;
         this.players[this.turn].canDice = true;
@@ -313,8 +320,9 @@ export class GameService {
       this.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.players[this.turn].actualCard);
       if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
         this.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameTable.cards.length - 1) - this.players[this.turn].actualCard)) - 1);
-      }
-      this.getCardPosition(this.diceNumber)
+      }*/
+      // this.getCardPosition(this.diceNumber)
+     
     }else{
      this.whatToDoInprison('prisonRoll')
     }
@@ -549,7 +557,7 @@ export class GameService {
     this.getCardPosition$.next(10);
     this.players[this.turn].canDice=false;
   }
-
+//OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
   whatToDoInprison(action:string){
     if(action == 'payToExit'){
       this.exitFromPrison(true, false);
