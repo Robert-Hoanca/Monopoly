@@ -12,6 +12,7 @@ import gsap from 'gsap'
 import { Vector3 } from 'three';
 import * as THREE from 'three';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
+import { GamePhysicsService } from './game-physics.service';
 
 @Injectable({
   providedIn: 'root'
@@ -101,7 +102,7 @@ export class GameService {
 
   setted:boolean=false;
 
-  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
+  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
  
   async retrieveDBData(){
 
@@ -275,7 +276,7 @@ export class GameService {
         this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!'}, 'finishGame')
       }
     }
-    this.router.navigateByUrl('game', { skipLocationChange: true })
+    this.router.navigateByUrl('game', { skipLocationChange: true });
   }
 
   nextTurn(){
