@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, TemplateRef } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import * as CANNON from 'cannon-es'
 import * as THREE from 'three';
 import { GameService } from './game.service';
@@ -21,8 +22,9 @@ export class GamePhysicsService {
   diceRes:Array<number> = [];
 
   dicesRolling:boolean = false;
+  showDiceResultDialogRef: TemplateRef<any> | any;
 
-  constructor(public gameService: GameService) { }
+  constructor(public gameService: GameService, private dialog: MatDialog) { }
 
   initWorld(){
     this.world.gravity.set(0, -9.82, 0);// m/s²
@@ -46,7 +48,7 @@ export class GamePhysicsService {
   createDice(dice:any){
     this.world.addBody(dice.body);
     this.addDiceEvents(dice);
-    this.diceRollTest(dice)
+    this.diceRoll(dice)
   }
 
   renderPhysicsWorld(){
@@ -104,7 +106,7 @@ export class GamePhysicsService {
                 this.diceRes.push(5);
                 this.showRollResults()
         } else if (isMinusHalfPi(euler.z)) {
-                this.diceRes.push(1);
+                this.diceRes.push(2);
                 this.showRollResults()
         } else {
             // landed on edge => wait to fall on side and fire the event again
@@ -118,10 +120,10 @@ export class GamePhysicsService {
 
 
   
-  diceRollTest(dice:any){
+  diceRoll(dice:any){
     this.dicesRolling = true;
-    dice.body.position.x = 0;
-    dice.body.position.z = 0;
+    dice.body.position.x = 10;
+    dice.body.position.z = 10;
     dice.body.position.y = 10;
 
     dice.body.velocity.setZero();
@@ -131,7 +133,7 @@ export class GamePhysicsService {
     dice.mesh.rotation.set(2 * Math.PI * Math.random(), 0, 2 * Math.PI * Math.random())
     dice.body.quaternion.copy(dice.mesh.quaternion);
 
-    const force = 3 + 5 * Math.random();
+    const force = 3 + 1 * Math.random();
     dice.body.applyImpulse(
       new CANNON.Vec3(force , 0, force),
       new CANNON.Vec3(0, 0.2 ,0 )
@@ -141,39 +143,50 @@ export class GamePhysicsService {
 
 
   showRollResults(){
-    console.log(this.diceRes)
     if(this.diceRes.length === 2){
-      
-
-      if(!this.gameService.players[this.gameService.turn].prison.inPrison){
-        if(this.diceRes[0]==this.diceRes[1]){
-          this.gameService.players[this.gameService.turn].prison.doubleDiceCounter++;
-          this.gameService.players[this.gameService.turn].canDice = true;
+      this.openShowDiceResDialog(this.diceRes);
+      setTimeout(() => {
+        this.dialog.closeAll()
+        if(!this.gameService.players[this.gameService.turn].prison.inPrison){
+          if(this.diceRes[0]==this.diceRes[1]){
+            this.gameService.players[this.gameService.turn].prison.doubleDiceCounter++;
+            this.gameService.players[this.gameService.turn].canDice = true;
+          }else{
+            this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
+            this.gameService.players[this.gameService.turn].canDice = false;
+          }
+          this.gameService.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.gameService.players[this.gameService.turn].actualCard);
+          if(this.gameService.diceNumber && this.gameService.diceNumber > (this.gameService.gameTable.cards.length - 1)){
+            this.gameService.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameService.gameTable.cards.length - 1) - this.gameService.players[this.gameService.turn].actualCard)) - 1);
+          }
+          this.gameService.getCardPosition(this.gameService.diceNumber);
         }else{
-          this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
-          this.gameService.players[this.gameService.turn].canDice = false;
+          if(this.diceRes[0] == this.diceRes[1]){
+            this.gameService.exitFromPrison(false, true, this.diceRes[0], this.diceRes[1]);
+            
+          }else if(this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter == 2){
+            this.gameService.exitFromPrison(true, false, this.diceRes[0], this.diceRes[1]);
+          }else{
+            this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter++;
+            this.gameService.players[this.gameService.turn].canDice = false;
+          }
         }
-        this.gameService.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.gameService.players[this.gameService.turn].actualCard);
-        if(this.gameService.diceNumber && this.gameService.diceNumber > (this.gameService.gameTable.cards.length - 1)){
-          this.gameService.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameService.gameTable.cards.length - 1) - this.gameService.players[this.gameService.turn].actualCard)) - 1);
-        }
-        this.gameService.getCardPosition(this.gameService.diceNumber);
-      }else{
-        if(this.diceRes[0] == this.diceRes[1]){
-          this.gameService.exitFromPrison(false, true, this.diceRes[0], this.diceRes[1]);
-          
-        }else if(this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter == 2){
-          this.gameService.exitFromPrison(true, false, this.diceRes[0], this.diceRes[1]);
-        }else{
-          this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter++;
-          this.gameService.players[this.gameService.turn].canDice = false;
-        }
-      }
-
-      
-     this.dicesRolling = false
-    this.diceRes = [];
+        this.dicesRolling = false
+        this.diceRes = [];
+      }, 2000);
     }
+  }
+
+  openShowDiceResDialog(diceRes:Array<number>){
+    this.dialog.open(this.showDiceResultDialogRef, {
+      panelClass: 'showDiceResult',
+      hasBackdrop: true,
+      autoFocus: false,
+      disableClose:true,
+      data: {
+        diceRes: diceRes
+      }
+    });
   }
 
 }

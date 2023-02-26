@@ -17,7 +17,6 @@ export class MessageDialogComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
 
   ngOnInit(): void {
-    
   }
 
   ngAfterViewInit(){
@@ -60,7 +59,7 @@ export class MessageDialogComponent implements OnInit {
       case 'communityChest':
         this.calculateChestChance(this.data.textData);
         break;
-       case 'goingToPrison':
+      case 'goingToPrison':
         this.gameService.goToPrison();
         break;
       case 'exitFromPrison':

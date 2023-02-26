@@ -88,7 +88,6 @@ export class GameService {
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
-  moneyDialogRef: TemplateRef<any> | undefined;
   exchangeRef: MatDialogRef<any> | undefined;
   randomChest:any;
   randomChance:any;
@@ -543,7 +542,7 @@ export class GameService {
       eventType,
     }
     this.cardInfoRef = this.dialog.open(MessageDialogComponent, {
-      panelClass: 'messadeDialog',
+      panelClass: 'messageDialog',
       hasBackdrop: true,
       autoFocus: false,
       disableClose:true,
