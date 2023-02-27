@@ -86,9 +86,6 @@ export class GameComponent implements OnInit {
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
 
   ngOnInit(): void {
-   /* this.openTextDialog$ = this.gameService.openTextDialog$.subscribe((data:any) =>{
-      this.openMoneyDialog(data)
-    });*/
     this.gameService.addingRemovingMoneyProps()
     if(window.navigator.userAgent.includes('Android')){
       this.gameService.userDevice = 'phone_android'
@@ -103,9 +100,9 @@ export class GameComponent implements OnInit {
     this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.gameService.cameraControls = this.cameraControls;
     this.activateLocalSave();
-    this.gamePhysicsService.groundMesh = this.physicsGround._objRef;
+    //this.gamePhysicsService.groundMesh = this.physicsGround._objRef;
+    this.gameService.gameScene = this.scene._objRef;
     this.gamePhysicsService.initWorld();
-
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
   }
 
@@ -236,5 +233,4 @@ export class GameComponent implements OnInit {
     }
     return returnClass;
   }
-
 }

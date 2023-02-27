@@ -12,15 +12,14 @@
             <app-dice *ngIf="gameService.startToDice"></app-dice>
             <app-dice *ngIf="gameService.startToDice"></app-dice>
 
-            <th-mesh
-                [position]="[0,0.2,0]"
-                [scale]="[500, 500, 500]"
+            <!-- <th-mesh
+                [scale]="[20, 20, 0]"
                 #physicsGround
                 >
                 <th-planeGeometry></th-planeGeometry>
-                <th-meshStandardMaterial [transparent]="true" [opacity]="0"
+                <th-meshStandardMaterial [transparent]="true" [opacity]="1"
                 ></th-meshStandardMaterial>
-            </th-mesh>
+            </th-mesh> -->
 
             <th-perspectiveCamera
                 [args]="[100, 2, 0.1, 1000]"

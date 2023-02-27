@@ -76,13 +76,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     height: 150px;
     width: 300px;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
   }
   .dice{
     width: 100px;
     height: 100px;
     background: #fff;
-    margin-left: 20px;
     border-radius: 5px;
     .dotsContainer{
       width: 100px;

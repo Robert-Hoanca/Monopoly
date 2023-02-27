@@ -13,11 +13,8 @@ export class GamePhysicsService {
   });
   time:number = 1 / 60;
 
-  groundMesh:any;
-  groundBody = new CANNON.Body({
-    mass: 0,
-    shape: new CANNON.Plane(),
-  })
+ 
+  groundArray:Array<any> = []
   diceArray:Array<any> = [];
   diceRes:Array<number> = [];
 
@@ -29,20 +26,52 @@ export class GamePhysicsService {
   initWorld(){
     this.world.gravity.set(0, -9.82, 0);// m/s²
     this.world.defaultContactMaterial.restitution = .3;
-    this.createGround()
-
+    this.createDiceCase();
     if(this.diceArray.length){
       this.diceArray.forEach(dice => {
         this.createDice(dice.body);
         this.addDiceEvents(dice)
       });
     }
-
   }
 
-  createGround(){
-    this.world.addBody(this.groundBody)
-    this.groundBody.quaternion.setFromEuler(-Math.PI / 2, 0,0)
+  createDiceCase(){
+    //Bottom side
+    this.createGround(20,20,[11,0,11], [-Math.PI / 2 , 0 , 0])
+    //Z side
+    this.createGround(20,20,[11,10,1], [ 0, 0 , 0])
+    this.createGround(20,20,[11,10,21], [0 , 0 , 0])
+    //X side
+    this.createGround(20,20,[1,10,11], [ 0, -Math.PI / 2 , 0])
+    this.createGround(20,20,[21,10,11], [0 , -Math.PI / 2 , 0])
+  }
+
+  createGround(width:number, heigth:number,position:any, rotation:Array<number>){
+    const groundGeo = new THREE.PlaneGeometry(width,heigth);
+    const groundMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      wireframe: false,
+    }) 
+    const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+    this.gameService.gameScene.children.push(groundMesh)
+
+    const groundBody = new CANNON.Body({
+      mass: 0,
+      shape: new CANNON.Box(new CANNON.Vec3(10, 10, 0.1)),
+    })
+
+    this.groundArray.push({
+      mesh: groundMesh,
+      body: groundBody,
+    })
+
+    this.world.addBody(groundBody)
+    groundBody.position.x = position[0];
+    groundBody.position.y = position[1];
+    groundBody.position.z = position[2];
+    groundBody.quaternion.setFromEuler(rotation[0], rotation[1], rotation[2])
   }
 
   createDice(dice:any){
@@ -53,10 +82,10 @@ export class GamePhysicsService {
 
   renderPhysicsWorld(){
     this.world.step(this.time);
-
-    this.groundMesh.position.copy(this.groundBody.position);
-    this.groundMesh.quaternion.copy(this.groundBody.quaternion);
-
+    this.groundArray.forEach(groundEl => {
+      groundEl.mesh.position.copy(groundEl.body.position);
+      groundEl.mesh.quaternion.copy(groundEl.body.quaternion);
+    });
     this.renderDices()
   }
 
@@ -118,8 +147,6 @@ export class GamePhysicsService {
     });
   }
 
-
-  
   diceRoll(dice:any){
     this.dicesRolling = true;
     dice.body.position.x = 10;
@@ -133,14 +160,13 @@ export class GamePhysicsService {
     dice.mesh.rotation.set(2 * Math.PI * Math.random(), 0, 2 * Math.PI * Math.random())
     dice.body.quaternion.copy(dice.mesh.quaternion);
 
-    const force = 3 + 1 * Math.random();
+    const force = 3 + 5 * Math.random();
     dice.body.applyImpulse(
       new CANNON.Vec3(force , 0, force),
       new CANNON.Vec3(0, 0.2 ,0 )
     );
     dice.body.allowSleep = true;
   }
-
 
   showRollResults(){
     if(this.diceRes.length === 2){

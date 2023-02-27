@@ -45,6 +45,7 @@ export class GameService {
   localSaveName:string = '';
   gamePaused:boolean=false;
   userDevice:string='';
+  gameScene:any;
 
   //Colors
  // bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
