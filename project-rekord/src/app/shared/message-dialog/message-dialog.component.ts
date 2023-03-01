@@ -182,7 +182,7 @@ export class MessageDialogComponent implements OnInit {
 
   closeDialog(){
     this.movedNearest = false;
-    this.dialogRef.close();
+    this.gameService.closeDialog(this.dialogRef);
   }
 
   getPlayerWhoWin(){

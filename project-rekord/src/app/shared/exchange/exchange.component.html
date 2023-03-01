@@ -1,6 +1,7 @@
 <div id="exchangeContainer" fxLayout="row" fxLayoutAlign="space-around center">
 
     <div *ngIf="!playerToExchangeWith" class="choosePlayer">
+        <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
         <button mat-raised-button *ngFor="let player of getPlayersToExchangeWith()" (click)="selectPlayerToExchange(player)" [disabled]="player.bankrupt">
             <span>{{player.name}}</span>
         </button>

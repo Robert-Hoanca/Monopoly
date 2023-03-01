@@ -1,4 +1,6 @@
 <div id="cardInfo" fxLayout="column" fxLayoutAlign="start start">
+    
+    <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
 
     <mat-card class="cardForm">
         <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(data.card.district)}" fxLayoutAlign="center center">

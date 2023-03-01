@@ -1,4 +1,4 @@
-import { Injectable, TemplateRef } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { collection, getFirestore, doc, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
@@ -12,7 +12,6 @@ import gsap from 'gsap'
 import { Vector3 } from 'three';
 import * as THREE from 'three';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
-import { GamePhysicsService } from './game-physics.service';
 
 @Injectable({
   providedIn: 'root'
@@ -519,6 +518,7 @@ export class GameService {
       this.cardInfoRef = this.dialog.open(CardDialogComponent, {
         panelClass: 'propertyInfo',
         hasBackdrop: true,
+        disableClose:true,
         autoFocus: false,
         data: {
           card: card,
@@ -531,6 +531,7 @@ export class GameService {
       panelClass: 'exchangePanel',
       hasBackdrop: true,
       autoFocus: false,
+      disableClose:true,
       data: {
       }
     });
@@ -549,6 +550,10 @@ export class GameService {
       disableClose:true,
       data: data
     });
+  }
+
+  closeDialog(dialogRef:any){
+    dialogRef.close()
   }
 
   //EVENTS
