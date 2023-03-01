@@ -184,7 +184,10 @@ export class GameComponent implements OnInit {
     });
   }
 
-  rollTheDice(){
+  async rollTheDice(){
+    //setcamera position on the corner opposite the start
+    await this.gameService.setCameraPosition(this.gameService.camera, 20,15,20,1000,5, false)
+
     if(this.gameService.startToDice){
       this.gameService.startToDice = false;
     }
