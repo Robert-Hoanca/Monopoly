@@ -111,9 +111,16 @@ export class PlayerComponent implements OnInit {
           if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
+          if(this.playerRef._objRef.position.x == 22 || this.playerRef._objRef.position.x == 0){
+            this.setPlayerRotation()
+          }
         }}, );
       }else{
-        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: 22, duration: 1000/1000});
+        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: 22, duration: 1000/1000, onUpdate:  (currentValue) => {
+          if(this.playerRef._objRef.position.x == 22 || this.playerRef._objRef.position.x == 0){
+            this.setPlayerRotation()
+          }
+        }});
       }
     }
     if(this.gameTableSides[index] == 'z'){
@@ -125,11 +132,38 @@ export class PlayerComponent implements OnInit {
           if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0  &&  !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
+          if(this.playerRef._objRef.position.z == 22 || this.playerRef._objRef.position.z == 0){
+            this.setPlayerRotation()
+          }
         }});
       }else{
-        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: 22, duration: 1000/1000});
+        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: 22, duration: 1000/1000 , onUpdate:  (currentValue) => {
+          if(this.playerRef._objRef.position.z == 22 || this.playerRef._objRef.position.z == 0){
+            this.setPlayerRotation();
+          }
+        }});
       }
     }
+  }
+
+   setPlayerRotation(){
+    let rotationValue = 0;
+    if(this.player.actualCard  >= 0 && this.player.actualCard  < 10){
+      //console.log("1")
+      rotationValue = 0;
+    }else if(this.player.actualCard  >= 10 && this.player.actualCard  < 20){
+      //console.log("2")
+      rotationValue = -Math.PI / 2;
+    }else if(this.player.actualCard  >= 20 && this.player.actualCard  < 30){
+      //console.log("3")
+      rotationValue = -Math.PI;
+    }else if(this.player.actualCard  >= 30 && this.player.actualCard  <= 39){
+      //console.log("4")
+      rotationValue = Math.PI / 2;
+    }
+    gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: rotationValue, duration: 1});
+    
+    this.player.pawn.rotation = [0, rotationValue ,0];
   }
 
 }

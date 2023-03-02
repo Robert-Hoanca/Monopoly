@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { collection, getFirestore, doc, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
@@ -70,6 +71,7 @@ export class GameService {
   cardsPositionCounter:number = 0;
   playersModel: any = {};
   pawnTypes: any = [];
+  pawnUrls:Array<any> = [];
   specialPawnTypes: any = [];
   specialPawn:String='';
   diceNumber:number|undefined;
@@ -102,6 +104,7 @@ export class GameService {
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
+    //const storage = getStorage();
 
     //Maps
     const getMaps = await getDocs(collection(this.db, "gameTables"));
@@ -125,7 +128,23 @@ export class GameService {
     pawnTypesRef.forEach((doc) => {
       doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
     });
+    this.pawnTypes.forEach((pawn:any) => {
+        this.pawnUrls.push('/assets/blenderModels/pawns/' + pawn.value + '/scene.gltf')
+    });
 
+    /*this.pawnTypes.forEach((pawn:any) => {
+      console.log(pawn.value)
+      getDownloadURL(ref(storage, 'projectRekord/assets/pawns/' + pawn.value + '/scene.gltf'))
+      .then((url) => {
+        if(url){
+          this.pawnModels.push(url)
+        }
+      })
+      .catch((error) => {
+        console.log("error ",error)
+      });
+      console.log("pawnModels ",this.pawnModels)
+    });*/
     this.cameraPosition = new THREE.Vector3(-10,10,-10);
   }
 

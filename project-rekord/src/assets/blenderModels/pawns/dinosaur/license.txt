@@ -1,0 +1,11 @@
+Model Information:
+* title:	Vox Dinosaur
+* source:	https://sketchfab.com/3d-models/vox-dinosaur-ddfff9c3e3634603b23644d0cd033452
+* author:	vladim247 (https://sketchfab.com/vladim247)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Vox Dinosaur" (https://sketchfab.com/3d-models/vox-dinosaur-ddfff9c3e3634603b23644d0cd033452) by vladim247 (https://sketchfab.com/vladim247) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
