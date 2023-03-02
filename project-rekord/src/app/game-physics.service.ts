@@ -174,33 +174,35 @@ export class GamePhysicsService {
       setTimeout(async () => {
         this.dialog.closeAll()
         await this.gameService.setCameraPosition(this.gameService.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2],1000,5, false)
-        if(!this.gameService.players[this.gameService.turn].prison.inPrison){
-          if(this.diceRes[0]==this.diceRes[1]){
-            this.gameService.players[this.gameService.turn].prison.doubleDiceCounter++;
-            this.gameService.players[this.gameService.turn].canDice = true;
+        setTimeout(() => {
+          if(!this.gameService.players[this.gameService.turn].prison.inPrison){
+            if(this.diceRes[0]==this.diceRes[1]){
+              this.gameService.players[this.gameService.turn].prison.doubleDiceCounter++;
+              this.gameService.players[this.gameService.turn].canDice = true;
+            }else{
+              this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
+              this.gameService.players[this.gameService.turn].canDice = false;
+            }
+            this.gameService.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.gameService.players[this.gameService.turn].actualCard);
+            if(this.gameService.diceNumber && this.gameService.diceNumber > (this.gameService.gameTable.cards.length - 1)){
+              this.gameService.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameService.gameTable.cards.length - 1) - this.gameService.players[this.gameService.turn].actualCard)) - 1);
+            }
+            this.gameService.getCardPosition(this.gameService.diceNumber);
           }else{
-            this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
-            this.gameService.players[this.gameService.turn].canDice = false;
+            if(this.diceRes[0] == this.diceRes[1]){
+              this.gameService.exitFromPrison(false, true, this.diceRes[0], this.diceRes[1]);
+              
+            }else if(this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter == 2){
+              this.gameService.exitFromPrison(true, false, this.diceRes[0], this.diceRes[1]);
+            }else{
+              this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter++;
+              this.gameService.players[this.gameService.turn].canDice = false;
+            }
           }
-          this.gameService.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.gameService.players[this.gameService.turn].actualCard);
-          if(this.gameService.diceNumber && this.gameService.diceNumber > (this.gameService.gameTable.cards.length - 1)){
-            this.gameService.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameService.gameTable.cards.length - 1) - this.gameService.players[this.gameService.turn].actualCard)) - 1);
-          }
-          this.gameService.getCardPosition(this.gameService.diceNumber);
-        }else{
-          if(this.diceRes[0] == this.diceRes[1]){
-            this.gameService.exitFromPrison(false, true, this.diceRes[0], this.diceRes[1]);
-            
-          }else if(this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter == 2){
-            this.gameService.exitFromPrison(true, false, this.diceRes[0], this.diceRes[1]);
-          }else{
-            this.gameService.players[this.gameService.turn].prison.inPrisonTurnCounter++;
-            this.gameService.players[this.gameService.turn].canDice = false;
-          }
-        }
-        this.dicesRolling = false
-        this.gameService.diceRes = this.diceRes;
-        this.diceRes = [];
+          this.dicesRolling = false
+          this.gameService.diceRes = this.diceRes;
+          this.diceRes = [];
+        }, 1100);
       }, 2000);
     }
   }

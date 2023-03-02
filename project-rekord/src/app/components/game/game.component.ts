@@ -97,10 +97,9 @@ export class GameComponent implements OnInit {
   }
   ngAfterViewInit(){
     this.gameService.camera = this.camera;
-    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.gameService.cameraControls = this.cameraControls;
+    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.activateLocalSave();
-    //this.gamePhysicsService.groundMesh = this.physicsGround._objRef;
     this.gameService.gameScene = this.scene._objRef;
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
@@ -186,7 +185,7 @@ export class GameComponent implements OnInit {
 
   async rollTheDice(){
     //setcamera position on the corner opposite the start
-    await this.gameService.setCameraPosition(this.gameService.camera, 20,15,20,1000,5, false)
+    await this.gameService.setCameraPosition(this.gameService.camera, 25,15,25,1000,5, false,'diceRoll')
 
     if(this.gameService.startToDice){
       this.gameService.startToDice = false;

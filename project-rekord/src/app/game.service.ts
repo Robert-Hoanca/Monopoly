@@ -12,6 +12,7 @@ import gsap from 'gsap'
 import { Vector3 } from 'three';
 import * as THREE from 'three';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
+import { off } from 'process';
 
 @Injectable({
   providedIn: 'root'
@@ -202,20 +203,21 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string){
-    let actualSide = 0;
+  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string) : Promise<any>{
     this.movingCamera = true;
     let xOffset = offset;
     let zOffset = offset;
-    if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20 && xOffset){
-      xOffset+=0;
-    }else if(30 < this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 39 && xOffset){
-      xOffset-=10;
-    }
-    if(20 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 30 && zOffset){
-      zOffset+=0;
-    }else if(0 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 10 && zOffset){
-      zOffset-=10;
+    if(xOffset != undefined && zOffset != undefined && playerMoving != undefined){
+      if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20){
+        xOffset+=0;
+      }else if(30 < this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 39){
+        xOffset-=10;
+      }
+      if(20 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 30){
+        zOffset+=0;
+      }else if(0 <= this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 10){
+        zOffset-=10;
+      }
     }
    if(playerMoving){
     if(axis){
@@ -228,12 +230,14 @@ export class GameService {
        }
     }
    }else if(!playerMoving){
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + (offset/2)) : y, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: axis == 'diceRoll' ? x : (xOffset ? (x + xOffset) : x), duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: axis == 'diceRoll' ? y : (offset ? (y + (offset/2)) : y), duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: axis == 'diceRoll' ? z : (zOffset ? (z + zOffset) : z), duration: duration/1000});
+    
    }
-
-   camera._objRef.lookAt(this.players[this.turn].pawn.position)
+   gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: axis == 'diceRoll' ? 0: x, duration: 1000/1000});
+   gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: axis == 'diceRoll' ? 0: y, duration: 1000/1000});
+   gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: axis == 'diceRoll' ? 0: z, duration: 1000/1000});
 
    setTimeout(() => {
     this.movingCamera = false;
