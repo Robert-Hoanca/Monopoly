@@ -46,13 +46,9 @@ export class GameService {
   gamePaused:boolean=false;
   userDevice:string='';
   gameScene:any;
-
-  //Colors
- // bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
   bgColors = [];
   sessionColor:string= '';
   players: Array<any> = [];
-  //actualTurnPlayer:any = {};
   ambientLightColor:string='#ff8326'
 
   choosenMode:string = '';
@@ -161,8 +157,7 @@ export class GameService {
     else if  ( g < 0 ) g = 0;
 
     return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
-}
-
+  }
 
   retrieveSavesFromLocal(){
     let localStorageAllSaves = [];
@@ -301,7 +296,6 @@ export class GameService {
         }
       }
     }
-    //console.log(this.turn)
     this.players[this.turn] = this.players[this.turn];
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
@@ -541,7 +535,6 @@ export class GameService {
     });
   }
 
-  //https://stackoverflow.com/questions/64460217/open-several-mat-dialogs-one-by-one-after-the-previous-one-is-closed
   textDialog(textData:any, eventType:string) {
     const data = {
       textData,

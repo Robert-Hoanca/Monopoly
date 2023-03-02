@@ -70,17 +70,10 @@ export class GameComponent implements OnInit {
   textDialog:string='';
   cardChangedCounter:number = 0;
   cardOutlineChangedCounter:number = 0;
-
-  //ADD OBJECTS TO SCENE
-  //this.scene.objRef.children.push( OBJECT );
   rendererOptions:any={
     shadowMap:{
-      //enabled:true,
-      //type:THREE.PCFSoftShadowMap
     },
     antialias: true,
-    //outputEncoding: 3001,
-   // toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
 
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }

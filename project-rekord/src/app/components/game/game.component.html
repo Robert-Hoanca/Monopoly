@@ -17,7 +17,7 @@
                 [position]="gameService.cameraPosition"
                 #camera
             >
-                <th-mapControls #cameraControls [enabled]="!gameService.movingCamera"></th-mapControls>
+                <th-mapControls #cameraControls [enabled]="!gameService.movingCamera && gameService.choosenMode == 'local'"></th-mapControls>
             </th-perspectiveCamera>
         </th-scene>
       </th-canvas>
