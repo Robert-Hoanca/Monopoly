@@ -69,32 +69,28 @@ export class PlayerComponent implements OnInit {
           actualSide = 0;
         }
         //console.log("oldCard", oldCardPosition, "actualCard",actualCardPosition,"actualSide", actualSide , "toGoSide", toGoSide)
-       /* if(actualSide < toGoSide || oldCardPosition < actualCardPosition){
-          for (let index = actualSide; index <= (toGoSide); index++) {
-            await this.movePlayerGsap(position, index,oldCardPosition)
-          }
-        }else if(actualSide > toGoSide){
-          await this.movePlayerGsap(position, actualSide,oldCardPosition)
-        }
-        await this.movePlayerGsap(position, this.gameService.players[this.gameService.turn].inPrison ? (actualSide += actualSide > 2 ? -1 : 1) : toGoSide,oldCardPosition);*/
-
-        if(actualSide > toGoSide){
-          if(toGoSide == 0){
-            await this.movePlayerGsap(position, actualSide, oldCardPosition);
-            await this.movePlayerGsap(position, (actualSide - 1), oldCardPosition);
-          }else{
-            for (let index = actualSide; index <= (toGoSide); index++) {
-              await this.movePlayerGsap(position, index,oldCardPosition);
+        if(actualSide === toGoSide){
+          if(oldCardPosition < actualCardPosition){
+            await this.movePlayerGsap(position, actualSide, oldCardPosition)
+          }else {
+            if(actualSide === 3){
+              await this.movePlayerGsap([0,0,0], 3,oldCardPosition);
+            }else{
+              await this.cycleMap(actualSide, oldCardPosition , 3 , 3 , [0,0,0])
             }
-            await this.movePlayerGsap(position, (toGoSide +1),oldCardPosition);
+            actualSide = 0;
+            await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
           }
-        }
-        if(actualSide == toGoSide){
-          await this.movePlayerGsap(position, actualSide, oldCardPosition)
         }else if(actualSide < toGoSide){
-          for (let index = actualSide; index <= (toGoSide); index++) {
-            await this.movePlayerGsap(position, index,oldCardPosition);
+          await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
+        }else if(actualSide > toGoSide){
+          if(actualSide === 3){
+            await this.movePlayerGsap([0,0,0], 3,oldCardPosition);
+          }else{
+            await this.cycleMap(actualSide, oldCardPosition , 3 , 3 , [0,0,0])
           }
+          actualSide = 0;
+          await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
         }
         this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)]);
       }
@@ -106,7 +102,7 @@ export class PlayerComponent implements OnInit {
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'x')
       //console.log("PlayerMoved X" , oldCardPosition , JSON.parse(JSON.stringify(position)))
       if(position[0] != 22){
-        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: position[0], duration: 1000/1000,  onUpdate: (currentValue) => {
+        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: position[0], duration: 1,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position
           if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
@@ -116,7 +112,7 @@ export class PlayerComponent implements OnInit {
           }
         }}, );
       }else{
-        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: 22, duration: 1000/1000, onUpdate:  (currentValue) => {
+        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: 22, duration: 1, onUpdate:  (currentValue) => {
           if(this.playerRef._objRef.position.x == 22 || this.playerRef._objRef.position.x == 0){
             this.setPlayerRotation()
           }
@@ -127,7 +123,7 @@ export class PlayerComponent implements OnInit {
       this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'z')
       //console.log("PlayerMoved z" , oldCardPosition , JSON.parse(JSON.stringify(position)))
       if(position[2] != 22){
-        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1000/1000,  onUpdate: (currentValue) => {
+        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1,  onUpdate: (currentValue) => {
           // Check if the object has reached the target position
           if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0  &&  !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
@@ -137,7 +133,7 @@ export class PlayerComponent implements OnInit {
           }
         }});
       }else{
-        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: 22, duration: 1000/1000 , onUpdate:  (currentValue) => {
+        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: 22, duration: 1 , onUpdate:  (currentValue) => {
           if(this.playerRef._objRef.position.z == 22 || this.playerRef._objRef.position.z == 0){
             this.setPlayerRotation();
           }
@@ -149,21 +145,25 @@ export class PlayerComponent implements OnInit {
    setPlayerRotation(){
     let rotationValue = 0;
     if(this.player.actualCard  >= 0 && this.player.actualCard  < 10){
-      //console.log("1")
       rotationValue = 0;
     }else if(this.player.actualCard  >= 10 && this.player.actualCard  < 20){
-      //console.log("2")
       rotationValue = -Math.PI / 2;
     }else if(this.player.actualCard  >= 20 && this.player.actualCard  < 30){
-      //console.log("3")
       rotationValue = -Math.PI;
     }else if(this.player.actualCard  >= 30 && this.player.actualCard  <= 39){
-      //console.log("4")
       rotationValue = Math.PI / 2;
     }
     gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: rotationValue, duration: 1});
-    
     this.player.pawn.rotation = [0, rotationValue ,0];
   }
 
+  async cycleMap(actualSide:number, oldCardPosition:number, indexCheckNum:number, indexMinusNum:number ,  finalPosition:Array<number>){
+    for (let index = actualSide; index <= (indexMinusNum); index++) {
+      if(index < indexCheckNum){
+        await this.movePlayerGsap([(index == 0 ? 22 : 0), 0 , (index == 1 ? 22 : 0)], index,oldCardPosition);
+      }else{
+        await this.movePlayerGsap(finalPosition, index,oldCardPosition);
+      }
+    }
+  }
 }

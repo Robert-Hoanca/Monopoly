@@ -187,7 +187,11 @@ export class GamePhysicsService {
             if(this.gameService.diceNumber && this.gameService.diceNumber > (this.gameService.gameTable.cards.length - 1)){
               this.gameService.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameService.gameTable.cards.length - 1) - this.gameService.players[this.gameService.turn].actualCard)) - 1);
             }
-            this.gameService.getCardPosition(this.gameService.diceNumber);
+            if(this.gameService.players[this.gameService.turn].prison.doubleDiceCounter === 3){
+              this.gameService.whichPropertyAmI('goToPrison');
+            }else{
+              this.gameService.getCardPosition(this.gameService.diceNumber);
+            }
           }else{
             if(this.diceRes[0] == this.diceRes[1]){
               this.gameService.exitFromPrison(false, true, this.diceRes[0], this.diceRes[1]);

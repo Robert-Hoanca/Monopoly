@@ -170,7 +170,7 @@ export class MessageDialogComponent implements OnInit {
       case 'addfundsfromplayers':
         (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach((otherPlayer:any ) => {
           if(otherPlayer.money >= data.amount){
-            this.gameService.addingRemovingMoney('remove',data.amount,otherPlayer)
+            this.gameService.addingRemovingMoney('remove',data.amount,1000,otherPlayer)
             this.gameService.addingRemovingMoney('add', data.amount, 1000)
           }else if(!this.gameService.checkBankrupt(otherPlayer, data.amount)){
             this.gameService.calculateAmountDebt(data.amount)
