@@ -50,7 +50,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   max-width: 60%;
   max-height: 80%;
 }
-.propertyInfo{
+.propertyInfo , .completedSeriesInfo{
     width: 100%;
     pointer-events: none!important;
     .mat-dialog-container{
@@ -58,7 +58,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
         background: none;
         box-shadow: none;
         display: flex;
-        justify-content: end;
         align-items: center;
         app-card-dialog{
           pointer-events: all;
@@ -66,6 +65,27 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     }
 }
 
+.propertyInfo{
+  .mat-dialog-container{
+    justify-content: end;
+    app-card-dialog{
+      //width: 100%;
+      #completedSeries-info{
+        //width: 100%;
+      }
+    }
+  }
+}
+
+.completedSeriesInfo{
+  .mat-dialog-container{
+    justify-content: center;
+    position: relative;
+    app-card-dialog{
+      width: 100%;
+    }
+  }
+}
 
 .showDiceResult{
   .mat-dialog-container{

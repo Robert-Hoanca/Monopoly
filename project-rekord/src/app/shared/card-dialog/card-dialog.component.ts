@@ -14,7 +14,11 @@ export class CardDialogComponent implements OnInit {
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
 
   ngOnInit(): void {
-    this.counterHouses();
+    if(this.data.completedSeries){
+      setTimeout(() => {
+        this.gameService.closeDialog(this.dialogRef)
+      }, 1500);
+    }
   }
 
   close(): void {

@@ -543,6 +543,19 @@ export class GameService {
       });
     }
   }
+  openCompletedSeriesDialog(cards:Array<any>){
+    this.cardInfoRef = this.dialog.open(CardDialogComponent, {
+      panelClass: 'completedSeriesInfo',
+      hasBackdrop: true,
+      disableClose:true,
+      autoFocus: false,
+      height: '60%',
+      data: {
+        cards: cards,
+        completedSeries: true
+      }
+    });
+  }
   openExchangeDialog(){
     this.cardInfoRef = this.dialog.open(ExchangeComponent, {
       panelClass: 'exchangePanel',
@@ -631,6 +644,8 @@ export class GameService {
       groupCards.forEach((card: { completedSeries: boolean; }) => {
         if(!card.completedSeries){  card.completedSeries = true;}
       });
+
+      this.openCompletedSeriesDialog(groupCards);
     }else{
       groupCards.forEach((card: { completedSeries: boolean; }) => {
         if(card.completedSeries){  card.completedSeries = false;}

@@ -1,4 +1,4 @@
-<div id="cardInfo" fxLayout="column" fxLayoutAlign="start start">
+<div *ngIf="data.card && !data.cards" id="cardInfo" fxLayout="column" fxLayoutAlign="start start">
     
     <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
 
@@ -83,3 +83,64 @@
         </div>
     </div>
 </div>
+
+
+<div *ngIf="!data.card && data.cards" id="completedSeries-info" fxLayoutAlign="center center" [ngClass]="data.cards.length > 2 ? 'three' : 'two'">
+    <mat-card class="cardForm" *ngFor="let card of data.cards">
+        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(card.district)}" fxLayoutAlign="center center">
+            <span class="cardName" [ngStyle]="{'color': getContrastColor(gameService.checkCardColorDistrict(card.district))}">{{card.name}}</span>
+        </span>
+        
+        <div class="cardCosts" fxLayout="column">
+            <span class="cardCost" fxLayoutAlign="space-between center">
+                <span>Property cost</span>
+                <span>{{card.cost}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.rentCosts">
+                <span>Rent</span>
+                <span>{{card.rentCosts.normal}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.rentCosts && card.rentCosts.completedSeriesBasic">
+                <span>Rent with color set</span>
+                <span>{{card.rentCosts.completedSeriesBasic}}€</span>
+            </span>
+            <span class="cardCost" *ngIf="card.rentCosts && card.rentCosts.one"> 
+                <span>Rent with property</span>
+                <div class="rentsWithProps" fxLayout="row">
+                    <div class="props" fxLayout="column">
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>1</span></span>
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>2</span></span>
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>3</span></span>
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>4</span></span>
+                        <span class="hotel" fxLayoutAlign="center center" *ngIf="card.rentCosts && card.rentCosts.hotel"><mat-icon>cottage</mat-icon></span>
+                    </div>
+                    <div class="rent" fxLayout="column" fxLayoutAlign="space-around end">
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.one}}€</span>
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.two}}€</span>
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.three}}€</span>
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.four}}€</span>
+                        <span class="hotel" fxLayoutAlign="center center" *ngIf="card.rentCosts && card.rentCosts.hotel">{{card.rentCosts.hotel}}€</span>
+                    </div>
+                </div>
+            </span>
+            <hr class="separator">
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.houseCost">
+                <span>House price</span>
+                <span>{{card.houseCost}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.hotelCost">
+                <span>Hotel price</span>
+                <span>{{card.hotelCost}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center">
+                <span>Distrain price</span>
+                <span>{{card.distrainedCost}}€</span>    
+            </span>
+        </div>
+        
+    </mat-card>
+    <div class="completedText" *ngIf="!data.card && data.cards" >
+        <span>Completed Series</span>
+    </div>
+</div>
+
