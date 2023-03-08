@@ -7,7 +7,6 @@
     }
     #playersContainer{
         position: absolute;
-        height: 100%;
         top: 0;
         left: 0;
         pointer-events: none;
@@ -27,6 +26,19 @@
                     background-color: #fff;
                     transform: rotate(45deg);
                 }
+            }
+            .actualTurnPlayer{
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                height: 30px;
+                width: 30px;
+                background: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
             }
 
             #passedStart{
@@ -79,5 +91,41 @@
         left: 0;
         height: 100%;
         width: 5px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #playersContainer{
+        flex-wrap: wrap;
+        height: 390px;
+        .playerCard{
+            width: 100px;
+            padding: 10px 0px!important;
+            width: 100px!important;
+            text-indent: 10px;
+            .actualTurnPlayer{
+                text-indent: 0px;
+            }
+            .name{
+                width: 90px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 600px) {
+    #playersContainer{
+        height: 100%;
+        .playerCard{
+            width: 160px;
+            padding: 10px!important;
+            .name, .money{
+                height: 25px;
+                display: flex;
+                align-items: center;
+            }
+        }
     }
 }

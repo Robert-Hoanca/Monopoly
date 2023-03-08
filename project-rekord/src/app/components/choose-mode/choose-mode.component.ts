@@ -1,10 +1,29 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
 import { GameService } from 'src/app/game.service';
 
 @Component({
   selector: 'app-choose-mode',
   templateUrl: './choose-mode.component.html',
-  styleUrls: ['./choose-mode.component.scss']
+  styleUrls: ['./choose-mode.component.scss'],
+  animations: [
+    trigger(
+      'mmAnimationScale',
+      [
+        transition(
+          ':enter', [
+          style({ transform: 'scale(0)', opacity: 0 }),
+          animate('300ms ease-in', style({ transform: 'scale(1)', 'opacity': 1 }))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({ transform: 'scale(1)', 'opacity': 1 }),
+          animate('300ms ease-out', style({ transform: 'scale(0)', 'opacity': 0 }))
+        ])
+      ]
+    ),
+  ]
 })
 export class ChooseModeComponent implements OnInit {
 
@@ -75,6 +94,11 @@ export class ChooseModeComponent implements OnInit {
       localStorage.removeItem(saveFile.localId);
       this.gameService.retrieveSavesFromLocal()
     }
+  }
+
+  calculateGameTime(save:any){
+    var dateFormat = new Date(save.time.begin);
+    return dateFormat.getDate() + ' / ' + dateFormat.getMonth() + ' / ' + dateFormat.getFullYear();
   }
 
 }

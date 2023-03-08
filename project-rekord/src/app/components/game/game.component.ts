@@ -45,7 +45,24 @@ import * as THREE from 'three'
         ])
       ]
     ),
-  ]
+    trigger(
+      'mmAnimationScale',
+      [
+        transition(
+          ':enter', [
+          style({ transform: 'scale(0)', opacity: 0 }),
+          animate('300ms ease-in', style({ transform: 'scale(1)', 'opacity': 1 }))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({ transform: 'scale(1)', 'opacity': 1 }),
+          animate('300ms ease-out', style({ transform: 'scale(0)', 'opacity': 0 }))
+        ])
+      ]
+    ),
+  ],
+  
 })
 export class GameComponent implements OnInit {
   @ViewChild('cardInfo', { static: true }) cardInfo:any;
@@ -79,14 +96,7 @@ export class GameComponent implements OnInit {
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
 
   ngOnInit(): void {
-    this.gameService.addingRemovingMoneyProps()
-    if(window.navigator.userAgent.includes('Android')){
-      this.gameService.userDevice = 'phone_android'
-    }else if(window.navigator.userAgent.includes('Windows')){
-      this.gameService.userDevice = 'computer_windows'
-    }else if(window.navigator.userAgent.includes('iPhone')){
-      this.gameService.userDevice = 'prone_ios'
-    }
+    this.gameService.addingRemovingMoneyProps();
   }
   ngAfterViewInit(){
     this.gameService.camera = this.camera;
@@ -155,11 +165,6 @@ export class GameComponent implements OnInit {
 
    
   }
-
-  goBackHome(){
-    location.reload();
-  }
-
   changeCardColor(){
     let color = new THREE.Color( this.gameService.sessionColor )
     this.scene.objRef.children.forEach((child:any) => {

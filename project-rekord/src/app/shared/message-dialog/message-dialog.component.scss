@@ -1,7 +1,41 @@
 #messageContainer{
+    .messageTitle{
+        width: 100%;
+        box-shadow: 0px 6px 9px -11px #000000;
+        padding: 20px;
+        h1{
+            margin: 0;
+            font-size: 18px;
+        }
+        .closeDialog{
+            height: 40px;
+            width: 40px;
+            min-width: unset;
+            padding: 0;
+            box-shadow: none;
+        }
+    }
+    .messageDialogText{
+        width: 290px;
+        padding: 20px;
+    }
     .winScreen{
         .time{
             font-weight: bold;
+        }
+    }
+    .playerProps{
+        h3{
+            font-size: 14px;
+        }
+    }
+    .finishWarning{
+        margin-top: 50px;
+        .bankRuptBtn{
+            width: 100px;
+        }
+        .okBtn{
+            width: 150px;
         }
     }
 }

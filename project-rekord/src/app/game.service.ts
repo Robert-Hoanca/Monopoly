@@ -178,6 +178,14 @@ export class GameService {
     return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
   }
 
+  returnInclude(element:any, string:string){
+    return element.includes(string)
+  }
+  goBackHome(){
+    location.reload();
+  }
+
+
   retrieveSavesFromLocal(){
     let localStorageAllSaves = [];
     if(localStorage.getItem("rekordLocalSave0")){

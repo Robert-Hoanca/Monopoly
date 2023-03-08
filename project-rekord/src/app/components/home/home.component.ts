@@ -13,6 +13,21 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.gameService.retrieveSavesFromLocal()
+    if(window.navigator.userAgent.includes('Android')){
+      this.gameService.userDevice = 'phone_android'
+    }else if(window.navigator.userAgent.includes('Windows')){
+      this.gameService.userDevice = 'computer_windows'
+    }else if(window.navigator.userAgent.includes('iPhone')){
+      this.gameService.userDevice = 'phone_ios'
+    }
+    /*
+    to do mac
+    lse if(window.navigator.userAgent.includes('Windows')){
+      this.gameService.userDevice = 'computer_windows'
+    }
+    */
+    
+    console.log( this.gameService.userDevice)
   }
 
   goToChooseModeView(){

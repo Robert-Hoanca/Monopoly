@@ -1,7 +1,7 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
 
-    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions" [ngStyle]="{'background': 'radial-gradient(' + gameService.sessionColor + ',' +  gameService.LightenDarkenColor(this.gameService.sessionColor, -80)+ ')'}" (onRender)="changeCardColor(); gamePhysicsService.renderPhysicsWorld()">
-        <th-scene [thStats]="true" [autoUpdate]="true" #scene>
+    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions" [ngStyle]="{background : 'radial-gradient(' + gameService.sessionColor + ',' +  gameService.LightenDarkenColor(this.gameService.sessionColor, -60)+ ')'}" (onRender)="changeCardColor(); gamePhysicsService.renderPhysicsWorld()">
+        <th-scene [autoUpdate]="true" #scene>
             
             <th-ambientLight #ambientLight [intensity]="1"></th-ambientLight>
             <th-hemisphereLight></th-hemisphereLight>
@@ -22,12 +22,11 @@
         </th-scene>
       </th-canvas>
       
-    <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around center">
-       
-        <mat-card *ngFor="let player of gameService.players" [ngStyle]="{'width': gameService.players[gameService.turn].id == player.id? '120%': '100%'}" [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center center">
-            <span>{{player.name}}</span>
-            <span>{{player.money}} €</span>
-
+    <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around start">
+        <mat-card *ngFor="let player of gameService.players" [@mmAnimationScale] [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center start">
+            <span class="name">{{player.name}}</span>
+            <span class="money">{{player.money}} €</span>
+            <mat-icon *ngIf="gameService.players[gameService.turn].id === player.id" class="material-symbols-outlined actualTurnPlayer" [@mmAnimationScale]>person</mat-icon>
             <div id="passedStart" *ngIf="(player.addingMoney || player.removingMoney) && !player.bankrupt" [@passedStartMoney]>
                 <span [ngStyle]="{'color': player.addingMoney ? 'green' : 'red'}"> <span [innerHTML]="player.addingMoney ? '+' : '-'"></span> {{gameService.playerMoneyChangeValue}}</span>
             </div>
@@ -49,7 +48,7 @@
     <div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
         <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
         <button mat-raised-button disabled="true">Options</button>
-        <button mat-raised-button (click)="goBackHome()">Home</button>
+        <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
     </div>
 
     <!--

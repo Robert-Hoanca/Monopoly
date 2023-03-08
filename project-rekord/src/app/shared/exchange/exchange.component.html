@@ -1,15 +1,20 @@
-<div id="exchangeContainer" fxLayout="row" fxLayoutAlign="space-around center">
-
+<div id="exchangeContainer" fxLayout="row" fxLayoutAlign="space-around center" fxLayout="column" fxLayoutAlign="center center">
+    <div class="exchangeTitle" fxLayoutAlign="space-between center">
+        <h1>Exchange Properties</h1>
+        <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
+    </div>
     <div *ngIf="!playerToExchangeWith" class="choosePlayer">
-        <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
-        <button mat-raised-button *ngFor="let player of getPlayersToExchangeWith()" (click)="selectPlayerToExchange(player)" [disabled]="player.bankrupt">
-            <span>{{player.name}}</span>
-        </button>
+        <!-- <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button> -->
+       <div [ngClass]="['playersContainer', getPlayersToExchangeWith().length === 1 ? 'solo' : 'multi']">
+            <button mat-raised-button *ngFor="let player of getPlayersToExchangeWith()" (click)="selectPlayerToExchange(player)" [disabled]="player.bankrupt">
+                <span>{{player.name}}</span>
+            </button>
+       </div>
     </div>
 
     <div *ngIf="playerToExchangeWith && !startExchange" class="exchangeContainer" fxLayout="column" fxLayoutAlign="space-around center">
         <div class="exchangeProperties">
-            <div fxLayout="column" fxLayoutAlign="space-around center" class="playerContainer">
+            <div fxLayout="column" fxLayoutAlign="start center" class="playerContainer">
                 <div class="titleContainer" fxLayoutAlign="start center">
                     <span>{{gameService.players[gameService.turn].name}}</span>
 
@@ -48,9 +53,12 @@
 
 
 
-    <div *ngIf="startExchange">
-        <button mat-raised-button (click)="finaliseExchange('refuse')"> <mat-icon>close</mat-icon> </button>
-        <button mat-raised-button (click)="finaliseExchange('accept')"> <mat-icon>done</mat-icon> </button>
+    <div *ngIf="startExchange" class="startExchange" fxLayout="column" fxLayoutAlign="center center">
+        <div class="title" fxLayoutAlign="center center">Deal?</div>
+        <div fxLayoutAlign="space-evenly center" class="btnContainer">
+            <button mat-raised-button (click)="finaliseExchange('refuse')" color="warn"> <mat-icon>close</mat-icon> </button>
+            <button mat-raised-button (click)="finaliseExchange('accept')" color="'#7cb77c'"> <mat-icon>done</mat-icon> </button>
+        </div>
     </div>
 
 

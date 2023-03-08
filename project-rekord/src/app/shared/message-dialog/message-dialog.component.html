@@ -1,18 +1,26 @@
 <div id="messageContainer">
 
-    <div *ngIf="this.data.eventType != 'showDiceResult'">
-        <h1 >{{data.textData.text ?? data.textData.title}}</h1>
+    <div *ngIf="data.eventType === 'showPlayerProps'" class="messageTitle" fxLayoutAlign="space-between center">
+        <h1>View Properties</h1>
+        <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
+    </div>
+
+    <div *ngIf="this.data.eventType != 'showDiceResult'" class="messageDialogText">
+        <h1>{{data.textData.text ?? data.textData.title}}</h1>
         <div *ngIf="gameService.playerWhoWonId != ''" class="winScreen">
             <div>Player money: {{getPlayerWhoWin().money}} €</div>
             <div>Time to finish the game:</div>
             <div class="time">{{gameService.gameAmountTime}}</div>
         </div>
     
-        <app-player-properties *ngIf="gameService.playerWhoWonId != '' || data.textData.showPlayerProps" [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
-        <div class="finishWarning" fxLayoutAlign="end center">
-            <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn">Yes</button>
-            <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt">No</button>
-            <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt">OK</button>
+        <div *ngIf="gameService.playerWhoWonId != '' || data.textData.showPlayerProps" class="playerProps">
+            <h3>Player properties:</h3>
+            <app-player-properties [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
+        </div>
+        <div class="finishWarning" fxLayoutAlign="space-evenly center">
+            <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn" class="bankRuptBtn">Confirm</button>
+            <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt" class="bankRuptBtn">No</button>
+            <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps'" class="okBtn">Close</button>
         </div>
     </div>
 

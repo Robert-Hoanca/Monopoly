@@ -45,10 +45,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 
 //Dialogs
-
+.mat-dialog-container{
+  padding: 0!important;
+}
 .exchangePanel{
   max-width: 60%;
   max-height: 80%;
+  .mat-dialog-container{
+    border-radius: 0px 5px 5px 5px;
+    position: relative;
+    overflow: visible;
+  }
 }
 .propertyInfo , .completedSeriesInfo{
     width: 100%;
@@ -67,7 +74,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .propertyInfo{
   .mat-dialog-container{
-    justify-content: end;
+    justify-content: center;
     app-card-dialog{
       //width: 100%;
       #completedSeries-info{
