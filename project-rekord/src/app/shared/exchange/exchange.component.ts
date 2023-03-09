@@ -66,13 +66,13 @@ export class ExchangeComponent implements OnInit {
   }
 
   finaliseExchange(answer:string){
-
     if(answer=='accept'){
       if(this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
         this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).forEach((property: {completedSeries: any; name: any;}) => {
           const card = this.gameService.gameTable.cards.find((card: { name: any; })=>card.name == property.name);
           card.owner = this.gameService.players[this.gameService.turn].id;
-          card.exchangeSelected = false
+          card.exchangeSelected = false;
+          card.completedSeries = false;
           if(!property.completedSeries){
             this.gameService.checkCompletedSeries(property, this.gameService.players[this.gameService.turn].id);
           }
@@ -82,7 +82,8 @@ export class ExchangeComponent implements OnInit {
         this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).forEach((property: {completedSeries: any; name: any; }) => {
           const card = this.gameService.gameTable.cards.find((card: { name: any; })=>card.name == property.name);
           card.owner = this.playerToExchangeWith.id;
-          card.exchangeSelected = false
+          card.exchangeSelected = false;
+          card.completedSeries = false;
           if(!property.completedSeries){
             this.gameService.checkCompletedSeries(property, this.playerToExchangeWith.id)
           }
@@ -116,4 +117,17 @@ export class ExchangeComponent implements OnInit {
   changeActualExpanded(playerId:string){
     this.actualExpanded = this.actualExpanded == playerId ? '' : playerId;
   }
+  ngOnDestroy(){
+    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerToExchangeWith)).forEach(property => {
+      if(property.exchangeSelected){
+        property.exchangeSelected = false;
+      }
+    });;
+    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.gameService.players[this.gameService.turn].id)).forEach(property => {
+      if(property.exchangeSelected){
+        property.exchangeSelected = false;
+      }
+    });;
+  }
+
 }

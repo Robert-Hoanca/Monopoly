@@ -47,6 +47,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 //Dialogs
 .mat-dialog-container{
   padding: 0!important;
+  overflow: hidden;
 }
 .exchangePanel{
   max-width: 60%;
@@ -83,6 +84,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     }
   }
 }
+.messageDialog{
+  .mat-dialog-container{
+    background: none;
+    box-shadow: none;
+  }
+}
 
 .completedSeriesInfo{
   .mat-dialog-container{
@@ -92,6 +99,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       width: 100%;
     }
   }
+}
+.cdk-global-scrollblock{
+
 }
 
 .showDiceResult{

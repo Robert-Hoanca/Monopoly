@@ -5,8 +5,8 @@
         <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
     </div>
 
-    <div *ngIf="this.data.eventType != 'showDiceResult'" class="messageDialogText">
-        <h1>{{data.textData.text ?? data.textData.title}}</h1>
+    <div *ngIf="data.eventType != 'showDiceResult' && data.eventType != 'chance' && data.eventType != 'communityChest'" class="messageDialogTextContainer">
+        <h1 class="messageText">{{data.textData.text ?? data.textData.title}}</h1>
         <div *ngIf="gameService.playerWhoWonId != ''" class="winScreen">
             <div>Player money: {{getPlayerWhoWin().money}} €</div>
             <div>Time to finish the game:</div>
@@ -20,13 +20,24 @@
         <div class="finishWarning" fxLayoutAlign="space-evenly center">
             <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn" class="bankRuptBtn">Confirm</button>
             <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt" class="bankRuptBtn">No</button>
-            <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps'" class="okBtn">Close</button>
+            <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps'" class="okBtn">Ok</button>
         </div>
     </div>
 
+    <div *ngIf="data.eventType === 'chance' || data.eventType === 'communityChest'" class="specialCardContainer">
+        <div class="cardContainer">
+            <div fxLayout="column" fxLayoutAlign="center space-between" [ngClass]="['card', data.eventType === 'chance' ? 'chance' : 'chest']">
+                <span *ngIf="data.eventType === 'chance'" class="title">Chance</span>
+                <span *ngIf="data.eventType === 'communityChest'" class="title">Community Chest</span>
     
-
-
+                <span class="messageText" fxLayoutAlign="center center">{{data.textData.text ?? data.textData.title}}</span>
+            </div>
+        </div>
+        
+        <div class="specialCardBtnContainer" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps' && data.eventType === 'chance' || data.eventType === 'communityChest'">
+            <button  mat-raised-button (click)="executeAndClose()" class="okBtnCards">Ok</button>
+        </div>
+    </div>
     <div *ngIf="this.data.eventType === 'showDiceResult'">
         
     </div>
