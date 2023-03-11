@@ -106,14 +106,13 @@ export class GameComponent implements OnInit {
     this.gameService.gameScene = this.scene._objRef;
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
-    //this.gameService.getChestChance('chance');
 
-   /*this.gameService.textDialog({
-      title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-      action: "move",
-      tileid: "trafalgarsquare",
-      cardIndex: 11
-    },'chance');*/
+   this.gameService.textDialog({
+    title: "Go Back 3 Spaces",
+    action: "move",
+    count: -39
+    },'chance');
+   
   }
 
   activateLocalSave(){

@@ -20,7 +20,8 @@
         }
     }
     .messageDialogTextContainer{
-        width: 290px;
+        min-width: 250px;
+        max-width: 300px;
         padding: 20px;
         background-color: #fff;
         .messageText{
@@ -35,7 +36,8 @@
             padding: 10px;
             min-height: 100px;
             .card{
-                width: 300px;
+                min-width: 250px;
+                max-width: 300px;
                 border: 2px solid black;
                 padding: 10px;
                 overflow: hidden;

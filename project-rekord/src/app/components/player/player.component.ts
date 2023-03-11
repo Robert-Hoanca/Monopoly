@@ -27,7 +27,11 @@ export class PlayerComponent implements OnInit {
     this.setPlayerPosition(this.player.pawn.position,true);
     this.setPlayerPosition$ = this.gameService.setPlayerPosition$.subscribe((data:any) =>{
       if(this.player.id == this.gameService.players[this.gameService.turn].id){
-        this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition)
+        if(this.gameService.randomChance && this.gameService.randomChance.count != undefined || this.gameService.randomChest && this.gameService.randomChest != undefined){
+          this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition, true)
+        }else{
+          this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition)
+        }
       }
     })
   }
@@ -38,7 +42,7 @@ export class PlayerComponent implements OnInit {
     this.setPlayerPosition$?.unsubscribe();
   }
 
-  async setPlayerPosition(position:any, noAnimation?:boolean ,oldCardPosition?:number,){
+  async setPlayerPosition(position:any, noAnimation?:boolean ,oldCardPosition?:number, goBack? :boolean){
     let actualCardPosition = JSON.parse(JSON.stringify(this.gameService.players[this.gameService.turn].actualCard))
     if(noAnimation){
       this.playerRef._objRef.position.x = position[0];
@@ -69,10 +73,22 @@ export class PlayerComponent implements OnInit {
           actualSide = 0;
         }
         //console.log("oldCard", oldCardPosition, "actualCard",actualCardPosition,"actualSide", actualSide , "toGoSide", toGoSide)
-        if(actualSide === toGoSide){
-          if(oldCardPosition < actualCardPosition){
-            await this.movePlayerGsap(position, actualSide, oldCardPosition)
-          }else {
+        if(!goBack){
+          if(actualSide === toGoSide){
+            if(oldCardPosition < actualCardPosition){
+              await this.movePlayerGsap(position, actualSide, oldCardPosition)
+            }else {
+              if(actualSide === 3){
+                await this.movePlayerGsap([0,0,0], 3,oldCardPosition);
+              }else{
+                await this.cycleMap(actualSide, oldCardPosition , 3 , 3 , [0,0,0])
+              }
+              actualSide = 0;
+              await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
+            }
+          }else if(actualSide < toGoSide){
+            await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
+          }else if(actualSide > toGoSide){
             if(actualSide === 3){
               await this.movePlayerGsap([0,0,0], 3,oldCardPosition);
             }else{
@@ -81,16 +97,12 @@ export class PlayerComponent implements OnInit {
             actualSide = 0;
             await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
           }
-        }else if(actualSide < toGoSide){
-          await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
-        }else if(actualSide > toGoSide){
-          if(actualSide === 3){
-            await this.movePlayerGsap([0,0,0], 3,oldCardPosition);
-          }else{
-            await this.cycleMap(actualSide, oldCardPosition , 3 , 3 , [0,0,0])
-          }
-          actualSide = 0;
-          await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
+        }else{
+          if(goBack){
+            for (let index = actualSide; index >= toGoSide; index--) {
+              await this.movePlayerGsap([index > toGoSide ? (index == 3 || index == 1 ? 0 : 22) : position[0], 0 , index > toGoSide ? (index == 3 ? 22 : 0) : position[2]], index , oldCardPosition);
+            }
+        }
         }
         this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)]);
       }

@@ -664,10 +664,12 @@ export class GameService {
   //Get a chanche or communityChest card 
   getChestChance(cardType:string){
     if(cardType=='chance'){
-      this.randomChance = this.gameTable.chance[(Math.round(Math.random() * ( this.gameTable.chance.length) - 1) + 0)];
+      const randomNum = (Math.round(Math.random() * ( this.gameTable.chance.length - 1) ) + 0);
+      this.randomChance = this.gameTable.chance[randomNum];
       this.textDialog(this.randomChance,'chance');
     }else{
-      this.randomChest = this.gameTable.communitychest[(Math.round(Math.random() * ( this.gameTable.communitychest.length) - 1) + 0)]
+      const randomNum = (Math.round(Math.random() * ( this.gameTable.communitychest.length - 1)) + 0)
+      this.randomChest = this.gameTable.communitychest[randomNum]
       this.textDialog(this.randomChest,'communityChest');
     }
   }

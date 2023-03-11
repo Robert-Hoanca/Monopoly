@@ -156,26 +156,33 @@ export class MessageDialogComponent implements OnInit {
         }       
         break;
       case 'removefundstoplayers':
-        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach((otherPlayer: { money: any; }) => {
-         
-          if(this.gameService.players[this.gameService.turn].money >= data.amount){
-            this.gameService.addingRemovingMoney('remove',data.amount, 1000)
-          }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], data.amount)){
-            this.gameService.calculateAmountDebt(data.amount);
+        let removefundstoplayersAmount = 0;
+        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach(otherPlayer => {
+          if(this.gameService.players[this.gameService.turn].money >= removefundstoplayersAmount){
+            removefundstoplayersAmount += 50;
+            this.gameService.addingRemovingMoney('add',data.amount,1000,otherPlayer)
+          }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], removefundstoplayersAmount)){
+            this.gameService.calculateAmountDebt(removefundstoplayersAmount, otherPlayer.id)
           }
-          this.gameService.addingRemovingMoney('add',data.amount, 1000, otherPlayer)
-          
         });
+
+
         break;
       case 'addfundsfromplayers':
-        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach((otherPlayer:any ) => {
+        let addfundsfromplayersAmount = 0;
+        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach(otherPlayer => {
           if(otherPlayer.money >= data.amount){
+            addfundsfromplayersAmount += 50;
             this.gameService.addingRemovingMoney('remove',data.amount,1000,otherPlayer)
-            this.gameService.addingRemovingMoney('add', data.amount, 1000)
           }else if(!this.gameService.checkBankrupt(otherPlayer, data.amount)){
-            this.gameService.calculateAmountDebt(data.amount)
+            this.gameService.calculateAmountDebt(data.amount, otherPlayer.id)
           }
         });
+        setTimeout(() => {
+          this.gameService.addingRemovingMoney('add',addfundsfromplayersAmount, 1000)
+        }, 1000);
+
+
         break;
     }
   }
