@@ -137,7 +137,7 @@ export class CardComponent implements OnInit {
         url = '/assets/blenderModels/card/definitiveCard/communityChest.gltf'
         break;
       case 'goToPrison':
-        url = '/assets/blenderModels/card/definitiveCard/policeStation.gltf'
+        url = '/assets/blenderModels/card/definitiveCard/police.gltf'
         break;
       case 'taxes':
         url = '/assets/blenderModels/card/definitiveCard/taxes.gltf'
