@@ -486,7 +486,7 @@ export class GameService {
     property.canBuy = false;
     property.owner = this.players[this.turn].id;
     if(!property.completedSeries){
-      this.checkCompletedSeries(property,this.players[this.turn].id);
+      this.checkCompletedSeries([property]);
     }
   }
   sellProperty(property:any){
@@ -495,19 +495,19 @@ export class GameService {
     }else{
       this.addingRemovingMoney('add',(property.distrainedCost - ((property.distrainedCost / 100) * 50)), 1000);
     }
-    this.checkCompletedSeries(property,this.players[this.turn].id);
+    this.checkCompletedSeries([property]);
     property.canBuy = true;
     property.owner = "";
   }
   distrainProperty(property:any){
     property.distrained = true;
     this.addingRemovingMoney('add', property.distrainedCost, 1000);
-    this.checkCompletedSeries(property,this.players[this.turn].id);
+    this.checkCompletedSeries([property]);
   }
   cancelDistrainedFromProperty(property:any){
     property.distrained = false;
    this.addingRemovingMoney('remove', property.distrainedCost, 1000);
-    this.checkCompletedSeries(property, this.players[this.turn].id);
+    this.checkCompletedSeries([property]);
   }
 
   sortProperties(properties:Array<any>){
@@ -645,20 +645,30 @@ export class GameService {
   }
 
   //Find if a player has completed a completed series of the given card
-  checkCompletedSeries(property:any,playerId:string){
-    const groupCards = this.gameTable.cards.filter((card: { district: any; }) => card.district == property.district) //ALL CARDS
-    const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == playerId)
-    if(groupCards.length == ownerCards.length && ownerCards.findIndex((cardI: { distrained: any; }) => cardI.distrained)<0){
-      groupCards.forEach((card: { completedSeries: boolean; }) => {
-        if(!card.completedSeries){  card.completedSeries = true;}
-      });
+  checkCompletedSeries(properties:Array<any>){ //property:any,playerId:string
+    const possibleDistricts:any = [];
+    const foundCompleted:Array<any> = [];
+    properties.forEach(property => {
+      if(!possibleDistricts.includes(property.district)){
+        possibleDistricts.push(property.district)
+      }
+    });
 
-      this.openCompletedSeriesDialog(groupCards);
-    }else{
-      groupCards.forEach((card: { completedSeries: boolean; }) => {
-        if(card.completedSeries){  card.completedSeries = false;}
-      });
-    }
+    possibleDistricts.forEach((district:string) => {
+      const groupCards = this.gameTable.cards.filter((card:any) => card.district == district);
+      const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == groupCards[0].owner);
+      if(groupCards.length == ownerCards.length && ownerCards.findIndex((cardI: { distrained: any; }) => cardI.distrained)<0){
+        groupCards.forEach((card: { completedSeries: boolean; }) => {
+          if(!card.completedSeries){  card.completedSeries = true;}
+        });
+        foundCompleted.push(groupCards);
+      }else{
+        groupCards.forEach((card: { completedSeries: boolean; }) => {
+          if(card.completedSeries){  card.completedSeries = false;}
+        });
+      }
+    });
+    this.openCompletedSeriesDialog(foundCompleted);
   }
 
   //Get a chanche or communityChest card 

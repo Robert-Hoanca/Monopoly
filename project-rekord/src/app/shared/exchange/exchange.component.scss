@@ -82,6 +82,10 @@
             background: #7cb77c;
             font-weight: bold;
             color: #fff;
+            transition: all 250ms ease;
+            &[disabled="true"]{
+                filter: grayscale(1);
+            }
         }
     }
 

@@ -3,15 +3,25 @@
     color:grey;
     pointer-events: none;
 }
+.externalBtns{
+    width: 100%;
+    button{
+        border-radius: 4px 4px 0px 0px;
+    }
+}
 .cardForm{
     width: 220px;
     height: 350px;
     position: relative;
+    border-radius: 0px 4px 4px 4px;
+    &.owned{
+        border-radius: 0px 0px 4px 4px;
+    }
+
     .propDistrict{
         position: absolute;
-        top: 10px;
         height: 50px;
-        width: 90%;
+        width: calc(100% - 32px);
     }
     .cardCosts{
         margin-top: 55px;
@@ -60,7 +70,16 @@
     }
 }
 .cardBtns{
+    width: 100%;
+    .buyPropertyBtn{
+        width: 100%;
+        margin-top: 20px;
+    }
     .housesManager{
+        width: 100%;
+        &>div{
+            width: 100%;
+        }
         .houseIcon{
             color: green;
         }
@@ -108,6 +127,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 5px;
+        text-align: center;
     }
 }
 

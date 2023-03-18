@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GameService } from 'src/app/game.service';
@@ -5,19 +6,48 @@ import { GameService } from 'src/app/game.service';
 @Component({
   selector: 'app-card-dialog',
   templateUrl: './card-dialog.component.html',
-  styleUrls: ['./card-dialog.component.scss']
+  styleUrls: ['./card-dialog.component.scss'],
+  animations: [
+    trigger(
+      'mmAnimationScale',
+      [
+        transition(
+          ':enter', [
+          style({ transform: 'scale(0)', opacity: 0 }),
+          animate('300ms ease-in', style({ transform: 'scale(1)', 'opacity': 1 }))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({ transform: 'scale(1)', 'opacity': 1 }),
+          animate('300ms ease-out', style({ transform: 'scale(0)', 'opacity': 0 }))
+        ])
+      ]
+    ),
+  ]
 })
 export class CardDialogComponent implements OnInit {
   houses:Array<string> = [];
   hotel:boolean=false;
+  completedSeriesCards:Array<any> = [];
+  ownerName:string = '';
 
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
 
   ngOnInit(): void {
+  }
+  ngAfterViewInit(){
     if(this.data.completedSeries){
+      this.data.cards.forEach((series:any, index:number) => {
+        setTimeout(() => {
+          this.completedSeriesCards = [];
+          this.completedSeriesCards = series;
+          this.ownerName = this.getPlayerName();
+        }, index * 1500);
+      });
       setTimeout(() => {
         this.gameService.closeDialog(this.dialogRef)
-      }, 1500);
+      }, this.data.cards.length * 1500);
     }
   }
 
@@ -68,5 +98,11 @@ export class CardDialogComponent implements OnInit {
     var b = parseInt(color.substring(4, 6), 16); // hexToB
     return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ?
     '#000' : '#fff';
+  }
+  
+  getPlayerName(){
+    if(this.completedSeriesCards[0]){
+      return this.gameService.players.find(player => player.id === this.completedSeriesCards[0].owner).name;
+    }
   }
 }

@@ -21,7 +21,6 @@ export class MessageDialogComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-   // console.log("MessageDialogData: ", this.data)
   }
 
   executeAndClose(){
@@ -83,7 +82,7 @@ export class MessageDialogComponent implements OnInit {
         this.gameService.players.find(player => player.id == this.data.textData.player.id).money = 0;
         this.gameService.gameTable.cards.filter((card: { id: any; }) => card.id == this.data.textData.player.id).forEach((prop:any) => {
           prop.owner = this.data.textData.playerToPay;
-          this.gameService.checkCompletedSeries(prop,this.data.textData.playerToPay)
+          this.gameService.checkCompletedSeries([prop])
         });
         this.gameService.checkIfSomeoneWon();
         break;

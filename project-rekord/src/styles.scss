@@ -73,17 +73,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     }
 }
 
-.propertyInfo{
-  .mat-dialog-container{
-    justify-content: center;
-    app-card-dialog{
-      //width: 100%;
-      #completedSeries-info{
-        //width: 100%;
-      }
-    }
-  }
-}
 .messageDialog{
   .mat-dialog-container{
     background: none;
@@ -176,6 +165,24 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
           flex-direction: column;
         }
       }
+    }
+  }
+}
+
+//On Mobile
+@media screen and (max-width: 600px) {
+  .propertyInfo{
+    .mat-dialog-container{
+      justify-content: center;
+    }
+  }
+}
+
+//On Tablets , PC
+@media screen and (min-width: 600px) {
+  .propertyInfo{
+    .mat-dialog-container{
+      justify-content: end;
     }
   }
 }
