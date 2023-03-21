@@ -48,6 +48,7 @@ export class CardComponent implements OnInit {
         this.gameService.setPlayerPosition(this.position, diceNumber);
       }
     });
+    //console.log( this.cardIndex, this.position)
   }
 
   ngAfterViewInit(){

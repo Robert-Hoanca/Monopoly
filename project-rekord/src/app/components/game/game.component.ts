@@ -108,9 +108,10 @@ export class GameComponent implements OnInit {
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
 
    /*this.gameService.textDialog({
-    title: "Go Back 3 Spaces",
+    title: "Advance to Trafalgar Square - If you pass Go, collect $200",
     action: "move",
-    count: -39
+    tileid: "trafalgarsquare",
+    cardIndex: 10
     },'chance');*/
    
   }
