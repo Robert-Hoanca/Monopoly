@@ -36,7 +36,6 @@ export class PlayerComponent implements OnInit {
     })
   }
   async ngAfterViewInit(){
-    //onsole.log("player", this.player.actualCard ,this.player.pawn.position)
   }
 
   ngOnDestroy(){
@@ -73,7 +72,6 @@ export class PlayerComponent implements OnInit {
         }else if(oldCardPosition >= 0 && oldCardPosition <=10){
           actualSide = 0;
         }
-        //console.log("oldCard", oldCardPosition, "actualCard",actualCardPosition,"actualSide", actualSide , "toGoSide", toGoSide)
         if(!goBack){
           if(actualSide === toGoSide){
             if(oldCardPosition < actualCardPosition){
@@ -109,99 +107,47 @@ export class PlayerComponent implements OnInit {
       }
     }
   }
-  //index <= Math.round(counterOfCards)
   async movePlayerGsap(position:any ,index:number, oldCardPosition:number){
+    //Based on given axis, move the player animating it using gsap library
     if(this.gameTableSides[index] == 'x'){
-      //this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'x')
+      //Calculate player position before moving and the amount of cells to pass through
       let playerPos = parseFloat(JSON.parse(JSON.stringify(this.playerRef._objRef.position.x)).toFixed(1))
       let counterOfCards = Math.round(position[0]) != 22 ? (parseFloat(position[0].toFixed(1)) / 2.2) - (playerPos / 2.2) : (22 / 2.2) - (playerPos / 2.2);
       let xIndex = 0;
       for ((counterOfCards > 0 ? xIndex = 1 : xIndex = -1); (counterOfCards > 0 ? xIndex <= Math.round(counterOfCards) : xIndex >= Math.round(counterOfCards)) ;(counterOfCards > 0 ? xIndex++ : xIndex--)) {
-        this.gameService.setCameraPosition(this.gameService.camera, playerPos +  parseFloat(( xIndex * 2.2).toFixed(1)), position[1], position[2],1000,5, true, 'x');
+        this.gameService.setCameraPosition(this.gameService.camera, playerPos +  parseFloat(( xIndex * 2.2).toFixed(1)), position[1], position[2],800,5, true, 'x');
         let shouldJump : boolean = false;
-        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: playerPos + parseFloat(( xIndex * 2.2).toFixed(1)), duration: 0.8, ease: 'ease-out' ,  onUpdate: (currentValue) => {
-          // Check if the object has reached the target position
+        let anotherPlayerOffset:number = this.movePlayerFromBeingOverAnother('x', playerPos , xIndex);
+        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + anotherPlayerOffset, duration: 0.8, ease: 'ease-out' ,  onUpdate: (currentValue) => {
+          //Check if player has reached the start cell and call the function.
           if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
+          //Check if player has reached one angle of the gameTable, if so rotate the player.
           if(this.playerRef._objRef.position.x == 22 || this.playerRef._objRef.position.x == 0){
             this.setPlayerRotation()
           }
+          //Check if the player is in a range in which should jump, if so do it otherwise fall down.
           if((counterOfCards > 0 && this.playerRef._objRef.position.x >= (playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) - 2) && this.playerRef._objRef.position.x <= (playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) - 1.1) && !shouldJump) || (counterOfCards < 0 && this.playerRef._objRef.position.x > (playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + 1.1) && this.playerRef._objRef.position.x < (playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + 2) && !shouldJump)){
             shouldJump = true;
-            this.jumpTest(true);
+            this.playerJump(true);
           }else if((counterOfCards > 0 && this.playerRef._objRef.position.x > (playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) - 1.1) && this.playerRef._objRef.position.x < (playerPos + parseFloat(( xIndex * 2.2).toFixed(1))) && shouldJump) || (counterOfCards < 0 && this.playerRef._objRef.position.x > (playerPos + parseFloat(( xIndex * 2.2).toFixed(1))) && this.playerRef._objRef.position.x < (playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + 1.1) && shouldJump)){
             shouldJump = false;
-            this.jumpTest(false);
+            this.playerJump(false);
           }
         }},);
       }
-
-
-      //OLD -- May delete
-      /*if(Math.round(position[0]) != 22){
-        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: position[0], duration: 1,  onUpdate: (currentValue) => {
-          // Check if the object has reached the target position
-          if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
-            this.gameService.playerPassedStart()
-          }
-          if(this.playerRef._objRef.position.x == 22 || this.playerRef._objRef.position.x == 0){
-            this.setPlayerRotation()
-          }
-        }},);
-
-       
-      }else{
-        await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: 22, duration: 1, onUpdate:  (currentValue) => {
-          if(this.playerRef._objRef.position.x == 22 || this.playerRef._objRef.position.x == 0){
-            this.setPlayerRotation()
-          }
-        }});
-        let playerPos = JSON.parse(JSON.stringify(this.playerRef._objRef.position.x))
-        for (let index = 0; index <=  (22 / 2.2) - (playerPos / 2.2) ; index++) {
-         console.log("index",index);
-         await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: parseFloat(( index * 2.2).toFixed(1)), duration: 0.8, onUpdate:  (currentValue) => {
-          if(this.playerRef._objRef.position.x == 22 || this.playerRef._objRef.position.x == 0){
-            this.setPlayerRotation()
-          }
-          if(this.playerRef._objRef.position.x > (parseFloat(( index * 2.2).toFixed(1)) - 1.1) && this.playerRef._objRef.position.x < parseFloat(( index * 2.2).toFixed(1)) &&  this.playerRef._objRef.position.y === 0 && this.playerRef._objRef.position.x !== parseFloat(( index * 2.2).toFixed(1)) && index < (parseFloat(position[0].toFixed(1)) / 2.2)){
-            this.jumpTest(true)
-          }else if( (this.playerRef._objRef.position.x <= (parseFloat(( index * 2.2).toFixed(1)) - 1.1) || this.playerRef._objRef.position.x > parseFloat(( index * 2.2).toFixed(1))) && this.playerRef._objRef.position.y > 0){
-            this.jumpTest(false)
-          }
-          }})
-        }
-      }*/
     }
     if(this.gameTableSides[index] == 'z'){
-      /*this.gameService.setCameraPosition(this.gameService.camera, position[0], position[1], position[2],1000,5, true, 'z')
-      //console.log("PlayerMoved z" , oldCardPosition , JSON.parse(JSON.stringify(position)))
-      if(position[2] != 22){
-        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: position[2], duration: 1,  onUpdate: (currentValue) => {
-          // Check if the object has reached the target position
-          if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0  &&  !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
-            this.gameService.playerPassedStart()
-          }
-          if(this.playerRef._objRef.position.z == 22 || this.playerRef._objRef.position.z == 0){
-            this.setPlayerRotation()
-          }
-        }});
-      }else{
-        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: 22, duration: 1 , onUpdate:  (currentValue) => {
-          if(this.playerRef._objRef.position.z == 22 || this.playerRef._objRef.position.z == 0){
-            this.setPlayerRotation();
-          }
-        }});
-      }*/
       let playerPos = parseFloat(JSON.parse(JSON.stringify(this.playerRef._objRef.position.z)).toFixed(1))
       let counterOfCards = Math.round(position[2]) != 22 ? (parseFloat(position[2].toFixed(1)) / 2.2) - (playerPos / 2.2) : (22 / 2.2) - (playerPos / 2.2);
       let zIndex = 0;
       for ((counterOfCards > 0 ? zIndex = 1 : zIndex = -1); (counterOfCards > 0 ? zIndex <= Math.round(counterOfCards) : zIndex >= Math.round(counterOfCards)) ;(counterOfCards > 0 ? zIndex++ : zIndex--)) {
-        this.gameService.setCameraPosition(this.gameService.camera, position[0] , position[1], playerPos +  parseFloat(( zIndex * 2.2).toFixed(1)),1000,5, true, 'z');
+        this.gameService.setCameraPosition(this.gameService.camera, position[0] , position[1], playerPos +  parseFloat(( zIndex * 2.2).toFixed(1)),800,5, true, 'z');
         let shouldJump : boolean = false;
-        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: playerPos + parseFloat(( zIndex * 2.2).toFixed(1)), duration: 0.8, ease: 'ease-out' ,  onUpdate: (currentValue) => {
-          // Check if the object has reached the target position
-          if ((this.playerRef._objRef.position.z == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
+        let anotherPlayerOffset:number = this.movePlayerFromBeingOverAnother('z', playerPos , zIndex);
+        await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + anotherPlayerOffset, duration: 0.8, ease: 'ease-out' ,  onUpdate: (currentValue) => {
+          if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
           if(this.playerRef._objRef.position.z == 22 || this.playerRef._objRef.position.z == 0){
@@ -209,10 +155,10 @@ export class PlayerComponent implements OnInit {
           }
           if((counterOfCards > 0 && this.playerRef._objRef.position.z >= (playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) - 2) && this.playerRef._objRef.position.z <= (playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) - 1.1) && !shouldJump) || (counterOfCards < 0 && this.playerRef._objRef.position.z > (playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + 1.1) && this.playerRef._objRef.position.z < (playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + 2) && !shouldJump)){
             shouldJump = true;
-            this.jumpTest(true);
+            this.playerJump(true);
           }else if((counterOfCards > 0 && this.playerRef._objRef.position.z > (playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) - 1.1) && this.playerRef._objRef.position.z < (playerPos + parseFloat(( zIndex * 2.2).toFixed(1))) && shouldJump) || (counterOfCards < 0 && this.playerRef._objRef.position.z > (playerPos + parseFloat(( zIndex * 2.2).toFixed(1))) && this.playerRef._objRef.position.z < (playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + 1.1) && shouldJump)){
             shouldJump = false;
-            this.jumpTest(false);
+            this.playerJump(false);
           }
         }},);
       }
@@ -244,7 +190,50 @@ export class PlayerComponent implements OnInit {
     }
   }
 
-  jumpTest(shouldJump:boolean){
+  playerJump(shouldJump:boolean){
     gsap.fromTo(this.playerRef._objRef.position, {y: this.playerRef._objRef.position.y}, {y: shouldJump ? 1 : 0 , ease: 'ease-out'})
+  }
+
+  movePlayerFromBeingOverAnother(axis:string , playerPos:number ,index:number){
+    //Based on player position on given axis, move the player by the opposite axis by +-0.5 and return += 0.5 to make the player move on the same axis by that amount;
+    if(this.gameService.players.filter(player => (axis === 'x' ? player.pawn.position[0] : player.pawn.position[2] ) === playerPos +  parseFloat(( index * 2.2).toFixed(1)) && player.id != this.player.id).length){
+      //If there is one or more player on the cell on which the player should pass, then calculate and make the moving player move.
+      switch (this.gameService.players.filter(player => player.actualCard ===  this.player.actualCard).length) {
+        case 1:// if axis == x --> +x +z  else  -x +z
+          this.movePlayerGsapNormal(axis === 'x' ? 'z' : 'x', (axis === 'x' ? this.playerRef._objRef.position.z : this.playerRef._objRef.position.x) + (0.5));
+          return axis === 'x' ? 0.5 : -0.5;
+        case 2://if axis == x --> +x -z  else  +x +z
+          this.movePlayerGsapNormal(axis === 'x' ? 'z' : 'x', (axis === 'x' ? this.playerRef._objRef.position.z : this.playerRef._objRef.position.x) + (axis === 'x' ? -0.5 : 0.5));
+          return 0.5; 
+        case 3: //if axis == x --> -x -z  else  +x -z
+          this.movePlayerGsapNormal(axis === 'x' ? 'z' : 'x', (axis === 'x' ? this.playerRef._objRef.position.z : this.playerRef._objRef.position.x) + (-0.5));
+          return axis === 'x' ? 0.5 : -0.5;
+        case 4: //if axis == x --> -x +z  else  -x -z
+          this.movePlayerGsapNormal(axis === 'x' ? 'z' : 'x', (axis === 'x' ? this.playerRef._objRef.position.z : this.playerRef._objRef.position.x) + (axis === 'x' ? 0.5 : -0.5));
+          return -0.5; 
+        default:
+          return 0;
+      }
+    }else{
+      //If the is no player on the cell on which the player should pass, then check if the moving player is already moved, if so then move it back in normal position 
+      if(this.playerRef._objRef.position.x == playerPos - 0.5){
+        this.movePlayerGsapNormal('x', this.playerRef._objRef.position.x + 0.5);
+      }else if(this.playerRef._objRef.position.x == playerPos + 0.5){
+        this.movePlayerGsapNormal('x', this.playerRef._objRef.position.x - 0.5);
+      }if(this.playerRef._objRef.position.z == playerPos - 0.5){
+        this.movePlayerGsapNormal('z', this.playerRef._objRef.position.z + 0.5);
+      }if( this.playerRef._objRef.position.z == playerPos + 0.5){
+        this.movePlayerGsapNormal('z', this.playerRef._objRef.position.z - 0.5);
+      }
+      return 0;
+    }
+  }
+
+  movePlayerGsapNormal(axis:string, value:number){
+    if(axis === 'x'){
+      gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: value , ease: 'ease-out'})
+    }else if(axis === 'z'){
+      gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: value , ease: 'ease-out'})
+    }
   }
 }
