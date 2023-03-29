@@ -255,7 +255,7 @@ export class PlayerComponent implements OnInit {
     let passedCards = this.calculatePassedCards(position);
     //If the player has arrived at the destination then place it in one of the four sections of a card
     if(index === counterOfCards && (passedCards === this.player.actualCard)){
-     // console.log("if", axis)
+     //console.log("if", axis)
       this.gameService.movingPlayer = false;
       this.gameService.movingCamera = false;
       
@@ -274,8 +274,8 @@ export class PlayerComponent implements OnInit {
             finalXNum = -0.5;
           }else if (passedCards === 30){
             //Final cardPosition === 30
-            finalZNum = this.playerRef._objRef.position.z + (0)
-            finalXNum = 0;
+            finalZNum = this.playerRef._objRef.position.z + (-0.5)
+            finalXNum = 0.5;
           }else{
             finalZNum = ( counterOfCards > 0 ? this.playerRef._objRef.position.z + (0.5) : this.playerRef._objRef.position.z + (-0.5))
             finalXNum = counterOfCards > 0 ? 0.5 : -0.5;
