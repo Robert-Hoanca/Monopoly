@@ -5,9 +5,6 @@ import { Subscription } from 'rxjs';
 import { GamePhysicsService } from 'src/app/game-physics.service';
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three'
-//import {Sky} from '../../../assets/jsImports/Sky.js'
-
-//const Sky = require('three-sky');
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
