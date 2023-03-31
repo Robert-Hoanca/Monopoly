@@ -252,6 +252,7 @@ export class GameService {
 
   async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string) : Promise<any>{
     //Move the game camere to a given position
+    this.movingCamera = true;
     let xOffset = offset;
     let zOffset = offset;
     //If the camera should follow the player then calculate the offset of the camera
@@ -288,6 +289,9 @@ export class GameService {
    gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: axis == 'diceRoll' ? 0: x, duration: 1000/1000});
    gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: axis == 'diceRoll' ? 0: y, duration: 1000/1000});
    gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: axis == 'diceRoll' ? 0: z, duration: 1000/1000});
+   setTimeout(() => {
+    this.movingCamera = false;
+   }, duration);
   }
 
   getCardPosition(cardIndex:any){

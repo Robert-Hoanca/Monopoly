@@ -122,7 +122,7 @@ export class PlayerComponent implements OnInit {
         confrontatePosition = Math.round(JSON.parse(JSON.stringify(this.playerRef._objRef.position.x))) > position[0];
       }
       if(!this.gameService.movingPlayer && confrontatePosition){
-        let amountOfDistance = this.setPlayerPositionToCenter('x', oldCardPosition < 20 ? true : false);
+        let amountOfDistance = await this.setPlayerPositionToCenter('x', oldCardPosition < 20 ? true : false);
         playerPos += amountOfDistance;
         this.gameService.movingPlayer = true;
         this.gameService.movingCamera = true;
@@ -168,7 +168,7 @@ export class PlayerComponent implements OnInit {
         confrontatePosition = Math.round(JSON.parse(JSON.stringify(this.playerRef._objRef.position.z))) > position[2];
       }
       if(!this.gameService.movingPlayer && confrontatePosition){
-        let amountOfDistance = this.setPlayerPositionToCenter('z', oldCardPosition < 20 ? true : false);
+        let amountOfDistance = await this.setPlayerPositionToCenter('z', oldCardPosition < 20 ? true : false);
         playerPos += amountOfDistance;
         this.gameService.movingPlayer = true;
         this.gameService.movingCamera = true;
@@ -255,7 +255,6 @@ export class PlayerComponent implements OnInit {
     let passedCards = this.calculatePassedCards(position);
     //If the player has arrived at the destination then place it in one of the four sections of a card
     if(index === counterOfCards && (passedCards === this.player.actualCard)){
-     //console.log("if", axis)
       this.gameService.movingPlayer = false;
       this.gameService.movingCamera = false;
       
@@ -386,7 +385,6 @@ export class PlayerComponent implements OnInit {
       return 0;
       
     }else if(counterOfCards > 0 ? (index < counterOfCards) : (index > counterOfCards)){
-      //console.log("else")
       //If the player hasn't arrived yet && if the player is not in the center, center the player position on the card.
       if(!this.gameService.movingPlayer){
         this.setPlayerPositionToCenter(axis, counterOfCards > 0 ? true : false);
@@ -398,30 +396,30 @@ export class PlayerComponent implements OnInit {
     }
   }
 
-  movePlayerGsapNormal(axis:string, value:number){
+  async movePlayerGsapNormal(axis:string, value:number){
     if(axis === 'x'){
       this.player.pawn.position[0] = value;
-      gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: value , ease: 'ease-out'})
+      await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: value , ease: 'ease-out'})
     }else if(axis === 'z'){
       this.player.pawn.position[2] = value;
-      gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: value , ease: 'ease-out'})
+      await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: value , ease: 'ease-out'})
     }
   }
 
-  setPlayerPositionToCenter(axis:string, isPositive:boolean){
+  async setPlayerPositionToCenter(axis:string, isPositive:boolean){
     if(axis === 'x'){
       switch (this.player.pawn.cardSection) {
         case 0:
-          this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z - 0.5 : this.playerRef._objRef.position.z + 0.5);
+          await this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z - 0.5 : this.playerRef._objRef.position.z + 0.5);
           return isPositive ? -0.5 : 0.5;
         case 1:
-          this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z + 0.5 : this.playerRef._objRef.position.z - 0.5);
+          await this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z + 0.5 : this.playerRef._objRef.position.z - 0.5);
           return isPositive ? -0.5 : 0.5;
         case 2:
-          this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z + 0.5 : this.playerRef._objRef.position.z - 0.5);
+          await this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z + 0.5 : this.playerRef._objRef.position.z - 0.5);
           return isPositive ? 0.5 : -0.5;
         case 3:
-          this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z - 0.5 : this.playerRef._objRef.position.z + 0.5);
+          await this.movePlayerGsapNormal('z', isPositive ? this.playerRef._objRef.position.z - 0.5 : this.playerRef._objRef.position.z + 0.5);
           return isPositive ? 0.5 : -0.5;
         default:
           return 0;
@@ -429,16 +427,16 @@ export class PlayerComponent implements OnInit {
     }else if(axis === 'z'){
       switch (this.player.pawn.cardSection) {
         case 0:
-          this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x + 0.5 : this.playerRef._objRef.position.x - 0.5);
+          await this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x + 0.5 : this.playerRef._objRef.position.x - 0.5);
           return isPositive ? -0.5 : 0.5;
         case 1:
-          this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x - 0.5 : this.playerRef._objRef.position.x + 0.5);
+          await this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x - 0.5 : this.playerRef._objRef.position.x + 0.5);
           return isPositive ? -0.5 : 0.5;
         case 2:
-          this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x - 0.5 : this.playerRef._objRef.position.x + 0.5);
+          await this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x - 0.5 : this.playerRef._objRef.position.x + 0.5);
           return isPositive ? 0.5 : -0.5;
         case 3:
-          this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x + 0.5 : this.playerRef._objRef.position.x - 0.5);
+          await this.movePlayerGsapNormal('x', isPositive ? this.playerRef._objRef.position.x + 0.5 : this.playerRef._objRef.position.x - 0.5);
           return isPositive ? 0.5 : -0.5;
           default:
             return 0;

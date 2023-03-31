@@ -105,10 +105,9 @@ export class GameComponent implements OnInit {
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
 
    /*this.gameService.textDialog({
-    title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-    action: "move",
-    tileid: "trafalgarsquare",
-    cardIndex: 10
+    title: "Go to Jail - Go directly to Jail - Do not pass Go, do not collect $200",
+    action: "jail",
+    subaction: "goto"
     },'chance');*/
    
   }

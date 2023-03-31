@@ -26,8 +26,6 @@ export class HomeComponent implements OnInit {
       this.gameService.userDevice = 'computer_windows'
     }
     */
-    
-    console.log( this.gameService.userDevice)
   }
 
   goToChooseModeView(){
