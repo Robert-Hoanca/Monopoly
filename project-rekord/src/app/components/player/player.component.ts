@@ -114,6 +114,7 @@ export class PlayerComponent implements OnInit {
     }
   }
   async movePlayerGsap(position:any ,index:number, oldCardPosition:number){
+    this.gameService.movingCamera = true;
     //Based on given axis, move the player animating it using gsap library
     let goingBack = (this.gameService.randomChance && this.gameService.randomChance.count !== undefined ) || (this.gameService.randomChest && this.gameService.randomChest.count !== undefined) ? true : false;
     if(this.gameTableSides[index] == 'x' && !this.playerArrived){
@@ -134,7 +135,6 @@ export class PlayerComponent implements OnInit {
         let amountOfDistance = await this.setPlayerPositionToCenter('x', oldCardPosition < 20 ? true : false);
         playerPos += amountOfDistance;
         this.gameService.movingPlayer = true;
-        this.gameService.movingCamera = true;
       }
       //Calculate the amount of cards that the player should pass in
       let counterOfCards = Math.round(Math.round(position[0]) != 22 ? (parseFloat(position[0].toFixed(1)) / 2.2) - (playerPos / 2.2) : (22 / 2.2) - (playerPos / 2.2));
@@ -185,7 +185,6 @@ export class PlayerComponent implements OnInit {
         let amountOfDistance = await this.setPlayerPositionToCenter('z', oldCardPosition < 20 ? true : false);
         playerPos += amountOfDistance;
         this.gameService.movingPlayer = true;
-        this.gameService.movingCamera = true;
       }
       
       let counterOfCards = Math.round(Math.round(position[2]) != 22 ? (parseFloat(position[2].toFixed(1)) / 2.2) - (playerPos / 2.2) : (22 / 2.2) - (playerPos / 2.2));
@@ -315,6 +314,7 @@ export class PlayerComponent implements OnInit {
       this.gameService.movingPlayer = false;
       this.gameService.movingCamera = false;
       this.playerArrived = true;
+      
       let finalZNum = 0;
       let finalXNum = 0;
       if(axis === 'x'){
