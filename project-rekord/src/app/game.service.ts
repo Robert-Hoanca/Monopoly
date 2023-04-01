@@ -63,6 +63,7 @@ export class GameService {
   movingCamera:boolean= false;
   movingPlayer:boolean = false;
 
+  setPlayerToCenter = true;
   beginTime:number = 0;
   endTime:number = 0;
   gameAmountTime:string = '';
@@ -81,6 +82,7 @@ export class GameService {
   addingPlayerMoney:boolean=false;
   removingPlayerMoney:boolean=false;
   playerMoneyChangeValue:number= 0;
+  
 
   getCardPosition$ = new Subject();
   setPlayerPosition$ = new Subject();
@@ -354,6 +356,11 @@ export class GameService {
     this.players[this.turn] = this.players[this.turn];
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
+    
+    if(this.randomChance || this.randomChest){
+      this.randomChance = undefined;
+      this.randomChance = undefined;
+    }
     this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
   }
   
@@ -814,13 +821,36 @@ export class GameService {
     }
   }
 
-  test(number:number){
-    this.textDialog({
-    title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-    action: "move",
-    tileid: "trafalgarsquare",
-    cardIndex: number
-    },'chance');
+  test(number?:number){
+    if(number !== undefined){
+      this.randomChance = {
+        title: "Advance to Trafalgar Square - If you pass Go, collect $200",
+        action: "move",
+        tileid: "trafalgarsquare",
+        cardIndex: number
+      };
+       this.textDialog({
+       title: "Advance to Trafalgar Square - If you pass Go, collect $200",
+       action: "move",
+       tileid: "trafalgarsquare",
+       cardIndex: number
+       },'chance');
+
+    }else{
+
+      this.randomChance = {
+        title: "Go Back 3 Spaces",
+        action: "move",
+        count: -3
+      };
+  
+      this.textDialog({
+        title: "Go Back 3 Spaces",
+        action: "move",
+        count: -3
+      },'chance');
+    }
+
   }
   
   /////////////////DELETE

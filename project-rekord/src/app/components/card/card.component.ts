@@ -126,8 +126,4 @@ export class CardComponent implements OnInit {
   }
   hoverCard(type:string){
   }
-
-  test(){
-    console.log(this.cardRef._objRef.position, this.cardRef)
-  }
 }

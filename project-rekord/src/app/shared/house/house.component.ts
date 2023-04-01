@@ -67,8 +67,4 @@ export class HouseComponent implements OnInit {
       this.housePosition[0]+=0.8;
     }
   }
-
-  test(){
-    //console.log(this.cardIndex,this.houseIndex, this.housePosition)
-  }
 }
