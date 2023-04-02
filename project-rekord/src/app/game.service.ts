@@ -245,6 +245,7 @@ export class GameService {
         newPlayer.pawn.position = [0,0,0]
         break;
     }
+    newPlayer.pawn.rotationSide = 0;
     newPlayer.canDice = false;
     newPlayer.actualCard = 0;
     this.players.push(newPlayer);
@@ -842,14 +843,10 @@ export class GameService {
       this.randomChance = {
         title: "Go Back 3 Spaces",
         action: "move",
-        count: -3
+        count: -6
       };
   
-      this.textDialog({
-        title: "Go Back 3 Spaces",
-        action: "move",
-        count: -3
-      },'chance');
+      this.textDialog( this.randomChance,'chance');
     }
 
   }
