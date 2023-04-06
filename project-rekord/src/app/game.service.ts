@@ -305,7 +305,7 @@ export class GameService {
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
     let oldCardPosition = JSON.parse(JSON.stringify((this.players[this.turn].actualCard)));
     this.players[this.turn].actualCard = newCardNum;
-    this.players[this.turn].pawn.position =  cardPosition;
+    //this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
   }
 
@@ -843,7 +843,7 @@ export class GameService {
       this.randomChance = {
         title: "Go Back 3 Spaces",
         action: "move",
-        count: -6
+        count: -28
       };
   
       this.textDialog( this.randomChance,'chance');

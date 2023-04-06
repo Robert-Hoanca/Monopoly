@@ -6,6 +6,7 @@ import { Vector3 } from 'three';
 import gsap from 'gsap'
 import { json } from 'stream/consumers';
 import { count } from 'console';
+import { parse } from 'path';
 
 @Component({
   selector: 'app-player',
@@ -26,9 +27,8 @@ export class PlayerComponent implements OnInit {
 
   constructor(public gameService: GameService) { }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.setPlayerPosition(this.player.pawn.position,true);
-    this.rotatePlayer(this.player.pawn.rotation[1], false);
     this.setPlayerPosition$ = this.gameService.setPlayerPosition$.subscribe((data:any) =>{
       if(this.playerArrived){
         this.playerArrived = false;
@@ -43,6 +43,9 @@ export class PlayerComponent implements OnInit {
     })
   }
   async ngAfterViewInit(){
+    setTimeout(() => {
+      this.rotatePlayer(this.player.pawn.rotation[1], false);
+    }, 500);
   }
 
   ngOnDestroy(){
@@ -170,8 +173,10 @@ export class PlayerComponent implements OnInit {
             shouldJump = false;
             this.playerJump(false);
           }
-          this.player.pawn.position[0] = this.playerRef._objRef.position.x;
         }},);
+        
+        this.player.pawn.position[0] = playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
+        this.player.pawn.position[2] = JSON.parse(JSON.stringify(this.playerRef._objRef.position.z));
       }
     }
     if(this.gameTableSides[index] == 'z' && !this.playerArrived){
@@ -213,8 +218,10 @@ export class PlayerComponent implements OnInit {
             shouldJump = false;
             this.playerJump(false);
           }
-          this.player.pawn.position[2] = this.playerRef._objRef.position.z;
         }},);
+        
+        this.player.pawn.position[0] = JSON.parse(JSON.stringify(this.playerRef._objRef.position.x));
+        this.player.pawn.position[2] = playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
       }
     }
     this.playerHasRotate = false;
@@ -224,34 +231,27 @@ export class PlayerComponent implements OnInit {
     if(!this.playerHasRotate){
       let rotationValue = 0;
       if(rotateBack || rotateforward){
-        //console.log("entrato")
-        rotationValue = JSON.parse(JSON.stringify(this.playerRef._objRef.rotation.y)) + (rotateBack ? ( Math.PI ) : ( -Math.PI));
+        rotationValue = JSON.parse(JSON.stringify(this.playerRef._objRef.rotation.y)) + (rotateBack ? (3.14 ) : ( -3.14));
         this.playerHasRotate = true;
       }
-
       if((this.playerRef._objRef.position.x >= 0 && this.playerRef._objRef.position.x < 1) && (this.playerRef._objRef.position.z >= 0 && this.playerRef._objRef.position.z < 1) && (this.player.pawn.rotationSide === 3 || this.playerIsGoingBack)){
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 2 : 0;
-        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( -Math.PI / 2) : (- Math.PI / 2));
-        //console.log("1")
+        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( 1.57) : (-1.57));
       }else if((this.playerRef._objRef.position.x > 21 && this.playerRef._objRef.position.x < 23) && (this.playerRef._objRef.position.z > 0 && this.playerRef._objRef.position.z < 1) && ((this.player.pawn.rotationSide < 1 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 1 && this.playerIsGoingBack))){
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 0 : 1;
-        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( -Math.PI / 2) : (- Math.PI / 2));
-        //console.log("2")
+        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( 1.57) : (-1.57));
       }else if((this.playerRef._objRef.position.x > 21 && this.playerRef._objRef.position.x < 23) && (this.playerRef._objRef.position.z > 21 && this.playerRef._objRef.position.z < 23) && ((this.player.pawn.rotationSide < 2 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 2 && this.playerIsGoingBack))){
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 1 : 2;
-        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( -Math.PI / 2) : (- Math.PI / 2));
-        //console.log("3")
+        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( 1.57) : (-1.57));
       }else if((this.playerRef._objRef.position.x >= 0 && this.playerRef._objRef.position.x < 1) && (this.playerRef._objRef.position.z > 21 && this.playerRef._objRef.position.z < 23)  && ((this.player.pawn.rotationSide < 3 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 3 && this.playerIsGoingBack))){
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 2 : 3;
-        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? (-Math.PI / 2) : (- Math.PI / 2));
-        //console.log("4")
+        rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? (1.57) : (-1.57));
       }
       if(this.playerRef._objRef.rotation.y != rotationValue && this.playerHasRotate){
-       // console.log("blbl")
         await this.rotatePlayer(rotationValue, true)
         this.player.pawn.rotation = [0, rotationValue ,0];
       }
@@ -306,7 +306,6 @@ export class PlayerComponent implements OnInit {
 
     //If the player has arrived at the destination then place it in one of the four sections of a card
     if(index === counterOfCards && (passedCards === this.player.actualCard)){
-      //console.log("if")
       this.gameService.movingPlayer = false;
       this.gameService.movingCamera = false;
       this.playerArrived = true;
@@ -456,10 +455,8 @@ export class PlayerComponent implements OnInit {
 
   async movePlayerGsapNormal(axis:string, value:number){
     if(axis === 'x'){
-      this.player.pawn.position[0] = value;
       await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: value , ease: 'ease-out'})
     }else if(axis === 'z'){
-      this.player.pawn.position[2] = value;
       await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: value , ease: 'ease-out'})
     }
   }
