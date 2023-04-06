@@ -305,7 +305,6 @@ export class GameService {
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
     let oldCardPosition = JSON.parse(JSON.stringify((this.players[this.turn].actualCard)));
     this.players[this.turn].actualCard = newCardNum;
-    //this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
   }
 
@@ -316,6 +315,9 @@ export class GameService {
       this.gameTable  = (await getDoc(gameTableRef)).data();
       this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
       this.players[this.turn].canDice = true;
+      setTimeout(() => {
+        this.textDialog({text: this.players[this.turn].name + ' begins the game!'}, 'playerWhoBegins')
+      }, 1500);
     }else{
       this.gameTable = this.localSaves.gameTable;
       this.players = this.localSaves.players;
