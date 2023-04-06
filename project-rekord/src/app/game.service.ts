@@ -843,9 +843,10 @@ export class GameService {
     }else{
 
       this.randomChance = {
-        title: "Go Back 3 Spaces",
+        title: "Advance to Go (Collect $200)",
         action: "move",
-        count: -28
+        tileid: "go",
+        cardIndex: 0
       };
   
       this.textDialog( this.randomChance,'chance');

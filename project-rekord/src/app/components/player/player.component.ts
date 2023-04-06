@@ -34,7 +34,7 @@ export class PlayerComponent implements OnInit {
         this.playerArrived = false;
       }
       if(this.player.id == this.gameService.players[this.gameService.turn].id){
-        if(this.gameService.randomChance && this.gameService.randomChance.count != undefined || this.gameService.randomChest && this.gameService.randomChest != undefined){
+        if((this.gameService.randomChance && this.gameService.randomChance.count != undefined) || (this.gameService.randomChest && this.gameService.randomChest != undefined)){
           this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition, true)
         }else{
           this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition)
@@ -107,12 +107,17 @@ export class PlayerComponent implements OnInit {
             actualSide = 0;
             await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position)
           }
-        }else{
-          if(goBack){
-            for (let index = actualSide; index >= toGoSide; index--) {
-              await this.movePlayerGsap([index > toGoSide ? (index == 3 || index == 0 ? 0 : 22) : position[0], 0 , index > toGoSide ? (index == 3 ? 22 : 0) : position[2]], index , oldCardPosition);
+        }else if(goBack){
+            if((actualSide === toGoSide && oldCardPosition > actualCardPosition) || actualSide > toGoSide){
+              await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position, true)
+            }else if(actualSide < toGoSide || ((actualSide === toGoSide && oldCardPosition < actualCardPosition))){
+              //Dalla posizione in cui mi trovo fino a 0
+                await this.cycleMap(actualSide, oldCardPosition , 0 , 0 , [0,0,0], true)
+              //Set actualcard a 0
+                actualSide = 3;
+              //Dalla posizione 3 alla posizione in cui devo andare
+                  await this.cycleMap(actualSide, oldCardPosition , toGoSide , toGoSide , position, true)
             }
-        }
         }
         this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)]);
       }
@@ -178,8 +183,7 @@ export class PlayerComponent implements OnInit {
         this.player.pawn.position[0] = playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
         this.player.pawn.position[2] = JSON.parse(JSON.stringify(this.playerRef._objRef.position.z));
       }
-    }
-    if(this.gameTableSides[index] == 'z' && !this.playerArrived){
+    }else if(this.gameTableSides[index] == 'z' && !this.playerArrived){
       let playerPos = parseFloat(JSON.parse(JSON.stringify(this.playerRef._objRef.position.z)).toFixed(1));
       let confrontatePosition:boolean = false;
       if(oldCardPosition < 20 && !shouldGoBack){
@@ -223,6 +227,8 @@ export class PlayerComponent implements OnInit {
         this.player.pawn.position[0] = JSON.parse(JSON.stringify(this.playerRef._objRef.position.x));
         this.player.pawn.position[2] = playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
       }
+    }else{
+    this.gameService.movingCamera = false;
     }
     this.playerHasRotate = false;
   }
@@ -234,19 +240,19 @@ export class PlayerComponent implements OnInit {
         rotationValue = JSON.parse(JSON.stringify(this.playerRef._objRef.rotation.y)) + (rotateBack ? (3.14 ) : ( -3.14));
         this.playerHasRotate = true;
       }
-      if((this.playerRef._objRef.position.x >= 0 && this.playerRef._objRef.position.x < 1) && (this.playerRef._objRef.position.z >= 0 && this.playerRef._objRef.position.z < 1) && (this.player.pawn.rotationSide === 3 || this.playerIsGoingBack)){
+      if((this.playerRef._objRef.position.x >= 0 && this.playerRef._objRef.position.x < 1) && (this.playerRef._objRef.position.z >= 0 && this.playerRef._objRef.position.z < 1) && (this.player.pawn.rotationSide === 3 && !this.playerIsGoingBack || (this.player.pawn.rotationSide === 0 && this.playerIsGoingBack))){
         this.playerHasRotate = true;
-        this.player.pawn.rotationSide = this.playerIsGoingBack ? 2 : 0;
+        this.player.pawn.rotationSide = this.playerIsGoingBack ? 3 : 0;
         rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( 1.57) : (-1.57));
-      }else if((this.playerRef._objRef.position.x > 21 && this.playerRef._objRef.position.x < 23) && (this.playerRef._objRef.position.z > 0 && this.playerRef._objRef.position.z < 1) && ((this.player.pawn.rotationSide < 1 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 1 && this.playerIsGoingBack))){
+      }else if((this.playerRef._objRef.position.x > 21 && this.playerRef._objRef.position.x < 23) && (this.playerRef._objRef.position.z > 0 && this.playerRef._objRef.position.z < 1) && ((this.player.pawn.rotationSide === 0 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 1 && this.playerIsGoingBack))){
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 0 : 1;
         rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( 1.57) : (-1.57));
-      }else if((this.playerRef._objRef.position.x > 21 && this.playerRef._objRef.position.x < 23) && (this.playerRef._objRef.position.z > 21 && this.playerRef._objRef.position.z < 23) && ((this.player.pawn.rotationSide < 2 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 2 && this.playerIsGoingBack))){
+      }else if((this.playerRef._objRef.position.x > 21 && this.playerRef._objRef.position.x < 23) && (this.playerRef._objRef.position.z > 21 && this.playerRef._objRef.position.z < 23) && ((this.player.pawn.rotationSide === 1 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 2 && this.playerIsGoingBack)) && !this.playerArrived){
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 1 : 2;
         rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? ( 1.57) : (-1.57));
-      }else if((this.playerRef._objRef.position.x >= 0 && this.playerRef._objRef.position.x < 1) && (this.playerRef._objRef.position.z > 21 && this.playerRef._objRef.position.z < 23)  && ((this.player.pawn.rotationSide < 3 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 3 && this.playerIsGoingBack))){
+      }else if((this.playerRef._objRef.position.x >= 0 && this.playerRef._objRef.position.x < 1) && (this.playerRef._objRef.position.z > 21 && this.playerRef._objRef.position.z < 23)  && ((this.player.pawn.rotationSide === 2 && !this.playerIsGoingBack) || (this.player.pawn.rotationSide === 3 && this.playerIsGoingBack))){
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 2 : 3;
         rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? (1.57) : (-1.57));
@@ -266,11 +272,19 @@ export class PlayerComponent implements OnInit {
     }
   }
 
-  async cycleMap(actualSide:number, oldCardPosition:number, indexCheckNum:number, indexMinusNum:number ,  finalPosition:Array<number>){
-    if(this.player.actualCard != 0){
+  async cycleMap(actualSide:number, oldCardPosition:number, indexCheckNum:number, indexMinusNum:number ,  finalPosition:Array<number>, goBack?:boolean){
+    if(!goBack){
       for (let index = actualSide; index <= (indexMinusNum); index++) {
         if(index < indexCheckNum){
           await this.movePlayerGsap([(index == 0 || index == 1 ? 22 : 0), 0 , (index == 1 || index == 2 ? 22 : 0)], index,oldCardPosition);
+        }else{
+          await this.movePlayerGsap(finalPosition, index,oldCardPosition);
+        }
+      }
+    }else if(goBack){
+      for (let index = actualSide; index >= (indexMinusNum); index--) {
+        if(index > indexCheckNum){
+          await this.movePlayerGsap([(index == 2 || index == 1 ? 22 : 0), 0 , (index == 2 || index == 3 ? 22 : 0)], index,oldCardPosition);
         }else{
           await this.movePlayerGsap(finalPosition, index,oldCardPosition);
         }

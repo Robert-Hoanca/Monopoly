@@ -100,7 +100,13 @@ export class MessageDialogComponent implements OnInit {
         if(data.cardIndex != undefined && data.cardIndex != null){
           this.gameService.getCardPosition(data.cardIndex)
         }else if(data.count != undefined && data.count != null){
-          this.gameService.getCardPosition((this.gameService.players[this.gameService.turn].actualCard + (data.count)));
+          let cardIndex = 0;
+          if(this.gameService.players[this.gameService.turn].actualCard + data.count < 0){
+            cardIndex = 40 + (this.gameService.players[this.gameService.turn].actualCard + data.count)
+          }else{
+            cardIndex = (this.gameService.players[this.gameService.turn].actualCard + (data.count));
+          }
+          this.gameService.getCardPosition(cardIndex);
         }
         break;
       case 'movenearest': //Maybe add multiply option in future

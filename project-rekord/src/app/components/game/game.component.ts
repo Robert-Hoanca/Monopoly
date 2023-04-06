@@ -103,13 +103,6 @@ export class GameComponent implements OnInit {
     this.gameService.gameScene = this.scene._objRef;
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
-
-   /*this.gameService.textDialog({
-    title: "Go to Jail - Go directly to Jail - Do not pass Go, do not collect $200",
-    action: "jail",
-    subaction: "goto"
-    },'chance');*/
-   
   }
 
   activateLocalSave(){
