@@ -268,7 +268,8 @@ export class PlayerComponent implements OnInit {
     if(animation){
       await gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: value, duration: 0.5});
     }else{
-      gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: value});
+      //gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: value});
+      this.playerRef._objRef.rotation.y = value;
     }
   }
 
