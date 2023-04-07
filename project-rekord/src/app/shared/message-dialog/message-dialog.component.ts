@@ -125,7 +125,7 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.players[this.gameService.turn].prison.getOutCards ++;
         }else if(data.subaction == 'goto'){
           this.closeDialog();
-          this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' is going to prison.'}, 'goingToPrison');
+          this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' have to go to prison.'}, 'goingToPrison');
         }
         break;
       case 'propertycharges':

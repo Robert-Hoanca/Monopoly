@@ -470,9 +470,9 @@ export class GameService {
         this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney'); 
       }
     }else if(property.cardType == 'goToPrison' || this.players[this.turn].prison.doubleDiceCounter == 3){
-      this.textDialog({text: this.players[this.turn].name + ' is going to prison.'}, 'goingToPrison');
+      this.textDialog({text: this.players[this.turn].name + ' have to go to prison.'}, 'goingToPrison');
     }else if(property.cardType == 'taxes'){
-      this.textDialog({text:this.players[this.turn].name + ' has payed ' + property.taxesCost + ' of taxes.', property, bankTaxes:true}, 'payMoney');
+      this.textDialog({text:this.players[this.turn].name + ' have to pay ' + property.taxesCost + ' of taxes.', property, bankTaxes:true}, 'payMoney');
     }else if(property.cardType == 'chance'){
       this.getChestChance('chance');
     }else if(property.cardType == 'communityChest'){
@@ -663,7 +663,7 @@ export class GameService {
       if(this.players[this.turn].money < 50){
         this.calculateAmountDebt(50);
       }else{
-        this.textDialog({text:this.players[this.turn].name + ' has payed ' + 50 +' and exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2, shouldPay, exitFromDice}, 'exitFromPrison');
+        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + 50 +' and then exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2, shouldPay, exitFromDice}, 'exitFromPrison');
       }
       this.players[this.turn].canDice=true;
     }else if(exitFromDice && dice1 && dice2){
