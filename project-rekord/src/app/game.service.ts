@@ -1,5 +1,6 @@
-import { Injectable, TemplateRef } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { collection, getFirestore, doc, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
@@ -12,6 +13,7 @@ import gsap from 'gsap'
 import { Vector3 } from 'three';
 import * as THREE from 'three';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
+import { off } from 'process';
 
 @Injectable({
   providedIn: 'root'
@@ -44,13 +46,10 @@ export class GameService {
   localSaveName:string = '';
   gamePaused:boolean=false;
   userDevice:string='';
-
-  //Colors
- // bgColors = ["#a7bed3","#c6e2e9","#f1ffc4","#ffcaaf","#dab894","#fddfdf","#fcf7de","#defde0","#def3fd","#f0defd","#FFDFBA","#558F97","#E6DFCC"];
+  gameScene:any;
   bgColors = [];
   sessionColor:string= '';
   players: Array<any> = [];
-  //actualTurnPlayer:any = {};
   ambientLightColor:string='#ff8326'
 
   choosenMode:string = '';
@@ -62,7 +61,9 @@ export class GameService {
   cameraControls:any;
   cameraPosition: Vector3 | any;
   movingCamera:boolean= false;
+  movingPlayer:boolean = false;
 
+  setPlayerToCenter = true;
   beginTime:number = 0;
   endTime:number = 0;
   gameAmountTime:string = '';
@@ -72,13 +73,16 @@ export class GameService {
   cardsPositionCounter:number = 0;
   playersModel: any = {};
   pawnTypes: any = [];
+  pawnUrls:Array<any> = [];
   specialPawnTypes: any = [];
   specialPawn:String='';
   diceNumber:number|undefined;
+  startToDice:boolean = false;
   playerWhoWonId:string = '';
   addingPlayerMoney:boolean=false;
   removingPlayerMoney:boolean=false;
   playerMoneyChangeValue:number= 0;
+  
 
   getCardPosition$ = new Subject();
   setPlayerPosition$ = new Subject();
@@ -86,7 +90,6 @@ export class GameService {
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
-  moneyDialogRef: TemplateRef<any> | undefined;
   exchangeRef: MatDialogRef<any> | undefined;
   randomChest:any;
   randomChance:any;
@@ -104,6 +107,7 @@ export class GameService {
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
+    //const storage = getStorage();
 
     //Maps
     const getMaps = await getDocs(collection(this.db, "gameTables"));
@@ -127,7 +131,23 @@ export class GameService {
     pawnTypesRef.forEach((doc) => {
       doc.data()['specialPawn'] ? this.specialPawnTypes.push(doc.data()):this.pawnTypes.push(doc.data());
     });
+    this.pawnTypes.forEach((pawn:any) => {
+        this.pawnUrls.push('/assets/blenderModels/pawns/' + pawn.value + '/scene.gltf')
+    });
 
+    /*this.pawnTypes.forEach((pawn:any) => {
+      console.log(pawn.value)
+      getDownloadURL(ref(storage, 'projectRekord/assets/pawns/' + pawn.value + '/scene.gltf'))
+      .then((url) => {
+        if(url){
+          this.pawnModels.push(url)
+        }
+      })
+      .catch((error) => {
+        console.log("error ",error)
+      });
+      console.log("pawnModels ",this.pawnModels)
+    });*/
     this.cameraPosition = new THREE.Vector3(-10,10,-10);
   }
 
@@ -135,6 +155,7 @@ export class GameService {
     this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
   }
   LightenDarkenColor(col:string,amt:number) {
+    //Return a lighten / darken color based on the given color
     var usePound = false;
     if ( col[0] == "#" ) {
         col = col.slice(1);
@@ -159,7 +180,14 @@ export class GameService {
     else if  ( g < 0 ) g = 0;
 
     return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
-}
+  }
+
+  returnInclude(element:any, string:string){
+    return element.includes(string)
+  }
+  goBackHome(){
+    location.reload();
+  }
 
 
   retrieveSavesFromLocal(){
@@ -187,6 +215,7 @@ export class GameService {
   }
 
   createPlayer(name:string, pawnIndex:number){
+    //Create a player with the defalt fields, give to id a uuid.
     const type = this.specialPawn != ''? 'special' : 'normal';
     const newPlayer = JSON.parse(JSON.stringify(this.playersModel));
     newPlayer.name = name;
@@ -194,6 +223,29 @@ export class GameService {
     newPlayer.money = 1500;
     newPlayer.pawn.choosenPawnLabel = type == 'normal'? this.pawnTypes[pawnIndex].name : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).name;
     newPlayer.pawn.choosenPawnValue =  type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).value;
+    switch (this.players.filter(player => player.id != newPlayer.id).length) {
+      case 0:
+        newPlayer.pawn.position = [0.5,0,0.5]
+        newPlayer.pawn.cardSection = 0;
+        break;
+      case 1:
+        newPlayer.pawn.position = [0.5,0,-0.5]
+        newPlayer.pawn.cardSection = 1;
+        break;
+      case 2:
+        newPlayer.pawn.position = [-0.5,0,-0.5]
+        newPlayer.pawn.cardSection = 2;
+        break;
+      case 3:
+        newPlayer.pawn.position = [-0.5,0,0.5]
+        newPlayer.pawn.cardSection = 3;
+        break;
+    
+      default:
+        newPlayer.pawn.position = [0,0,0]
+        break;
+    }
+    newPlayer.pawn.rotationSide = 0;
     newPlayer.canDice = false;
     newPlayer.actualCard = 0;
     this.players.push(newPlayer);
@@ -201,21 +253,24 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string){
-    let actualSide = 0;
-    this.movingCamera = true;
+  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string) : Promise<any>{
+    //Move the game camere to a given position
     let xOffset = offset;
     let zOffset = offset;
-    if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20 && xOffset){
-      xOffset+=0;
-    }else if(30 < this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 39 && xOffset){
-      xOffset-=10;
+    //If the camera should follow the player then calculate the offset of the camera
+    if(xOffset != undefined && zOffset != undefined && playerMoving != undefined){
+      if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20){
+        xOffset+=0;
+      }else if(30 < this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 39){
+        xOffset-=10;
+      }
+      if(20 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 30){
+        zOffset+=0;
+      }else if(0 <= this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 10){
+        zOffset-=10;
+      }
     }
-    if(20 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 30 && zOffset){
-      zOffset+=0;
-    }else if(0 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 10 && zOffset){
-      zOffset-=10;
-    }
+    //If the camera should follow the player then, based on given axis, move the camera on that axis to the given position. Otherwise move the entire camera position at a time to that position
    if(playerMoving){
     if(axis){
        if(axis == 'x'){
@@ -227,16 +282,20 @@ export class GameService {
        }
     }
    }else if(!playerMoving){
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + (offset/2)) : y, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: duration/1000});
+    
+    this.movingCamera = true;
+    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: axis == 'diceRoll' ? x : (xOffset ? (x + xOffset) : x), duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: axis == 'diceRoll' ? y : (offset ? (y + (offset/2)) : y), duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: axis == 'diceRoll' ? z : (zOffset ? (z + zOffset) : z), duration: duration/1000});
+    setTimeout(() => {
+      this.movingCamera = false;
+     }, duration);
    }
+   //Make the camera look at a target
+   gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: axis == 'diceRoll' ? 0: x, duration: 1000/1000});
+   gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: axis == 'diceRoll' ? 0: y, duration: 1000/1000});
+   gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: axis == 'diceRoll' ? 0: z, duration: 1000/1000});
 
-   camera._objRef.lookAt(this.players[this.turn].pawn.position)
-
-   setTimeout(() => {
-    this.movingCamera = false;
-   }, duration);
   }
 
   getCardPosition(cardIndex:any){
@@ -246,7 +305,6 @@ export class GameService {
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
     let oldCardPosition = JSON.parse(JSON.stringify((this.players[this.turn].actualCard)));
     this.players[this.turn].actualCard = newCardNum;
-    this.players[this.turn].pawn.position =  cardPosition;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
   }
 
@@ -257,6 +315,9 @@ export class GameService {
       this.gameTable  = (await getDoc(gameTableRef)).data();
       this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
       this.players[this.turn].canDice = true;
+      setTimeout(() => {
+        this.textDialog({text: this.players[this.turn].name + ' begins the game!'}, 'playerWhoBegins')
+      }, 1500);
     }else{
       this.gameTable = this.localSaves.gameTable;
       this.players = this.localSaves.players;
@@ -275,10 +336,13 @@ export class GameService {
         this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!'}, 'finishGame')
       }
     }
-    this.router.navigateByUrl('game', { skipLocationChange: true })
+    this.router.navigateByUrl('game', { skipLocationChange: true });
   }
 
   nextTurn(){
+    if(this.startToDice){
+      this.startToDice = false;
+    }
     if(this.turn == (this.players.length - 1)){
       this.turn = 0;
     }else{
@@ -293,15 +357,22 @@ export class GameService {
         }
       }
     }
-    //console.log(this.turn)
     this.players[this.turn] = this.players[this.turn];
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
+    
+    if(this.randomChance || this.randomChest){
+      this.randomChance = undefined;
+      this.randomChance = undefined;
+    }
     this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
   }
+  
+  //OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
   async rollTheDice(){
     if(!this.players[this.turn].prison.inPrison){
-       this.diceRes = this.getDiceRoll();
+      this.startToDice = true;
+      /* this.diceRes = this.getDiceRoll();
       if(this.diceRes[0]==this.diceRes[1]){
         this.players[this.turn].prison.doubleDiceCounter++;
         this.players[this.turn].canDice = true;
@@ -312,8 +383,9 @@ export class GameService {
       this.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.players[this.turn].actualCard);
       if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
         this.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameTable.cards.length - 1) - this.players[this.turn].actualCard)) - 1);
-      }
-      this.getCardPosition(this.diceNumber)
+      }*/
+      // this.getCardPosition(this.diceNumber)
+     
     }else{
      this.whatToDoInprison('prisonRoll')
     }
@@ -453,7 +525,7 @@ export class GameService {
     property.canBuy = false;
     property.owner = this.players[this.turn].id;
     if(!property.completedSeries){
-      this.checkCompletedSeries(property,this.players[this.turn].id);
+      this.checkCompletedSeries([property]);
     }
   }
   sellProperty(property:any){
@@ -462,19 +534,19 @@ export class GameService {
     }else{
       this.addingRemovingMoney('add',(property.distrainedCost - ((property.distrainedCost / 100) * 50)), 1000);
     }
-    this.checkCompletedSeries(property,this.players[this.turn].id);
+    this.checkCompletedSeries([property]);
     property.canBuy = true;
     property.owner = "";
   }
   distrainProperty(property:any){
     property.distrained = true;
     this.addingRemovingMoney('add', property.distrainedCost, 1000);
-    this.checkCompletedSeries(property,this.players[this.turn].id);
+    this.checkCompletedSeries([property]);
   }
   cancelDistrainedFromProperty(property:any){
     property.distrained = false;
    this.addingRemovingMoney('remove', property.distrainedCost, 1000);
-    this.checkCompletedSeries(property, this.players[this.turn].id);
+    this.checkCompletedSeries([property]);
   }
 
   sortProperties(properties:Array<any>){
@@ -510,6 +582,7 @@ export class GameService {
       this.cardInfoRef = this.dialog.open(CardDialogComponent, {
         panelClass: 'propertyInfo',
         hasBackdrop: true,
+        disableClose:true,
         autoFocus: false,
         data: {
           card: card,
@@ -517,29 +590,46 @@ export class GameService {
       });
     }
   }
+  openCompletedSeriesDialog(cards:Array<any>){
+    this.cardInfoRef = this.dialog.open(CardDialogComponent, {
+      panelClass: 'completedSeriesInfo',
+      hasBackdrop: true,
+      disableClose:true,
+      autoFocus: false,
+      height: '60%',
+      data: {
+        cards: cards,
+        completedSeries: true
+      }
+    });
+  }
   openExchangeDialog(){
     this.cardInfoRef = this.dialog.open(ExchangeComponent, {
       panelClass: 'exchangePanel',
       hasBackdrop: true,
       autoFocus: false,
+      disableClose:true,
       data: {
       }
     });
   }
 
-  //https://stackoverflow.com/questions/64460217/open-several-mat-dialogs-one-by-one-after-the-previous-one-is-closed
   textDialog(textData:any, eventType:string) {
     const data = {
       textData,
       eventType,
     }
     this.cardInfoRef = this.dialog.open(MessageDialogComponent, {
-      panelClass: 'messadeDialog',
+      panelClass: 'messageDialog',
       hasBackdrop: true,
       autoFocus: false,
       disableClose:true,
       data: data
     });
+  }
+
+  closeDialog(dialogRef:any){
+    dialogRef.close()
   }
 
   //EVENTS
@@ -548,7 +638,7 @@ export class GameService {
     this.getCardPosition$.next(10);
     this.players[this.turn].canDice=false;
   }
-
+//OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
   whatToDoInprison(action:string){
     if(action == 'payToExit'){
       this.exitFromPrison(true, false);
@@ -594,27 +684,41 @@ export class GameService {
   }
 
   //Find if a player has completed a completed series of the given card
-  checkCompletedSeries(property:any,playerId:string){
-    const groupCards = this.gameTable.cards.filter((card: { district: any; }) => card.district == property.district) //ALL CARDS
-    const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == playerId)
-    if(groupCards.length == ownerCards.length && ownerCards.findIndex((cardI: { distrained: any; }) => cardI.distrained)<0){
-      groupCards.forEach((card: { completedSeries: boolean; }) => {
-        if(!card.completedSeries){  card.completedSeries = true;}
-      });
-    }else{
-      groupCards.forEach((card: { completedSeries: boolean; }) => {
-        if(card.completedSeries){  card.completedSeries = false;}
-      });
-    }
+  checkCompletedSeries(properties:Array<any>){ //property:any,playerId:string
+    const possibleDistricts:any = [];
+    const foundCompleted:Array<any> = [];
+    properties.forEach(property => {
+      if(!possibleDistricts.includes(property.district)){
+        possibleDistricts.push(property.district)
+      }
+    });
+
+    possibleDistricts.forEach((district:string) => {
+      const groupCards = this.gameTable.cards.filter((card:any) => card.district == district);
+      const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == groupCards[0].owner);
+      if(groupCards.length == ownerCards.length && ownerCards.findIndex((cardI: { distrained: any; }) => cardI.distrained)<0){
+        groupCards.forEach((card: { completedSeries: boolean; }) => {
+          if(!card.completedSeries){  card.completedSeries = true;}
+        });
+        foundCompleted.push(groupCards);
+      }else{
+        groupCards.forEach((card: { completedSeries: boolean; }) => {
+          if(card.completedSeries){  card.completedSeries = false;}
+        });
+      }
+    });
+    this.openCompletedSeriesDialog(foundCompleted);
   }
 
   //Get a chanche or communityChest card 
   getChestChance(cardType:string){
     if(cardType=='chance'){
-      this.randomChance = this.gameTable.chance[(Math.round(Math.random() * ( this.gameTable.chance.length) - 1) + 0)];
+      const randomNum = (Math.round(Math.random() * ( this.gameTable.chance.length - 1) ) + 0);
+      this.randomChance = this.gameTable.chance[randomNum];
       this.textDialog(this.randomChance,'chance');
     }else{
-      this.randomChest = this.gameTable.communitychest[(Math.round(Math.random() * ( this.gameTable.communitychest.length) - 1) + 0)]
+      const randomNum = (Math.round(Math.random() * ( this.gameTable.communitychest.length - 1)) + 0)
+      this.randomChest = this.gameTable.communitychest[randomNum]
       this.textDialog(this.randomChest,'communityChest');
     }
   }
@@ -719,6 +823,35 @@ export class GameService {
         (playerId? this.players.find(player => player.id == playerId) : this.players[this.turn]).money = 0;
       }
     }
+  }
+
+  test(number?:number){
+    if(number !== undefined){
+      this.randomChance = {
+        title: "Advance to Trafalgar Square - If you pass Go, collect $200",
+        action: "move",
+        tileid: "trafalgarsquare",
+        cardIndex: number
+      };
+       this.textDialog({
+       title: "Advance to Trafalgar Square - If you pass Go, collect $200",
+       action: "move",
+       tileid: "trafalgarsquare",
+       cardIndex: number
+       },'chance');
+
+    }else{
+
+      this.randomChance = {
+        title: "Advance to Go (Collect $200)",
+        action: "move",
+        tileid: "go",
+        cardIndex: 0
+      };
+  
+      this.textDialog( this.randomChance,'chance');
+    }
+
   }
   
   /////////////////DELETE

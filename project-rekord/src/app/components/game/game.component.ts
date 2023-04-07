@@ -2,38 +2,14 @@ import { animate, keyframes, state, style, transition, trigger } from '@angular/
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { GamePhysicsService } from 'src/app/game-physics.service';
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three'
-//import {Sky} from '../../../assets/jsImports/Sky.js'
-
-//const Sky = require('three-sky');
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss'],
   animations: [
-   /* trigger(
-      'passedStartMoney',
-      [
-        state('open', style({
-          opacity: 1,
-          top: '0px',
-        })),
-        state('close', style({
-          opacity: 0,
-          top: '-50px',
-        })),
-        transition('hide => show', [animate('300ms ease-in', keyframes([
-          style({ top: '-50px', opacity: 0, offset: 0 }),
-          style({ top: '0px', opacity: 1, offset: 1 }),
-        ]))]),
-        transition('show => hide', [animate('300ms ease-out', keyframes([
-          style({ top: '0px', opacity: 1, offset: 0 }),
-          style({ top: '-50px', opacity: 0, offset: 1 }),
-        ]))]),
-      ]
-
-    ),*/
     trigger(
       'passedStartMoney',
       [
@@ -50,7 +26,40 @@ import * as THREE from 'three'
         ])
       ]
     ),
-  ]
+    trigger(
+      'showDice',
+      [
+        transition(
+          ':enter', [
+          style({ tansform: 'scale(0)', opacity: 0 }),
+          animate('250ms ease-in', style({ tansform: 'scale(1)', opacity: 1 }))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({ tansform: 'scale(1)', opacity: 1 }),
+          animate('250ms ease-out', style({ tansform: 'scale(0)', opacity: 0 }))
+        ])
+      ]
+    ),
+    trigger(
+      'mmAnimationScale',
+      [
+        transition(
+          ':enter', [
+          style({ transform: 'scale(0)', opacity: 0 }),
+          animate('300ms ease-in', style({ transform: 'scale(1)', 'opacity': 1 }))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({ transform: 'scale(1)', 'opacity': 1 }),
+          animate('300ms ease-out', style({ transform: 'scale(0)', 'opacity': 0 }))
+        ])
+      ]
+    ),
+  ],
+  
 })
 export class GameComponent implements OnInit {
   @ViewChild('cardInfo', { static: true }) cardInfo:any;
@@ -64,7 +73,10 @@ export class GameComponent implements OnInit {
 
   @ViewChild('sky', { static: true }) sky:any;
 
-  @ViewChild('moneyDialog', { static: true }) moneyDialogRef!: TemplateRef<any>;
+  @ViewChild('showDiceResultDialog', { static: true }) showDiceResultDialogRef!: TemplateRef<any>;
+
+
+  @ViewChild('physicsGround', { static: true }) physicsGround:any;
 
   actualPlayerProps:Array<any> = [];
 
@@ -72,39 +84,25 @@ export class GameComponent implements OnInit {
   textDialog:string='';
   cardChangedCounter:number = 0;
   cardOutlineChangedCounter:number = 0;
-
-  //ADD OBJECTS TO SCENE
-  //this.scene.objRef.children.push( OBJECT );
   rendererOptions:any={
     shadowMap:{
-      //enabled:true,
-      //type:THREE.PCFSoftShadowMap
     },
     antialias: true,
-    //outputEncoding: 3001,
-   // toneMapping:THREE.CineonToneMapping //THREE.ACESFilmicToneMapping
   }
 
-  constructor(public gameService: GameService,private dialog: MatDialog ) { }
+  constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
 
   ngOnInit(): void {
-    this.openTextDialog$ = this.gameService.openTextDialog$.subscribe((data:any) =>{
-      this.openMoneyDialog(data)
-    });
-    this.gameService.addingRemovingMoneyProps()
-    if(window.navigator.userAgent.includes('Android')){
-      this.gameService.userDevice = 'phone_android'
-    }else if(window.navigator.userAgent.includes('Windows')){
-      this.gameService.userDevice = 'computer_windows'
-    }else if(window.navigator.userAgent.includes('iPhone')){
-      this.gameService.userDevice = 'prone_ios'
-    }
+    this.gameService.addingRemovingMoneyProps();
   }
   ngAfterViewInit(){
     this.gameService.camera = this.camera;
-    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.gameService.cameraControls = this.cameraControls;
+    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.activateLocalSave();
+    this.gameService.gameScene = this.scene._objRef;
+    this.gamePhysicsService.initWorld();
+    this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
   }
 
   activateLocalSave(){
@@ -142,11 +140,6 @@ export class GameComponent implements OnInit {
     return element; 
   }
 
-  openMoneyDialog(data:any){
-    this.textDialog = data.text;
-    this.dialog.open(this.moneyDialogRef);
-  }
-
   tryToGoNextTurn(){
     if(this.gameService.amountDebt!=0){
       if(this.gameService.debtWithWho == 'player'){
@@ -162,11 +155,6 @@ export class GameComponent implements OnInit {
 
    
   }
-
-  goBackHome(){
-    location.reload();
-  }
-
   changeCardColor(){
     let color = new THREE.Color( this.gameService.sessionColor )
     this.scene.objRef.children.forEach((child:any) => {
@@ -188,5 +176,58 @@ export class GameComponent implements OnInit {
         })
       }
     });
+  }
+
+  async rollTheDice(){
+    //setcamera position on the corner opposite the start
+    await this.gameService.setCameraPosition(this.gameService.camera, 25,15,25,1000,5, false,'diceRoll')
+
+    if(this.gameService.startToDice){
+      this.gameService.startToDice = false;
+    }
+    if(!this.gameService.players[this.gameService.turn].prison.inPrison){
+      this.gameService.startToDice = true;
+      this.gamePhysicsService.diceArray.forEach(dice => {
+        this.gamePhysicsService.diceRoll(dice);
+      });
+     
+    }else{
+     this.whatToDoInPrison('prisonRoll')
+    }
+  }
+
+  whatToDoInPrison(action:string){
+    if(action == 'payToExit'){
+      this.gameService.exitFromPrison(true, false);
+    }if(action == 'freeExit'){
+      this.gameService.exitFromPrison(false, false);
+    }else if(action == 'prisonRoll'){
+      this.gameService.startToDice = true;
+      this.gamePhysicsService.diceArray.forEach(dice => {
+        this.gamePhysicsService.diceRoll(dice);
+      });
+    }
+  }
+
+  getDiceResClass(res:number){
+    let returnClass = '';
+    switch (res) {
+      case 3:
+        returnClass = 'three';
+        break;
+      case 4:
+        returnClass = 'four';
+        break;
+      case 5:
+        returnClass = 'five';
+        break;
+      case 6:
+        returnClass = 'six';
+        break;
+    
+      default:
+        break;
+    }
+    return returnClass;
   }
 }

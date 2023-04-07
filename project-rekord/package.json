@@ -25,6 +25,7 @@
     "@angular/platform-browser": "^14.1.0",
     "@angular/platform-browser-dynamic": "^14.1.0",
     "@angular/router": "^14.1.0",
+    "cannon-es": "^0.20.0",
     "firebase": "^9.9.3",
     "firebase-admin": "^11.0.1",
     "gsap": "^3.11.3",

@@ -1,6 +1,14 @@
-<div id="cardInfo" fxLayout="column" fxLayoutAlign="start start">
+<div *ngIf="data.card && !data.cards" id="cardInfo" fxLayout="column" fxLayoutAlign="start start">
+    
+   
+    <div class="externalBtns" fxLayoutAlign="space-between center">
+        <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
+        <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.distrainProperty(data.card);close()" [matTooltipPosition]="'above'" matTooltip="Mortgage" [disabled]="data.card.housesCounter>0"><mat-icon>credit_card</mat-icon></button>
 
-    <mat-card class="cardForm">
+        <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.cancelDistrainedFromProperty(data.card)" [disabled]="gameService.players[gameService.turn].money<data.card.distrainedCost" [matTooltipPosition]="'above'" matTooltip="Remove mortgage"><mat-icon>credit_card_off</mat-icon></button>
+    </div>
+
+    <mat-card [ngClass]="['cardForm', data.card.owner == gameService.players[gameService.turn].id ? 'owned' : '']">
         <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(data.card.district)}" fxLayoutAlign="center center">
             <span class="cardName" [ngStyle]="{'color': getContrastColor(gameService.checkCardColorDistrict(data.card.district))}">{{data.card.name}}</span>
         </span>
@@ -58,17 +66,14 @@
 
     </div>
     <div class="cardBtns" fxLayoutAlign="end center">
-        <button mat-raised-button (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy" [disabled]="gameService.players[gameService.turn].money<data.card.cost">Compra</button>
-        <button mat-raised-button *ngIf="data.card.canBuy" [disabled]="true">Asta</button>
-        <!-- <button mat-raised-button  *ngIf="data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.sellProperty(data.card);close()">Vendi</button> -->
-    
-        <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.distrainProperty(data.card);close()" [matTooltipPosition]="'above'" matTooltip="Mortgage"><mat-icon>credit_card</mat-icon></button>
+        <button mat-raised-button class="buyPropertyBtn" (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy" [disabled]="gameService.players[gameService.turn].money<data.card.cost">Compra</button>
+        <button mat-raised-button *ngIf="data.card.canBuy && false" [disabled]="true">Asta</button>
 
-        <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.cancelDistrainedFromProperty(data.card)" [disabled]="gameService.players[gameService.turn].money<data.card.distrainedCost" [matTooltipPosition]="'above'" matTooltip="Remove mortgage"><mat-icon>credit_card_off</mat-icon></button>
+       
 
-        <div class="housesManager" *ngIf="data.card.completedSeries && data.card.owner == gameService.players[gameService.turn].id">
+        <div class="housesManager" *ngIf="data.card.completedSeries && data.card.owner == gameService.players[gameService.turn].id"  fxLayoutAlign="space-between center">
             
-            <div fxLayout="row" fxLayoutAlign="start center" *ngIf="data.card.cardType == 'property'">
+            <div fxLayout="row" fxLayoutAlign="space-between center" *ngIf="data.card.cardType == 'property'">
                 <div *ngIf="!data.card.hotelCounter" [fxFlex]="'100%'" class="houses">
                     <button mat-raised-button (click)="removeHouse()" [disabled]="!data.card.housesCounter" [fxFlex]="'50%'" [matTooltipPosition]="'above'" matTooltip="Remove house"><mat-icon>remove</mat-icon><mat-icon class="houseIcon">cottage</mat-icon></button>
                     <button *ngIf="data.card.housesCounter<4" mat-raised-button (click)="addHouse()" [fxFlex]="'50%'" [disabled]="gameService.players[gameService.turn].money < data.card.houseCost" [matTooltipPosition]="'above'" matTooltip="Add house"><mat-icon>add</mat-icon><mat-icon class="houseIcon">cottage</mat-icon></button>
@@ -82,3 +87,64 @@
         </div>
     </div>
 </div>
+
+
+<div *ngIf="completedSeriesCards.length" id="completedSeries-info" fxLayoutAlign="center center" [ngClass]="completedSeriesCards.length > 2 ? 'three' : 'two'">
+    <mat-card class="cardForm" *ngFor="let card of completedSeriesCards">
+        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(card.district)}" fxLayoutAlign="center center">
+            <span class="cardName" [ngStyle]="{'color': getContrastColor(gameService.checkCardColorDistrict(card.district))}">{{card.name}}</span>
+        </span>
+        
+        <div class="cardCosts" fxLayout="column">
+            <span class="cardCost" fxLayoutAlign="space-between center">
+                <span>Property cost</span>
+                <span>{{card.cost}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.rentCosts">
+                <span>Rent</span>
+                <span>{{card.rentCosts.normal}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.rentCosts && card.rentCosts.completedSeriesBasic">
+                <span>Rent with color set</span>
+                <span>{{card.rentCosts.completedSeriesBasic}}€</span>
+            </span>
+            <span class="cardCost" *ngIf="card.rentCosts && card.rentCosts.one"> 
+                <span>Rent with property</span>
+                <div class="rentsWithProps" fxLayout="row">
+                    <div class="props" fxLayout="column">
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>1</span></span>
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>2</span></span>
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>3</span></span>
+                        <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>4</span></span>
+                        <span class="hotel" fxLayoutAlign="center center" *ngIf="card.rentCosts && card.rentCosts.hotel"><mat-icon>cottage</mat-icon></span>
+                    </div>
+                    <div class="rent" fxLayout="column" fxLayoutAlign="space-around end">
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.one}}€</span>
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.two}}€</span>
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.three}}€</span>
+                        <span class="house" fxLayoutAlign="center center">{{card.rentCosts.four}}€</span>
+                        <span class="hotel" fxLayoutAlign="center center" *ngIf="card.rentCosts && card.rentCosts.hotel">{{card.rentCosts.hotel}}€</span>
+                    </div>
+                </div>
+            </span>
+            <hr class="separator">
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.houseCost">
+                <span>House price</span>
+                <span>{{card.houseCost}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="card.hotelCost">
+                <span>Hotel price</span>
+                <span>{{card.hotelCost}}€</span>
+            </span>
+            <span class="cardCost" fxLayoutAlign="space-between center">
+                <span>Distrain price</span>
+                <span>{{card.distrainedCost}}€</span>    
+            </span>
+        </div>
+        
+    </mat-card>
+    <div class="completedText" *ngIf="!data.card && data.cards" >
+        <span> {{getPlayerName()}} has Completed the Series</span>
+    </div>
+</div>
+

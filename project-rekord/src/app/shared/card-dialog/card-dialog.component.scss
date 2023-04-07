@@ -3,71 +3,191 @@
     color:grey;
     pointer-events: none;
 }
-#cardInfo{
-    .cardForm{
-        width: 220px;
-        height: 350px;
-        position: relative;
-        .propDistrict{
-            position: absolute;
-            top: 10px;
-            height: 50px;
-            width: 90%;
-        }
-        .cardCosts{
-            margin-top: 55px;
-            .rentsWithProps{
-                .props{
-                    .house, .hotel{
-                        height:20px;
-                        position: relative;
-                        margin-top: 5px;
-                        span{
-                            position: absolute;
-                            z-index: 2;
-                            font-size: 10px;
-                            color: #fff;
-                        }
-                    }
-                   .hotel{
-                        mat-icon{
-                            color: red;
-                        }
-                        span{
-                            background: red;
-                        }
-                    }
-                    .house{
-                        mat-icon{
-                            color: green;
-                        }
-                        span{
-                            background: green;
-                        }
+.externalBtns{
+    width: 100%;
+    button{
+        border-radius: 4px 4px 0px 0px;
+    }
+}
+.cardForm{
+    width: 220px;
+    height: 350px;
+    position: relative;
+    border-radius: 0px 4px 4px 4px;
+    &.owned{
+        border-radius: 0px 0px 4px 4px;
+    }
+
+    .propDistrict{
+        position: absolute;
+        height: 50px;
+        width: calc(100% - 32px);
+    }
+    .cardCosts{
+        margin-top: 55px;
+        .rentsWithProps{
+            .props{
+                .house, .hotel{
+                    height:20px;
+                    position: relative;
+                    margin-top: 5px;
+                    span{
+                        position: absolute;
+                        z-index: 2;
+                        font-size: 10px;
+                        color: #fff;
                     }
                 }
-                .rent{
-                    width: 100%;
-                    .house,.hotel{
-                        margin-top: 5px;
+               .hotel{
+                    mat-icon{
+                        color: red;
+                    }
+                    span{
+                        background: red;
+                    }
+                }
+                .house{
+                    mat-icon{
+                        color: green;
+                    }
+                    span{
+                        background: green;
                     }
                 }
             }
+            .rent{
+                width: 100%;
+                .house,.hotel{
+                    margin-top: 5px;
+                }
+            }
         }
-        .separator{
-            height: 0.5px;
+    }
+    .separator{
+        height: 0.5px;
+        width: 100%;
+        background: grey;
+    }
+}
+.cardBtns{
+    width: 100%;
+    .buyPropertyBtn{
+        width: 100%;
+        margin-top: 20px;
+    }
+    .housesManager{
+        width: 100%;
+        &>div{
             width: 100%;
-            background: grey;
+        }
+        .houseIcon{
+            color: green;
+        }
+        .hotelIcon{
+            color: red;
         }
     }
-    .cardBtns{
-        .housesManager{
-            .houseIcon{
-                color: green;
+}
+
+#completedSeries-info{
+    //position: relative;
+    &.three{
+        .cardForm:first-child{
+            margin-right: -50px;
+            margin-bottom: -80px;
+            z-index: 0;
+        }
+        .cardForm:not(:first-child):not(:last-of-type){
+            z-index: 1;
+        }
+        .cardForm:last-of-type{
+            margin-left: -50px;
+            margin-bottom: -80px;
+            z-index: 0;
+        }
+    }
+    &.two{
+        .cardForm:first-child{
+            margin-right: -20px;
+            z-index: 0;
+        }
+        .cardForm:last-of-type{
+            margin-left: -20px;
+            z-index: 0;
+        }
+    }
+    .completedText{
+        position: absolute;
+        top: 0px;
+        z-index: 2;
+        height: 50px;
+        width: 300px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        text-align: center;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    #completedSeries-info{
+        &.three{
+            .cardForm:first-child{
+                transform: scale(0.8) rotate(-5deg);
             }
-            .hotelIcon{
-                color: red;
+            .cardForm:last-of-type{
+                transform: scale(0.8) rotate(5deg);
+            }
+        }
+        &.two{
+            .cardForm:first-child{
+                transform: rotate(-5deg);
+            }
+            .cardForm:last-of-type{
+                transform: rotate(5deg);
             }
         }
     }
+    
+}
+
+//On Phone
+@media screen and (max-width: 600px) {
+    #completedSeries-info{
+        &.three{
+            .cardForm:first-child{
+                transform: scale(0.5) rotate(-5deg);
+                left: -50px;
+                margin-bottom: -50px;
+                z-index: 0;
+
+            }
+            .cardForm:not(:first-child):not(:last-of-type){
+                transform: scale(0.6);
+            }
+            .cardForm:last-of-type{
+                transform: scale(0.5) rotate(5deg);
+                right: -50px;
+                margin-bottom: -50px;
+                z-index: 0;
+            }
+        }
+        &.two{
+            .cardForm:first-child{
+                transform: scale(0.5) rotate(-5deg);
+                left: 20px;
+            }
+            .cardForm:last-of-type{
+                transform: scale(0.5) rotate(5deg);
+                right: 20px;
+            }
+        }
+        
+        .cardForm{
+            position: absolute;
+        }
+    }
+    
 }

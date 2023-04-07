@@ -1,7 +1,95 @@
 #messageContainer{
+    overflow: hidden;
+    .messageTitle{
+        width: 100%;
+        box-shadow: 0px 6px 9px -11px #000000;
+        background-color: #fff;
+        padding: 20px;
+        z-index: 1;
+        position: relative;
+        h1{
+            margin: 0;
+            font-size: 18px;
+        }
+        .closeDialog{
+            height: 40px;
+            width: 40px;
+            min-width: unset;
+            padding: 0;
+            box-shadow: none;
+        }
+    }
+    .messageDialogTextContainer{
+        min-width: 250px;
+        max-width: 300px;
+        padding: 20px;
+        background-color: #fff;
+        .messageText{
+            font-size: 18px;
+        }
+    }
+
+    .specialCardContainer{
+        .cardContainer{
+            background-color: #fff;
+            box-shadow: 0px 6px 9px -11px #000000;
+            padding: 10px;
+            min-height: 100px;
+            .card{
+                min-width: 250px;
+                max-width: 300px;
+                border: 2px solid black;
+                padding: 10px;
+                overflow: hidden;
+                .title{
+                    font-size: 18px;
+                    text-transform: uppercase;
+                    text-align: center;
+                    overflow: hidden;
+                }
+                
+                .messageText{
+                    font-size: 16px;
+                    text-align: center;
+                    min-height: 150px;
+                    overflow: hidden;
+                }
+                &.chance{
+                }
+                &.chest{
+                }
+            }
+        }
+        .specialCardBtnContainer{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    }
+
     .winScreen{
         .time{
             font-weight: bold;
         }
+    }
+    .playerProps{
+        h3{
+            font-size: 14px;
+        }
+    }
+    .finishWarning{
+        margin-top: 50px;
+        .bankRuptBtn{
+            width: 100px;
+        }
+    }
+   
+}
+
+.okBtn{
+    width: 150px;
+    &Cards{
+        width: 150px;
     }
 }

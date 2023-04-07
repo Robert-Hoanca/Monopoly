@@ -17,11 +17,10 @@ export class MessageDialogComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
 
   ngOnInit(): void {
-    
+
   }
 
   ngAfterViewInit(){
-   // console.log("MessageDialogData: ", this.data)
   }
 
   executeAndClose(){
@@ -60,7 +59,7 @@ export class MessageDialogComponent implements OnInit {
       case 'communityChest':
         this.calculateChestChance(this.data.textData);
         break;
-       case 'goingToPrison':
+      case 'goingToPrison':
         this.gameService.goToPrison();
         break;
       case 'exitFromPrison':
@@ -83,7 +82,7 @@ export class MessageDialogComponent implements OnInit {
         this.gameService.players.find(player => player.id == this.data.textData.player.id).money = 0;
         this.gameService.gameTable.cards.filter((card: { id: any; }) => card.id == this.data.textData.player.id).forEach((prop:any) => {
           prop.owner = this.data.textData.playerToPay;
-          this.gameService.checkCompletedSeries(prop,this.data.textData.playerToPay)
+          this.gameService.checkCompletedSeries([prop])
         });
         this.gameService.checkIfSomeoneWon();
         break;
@@ -101,7 +100,13 @@ export class MessageDialogComponent implements OnInit {
         if(data.cardIndex != undefined && data.cardIndex != null){
           this.gameService.getCardPosition(data.cardIndex)
         }else if(data.count != undefined && data.count != null){
-          this.gameService.getCardPosition((this.gameService.players[this.gameService.turn].actualCard + (data.count)));
+          let cardIndex = 0;
+          if(this.gameService.players[this.gameService.turn].actualCard + data.count < 0){
+            cardIndex = 40 + (this.gameService.players[this.gameService.turn].actualCard + data.count)
+          }else{
+            cardIndex = (this.gameService.players[this.gameService.turn].actualCard + (data.count));
+          }
+          this.gameService.getCardPosition(cardIndex);
         }
         break;
       case 'movenearest': //Maybe add multiply option in future
@@ -156,33 +161,42 @@ export class MessageDialogComponent implements OnInit {
         }       
         break;
       case 'removefundstoplayers':
-        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach((otherPlayer: { money: any; }) => {
-         
-          if(this.gameService.players[this.gameService.turn].money >= data.amount){
-            this.gameService.addingRemovingMoney('remove',data.amount, 1000)
-          }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], data.amount)){
-            this.gameService.calculateAmountDebt(data.amount);
+        let removefundstoplayersAmount = 0;
+        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach(otherPlayer => {
+          if(this.gameService.players[this.gameService.turn].money >= removefundstoplayersAmount){
+            removefundstoplayersAmount += 50;
+            this.gameService.addingRemovingMoney('add',data.amount,1000,otherPlayer)
+          }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], removefundstoplayersAmount)){
+            this.gameService.calculateAmountDebt(removefundstoplayersAmount, otherPlayer.id)
           }
-          this.gameService.addingRemovingMoney('add',data.amount, 1000, otherPlayer)
-          
         });
+        setTimeout(() => {
+          this.gameService.addingRemovingMoney('remove',removefundstoplayersAmount, 1000)
+        }, 1000);
+
         break;
       case 'addfundsfromplayers':
-        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach((otherPlayer:any ) => {
+        let addfundsfromplayersAmount = 0;
+        (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach(otherPlayer => {
           if(otherPlayer.money >= data.amount){
-            this.gameService.addingRemovingMoney('remove',data.amount,otherPlayer)
-            this.gameService.addingRemovingMoney('add', data.amount, 1000)
+            addfundsfromplayersAmount += 50;
+            this.gameService.addingRemovingMoney('remove',data.amount,1000,otherPlayer)
           }else if(!this.gameService.checkBankrupt(otherPlayer, data.amount)){
-            this.gameService.calculateAmountDebt(data.amount)
+            this.gameService.calculateAmountDebt(data.amount, otherPlayer.id)
           }
         });
+        setTimeout(() => {
+          this.gameService.addingRemovingMoney('add',addfundsfromplayersAmount, 1000)
+        }, 1000);
+
+
         break;
     }
   }
 
   closeDialog(){
     this.movedNearest = false;
-    this.dialogRef.close();
+    this.gameService.closeDialog(this.dialogRef);
   }
 
   getPlayerWhoWin(){

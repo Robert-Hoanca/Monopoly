@@ -19,24 +19,14 @@ export class CardComponent implements OnInit {
   @Input() card!: any;
   @Input() cardIndex!: any;
   @Input() scene!: any;
-
   url:string='';
-
   position: [x: number, y: number, z: number] = [0, 0, 0];
   rotation: [x: number, y: number, z: number] = [0, 0, 0];
   carpetPosistion: [x: number, y: number, z: number] = [0, 0, 0];
-  
-  meshColor:string='#ffff00';
   getCardPosition$: Subscription | undefined;
-  castedShadow:boolean=false;
-  fontLoader = new FontLoader();
   @ViewChild('cardRef', { static: true }) cardRef:any;
   @ViewChild('cardOutlineRef', { static: true }) cardOutlineRef:any;
   @ViewChild('carpetRef', { static: true }) carpetRef:any;
-  //@ViewChild('decorationRef', { static: true }) decorationRef:any;
-
-  
-  
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
@@ -45,7 +35,7 @@ export class CardComponent implements OnInit {
     this.setCarpetPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
       if(diceNumber == this.cardIndex){
-        this.gameService.setPlayerPosition(this.position, diceNumber);
+        this.gameService.setPlayerPosition([this.cardRef._objRef.position.x, this.cardRef._objRef.position.y, this.cardRef._objRef.position.z], diceNumber);
       }
     });
   }
@@ -73,34 +63,6 @@ export class CardComponent implements OnInit {
       this.rotation = [0,(Math.PI / 2),0];
     }
     this.gameService.cardsPositionCounter += 2.2;
-  }
-
-  loadText(){
-    let that=this;
-    this.fontLoader.load( 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond&family=Spline+Sans:wght@400;700&display=swap', function (  this: any ,font: any) {
-
-      const geometry = new TextGeometry( 'Hello three.js!', {
-        font: font,
-        size: 80,
-        height: 5,
-        curveSegments: 12,
-        bevelEnabled: true,
-        bevelThickness: 10,
-        bevelSize: 8,
-        bevelOffset: 0,
-        bevelSegments: 5
-      } );
-      geometry.computeBoundingBox();
-      const material = new THREE.MeshBasicMaterial();
-      
-      const cube = new THREE.Mesh( geometry, material );
-      cube.position.x = 0;
-      cube.position.y = 5;
-      cube.position.z = 0;
-      this.scene.objRef.children.push(cube)
-    } );
-
-
   }
 
   setCarpetPosition(){
@@ -137,7 +99,7 @@ export class CardComponent implements OnInit {
         url = '/assets/blenderModels/card/definitiveCard/communityChest.gltf'
         break;
       case 'goToPrison':
-        url = '/assets/blenderModels/card/definitiveCard/policeStation.gltf'
+        url = '/assets/blenderModels/card/definitiveCard/police.gltf'
         break;
       case 'taxes':
         url = '/assets/blenderModels/card/definitiveCard/taxes.gltf'
@@ -163,9 +125,5 @@ export class CardComponent implements OnInit {
    
   }
   hoverCard(type:string){
-  }
-
-  test(){
-    console.log(this.cardRef._objRef.position, this.cardRef)
   }
 }

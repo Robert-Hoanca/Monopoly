@@ -1,4 +1,4 @@
-<div fxLayout="row" class="propertiesContainer">
+<div fxLayout="row" class="propertiesContainer" *ngIf="getPlayerProps().length">
     <mat-card class="property" *ngFor="let property of getPlayerProps()" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="selectProperty(property)">
         <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(property.district)}"></span>
         <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center" >check</mat-icon></span>
