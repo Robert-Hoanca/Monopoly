@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { GamePhysicsService } from 'src/app/game-physics.service';
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three'
+import gsap from 'gsap'
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
@@ -89,6 +90,9 @@ export class GameComponent implements OnInit {
     },
     antialias: true,
   }
+  width:number = 0;
+  height:number = 0;
+  cameraZoom:number = 1;
 
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
 
@@ -96,15 +100,18 @@ export class GameComponent implements OnInit {
     this.gameService.addingRemovingMoneyProps();
   }
   ngAfterViewInit(){
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
     this.gameService.camera = this.camera;
     this.gameService.cameraControls = this.cameraControls;
-    this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
+    let evt =  new WheelEvent("wheel", {deltaY:1})
+    document.querySelector("canvas")?.dispatchEvent(evt)
+    //this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.activateLocalSave();
     this.gameService.gameScene = this.scene._objRef;
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
   }
-
   activateLocalSave(){
     setInterval(() => {
       this.gameService.localSave.gameTable = this.gameService.gameTable;
@@ -133,7 +140,12 @@ export class GameComponent implements OnInit {
   }
 
   resizeCanvas(event:any){
-
+    if(this.camera._objRef != undefined && this.camera._objRef.zoom != this.cameraZoom){
+      this.camera._objRef.zoom = this.cameraZoom;
+      let evt =  new WheelEvent("wheel", {deltaY : this.cameraZoom})
+      document.querySelector("canvas")?.dispatchEvent(evt)
+    }
+    this.gameService.aspect = event.width / event.height;
   }
 
   onBeforeRender(element:any){
@@ -156,22 +168,23 @@ export class GameComponent implements OnInit {
    
   }
   changeCardColor(){
-    let color = new THREE.Color( this.gameService.sessionColor )
     this.scene.objRef.children.forEach((child:any) => {
       if( child.name.includes('cardNumber') && this.cardChangedCounter < this.gameService.gameTable.cards.length){
         child.traverse((child:any) => {
           if(child.isMesh ){
-            const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -20)});
+            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -20)});
+            const material = new THREE.MeshBasicMaterial({color: this.gameService.sessionTheme.cardColor});
             child.material = material
-            this.cardChangedCounter++;
+            //this.cardChangedCounter++;
           }
         })
       }else if( child.name.includes('cardOutline') && this.cardOutlineChangedCounter < this.gameService.gameTable.cards.length){
         child.traverse((child:any) => {
           if(child.isMesh ){
-            const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -40), side: THREE.BackSide});
+            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionTheme.cardColor, -30), side: THREE.BackSide});
+            const material = new THREE.MeshBasicMaterial({color: this.gameService.sessionTheme.cardBorder, side: THREE.BackSide});
             child.material = material
-            this.cardOutlineChangedCounter++;
+            //this.cardOutlineChangedCounter++;
           }
         })
       }
@@ -180,7 +193,7 @@ export class GameComponent implements OnInit {
 
   async rollTheDice(){
     //setcamera position on the corner opposite the start
-    await this.gameService.setCameraPosition(this.gameService.camera, 25,15,25,1000,5, false,'diceRoll')
+    //await this.gameService.setCameraPosition(this.gameService.camera, 25,15,25,1000,5, false,'diceRoll')
 
     if(this.gameService.startToDice){
       this.gameService.startToDice = false;

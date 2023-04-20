@@ -43,6 +43,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
 import { PlayerPropertiesComponent } from './shared/player-properties/player-properties.component';
 import { DiceComponent } from './shared/dice/dice.component';
+import { DecorationItemComponent } from './shared/decoration-item/decoration-item.component';
+import { RandomNumPipePipe } from './pipes/random-num-pipe.pipe';
+import { WaterWaveItemComponent } from './shared/decorations/water-wave-item/water-wave-item.component';
+import { CloudItemComponent } from './shared/decorations/cloud-item/cloud-item.component';
 
 @NgModule({
   declarations: [
@@ -61,6 +65,10 @@ import { DiceComponent } from './shared/dice/dice.component';
     MessageDialogComponent,
     PlayerPropertiesComponent,
     DiceComponent,
+    DecorationItemComponent,
+    RandomNumPipePipe,
+    WaterWaveItemComponent,
+    CloudItemComponent,
   ],
   imports: [
     BrowserModule,

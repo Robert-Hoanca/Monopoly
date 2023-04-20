@@ -119,7 +119,7 @@ export class ExchangeComponent implements OnInit {
     this.actualExpanded = this.actualExpanded == playerId ? '' : playerId;
   }
   ngOnDestroy(){
-    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerToExchangeWith)).forEach(property => {
+    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerToExchangeWith.id)).forEach(property => {
       if(property.exchangeSelected){
         property.exchangeSelected = false;
       }
@@ -130,7 +130,6 @@ export class ExchangeComponent implements OnInit {
       }
     });;
   }
-
   checkIfCanExchange(){
     if(this.moneyToExchange[0] > 0 || this.moneyToExchange[1] > 0 || this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length || this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
       return false;

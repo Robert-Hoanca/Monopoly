@@ -1,24 +1,41 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
-
-    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="true" [rendererParameters]="rendererOptions" [ngStyle]="{background : 'radial-gradient(' + gameService.sessionColor + ',' +  gameService.LightenDarkenColor(this.gameService.sessionColor, -60)+ ')'}" (onRender)="changeCardColor(); gamePhysicsService.renderPhysicsWorld()">
+    <!-- {background : 'radial-gradient(' + gameService.sessionColor + ',' +  gameService.LightenDarkenColor(this.gameService.sessionColor, -60)+ ')'} -->
+    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="false" [rendererParameters]="rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="changeCardColor(); gamePhysicsService.renderPhysicsWorld()">
         <th-scene [autoUpdate]="true" #scene>
             
-            <th-ambientLight #ambientLight [intensity]="1"></th-ambientLight>
-            <th-hemisphereLight></th-hemisphereLight>
-
+            <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
+            <th-hemisphereLight [castShadow]="false"></th-hemisphereLight>
             <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
 
             <app-dice *ngIf="gameService.startToDice"></app-dice>
             <app-dice *ngIf="gameService.startToDice"></app-dice>
 
-            <th-perspectiveCamera
+            <!-- <th-perspectiveCamera
                 [args]="[100, 2, 0.1, 1000]"
                 [position]="gameService.cameraPosition"
                 #camera
             >
                 <th-mapControls #cameraControls [enabled]="!gameService.movingCamera && gameService.choosenMode == 'local'"></th-mapControls>
-            </th-perspectiveCamera>
+            </th-perspectiveCamera> -->
+
+
+            <th-orthographicCamera
+                [left]="-gameService.distance * this.gameService.aspect"
+                [right]="(gameService.distance * this.gameService.aspect)"
+                [top]="gameService.distance"
+                [bottom]="-gameService.distance"
+                [near]="-1000"
+                [far]="2000"
+                [position]="[-10,10,-10]"
+                [zoom]="cameraZoom"
+                #camera
+                
+            >
+                <th-mapControls #cameraControls [enabled]="true" [target]="[8,0,8]"></th-mapControls>
+            </th-orthographicCamera>
+
+            <app-decoration-item [decorationType]="['water_wave']"></app-decoration-item>
         </th-scene>
       </th-canvas>
       
@@ -40,10 +57,8 @@
         <button mat-raised-button id="openExchange" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Exchange"><mat-icon>currency_exchange</mat-icon></button>
         <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.players[gameService.turn].canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Next Turn"><mat-icon>skip_next</mat-icon></button>
         <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="rollTheDice()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera" (click)="whatToDoInPrison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>  
-        <!-- <button mat-raised-button (click)="gameService.test(37)">test</button>
-        <button mat-raised-button (click)="gameService.test()">Rotate</button> -->
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" (click)="whatToDoInPrison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" [matTooltipPosition]="'above'" matTooltip="Use free card and exit">free get out</button>  
     </div>
 
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
@@ -51,6 +66,8 @@
         <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
         <button mat-raised-button disabled="true">Options</button>
         <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
+
+        <!-- <button mat-raised-button id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button> -->
     </div>
 
     <!--
@@ -88,4 +105,34 @@
             </div>
         </div>
     </ng-template>
+
+
+    <div id="debugger" *ngIf="gameService.debugMode">
+
+        <div class="theme" fxLayout="column">
+            <span class="title">Theme Colors</span>
+            <mat-form-field>
+                <mat-label>Background</mat-label>
+                <div class="colorContainer" fxLayoutAlign="start center">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.background">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.background">
+                </div>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Card Color</mat-label>
+                <div class="colorContainer" fxLayoutAlign="start center">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardColor">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="changeCardColor()">
+                </div>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Card Border</mat-label>
+                <div class="colorContainer" fxLayoutAlign="start center" fxLayoutAlign="start center">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardBorder">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardBorder">
+                </div>
+            </mat-form-field>
+        </div>
+
+    </div>
 </div>

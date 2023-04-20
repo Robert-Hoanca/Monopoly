@@ -47,10 +47,14 @@ export class GameService {
   gamePaused:boolean=false;
   userDevice:string='';
   gameScene:any;
+
+  //Game Colors
   bgColors = [];
   sessionColor:string= '';
+  sessionTheme:any;
   players: Array<any> = [];
   ambientLightColor:string='#ff8326'
+  themes: any;
 
   choosenMode:string = '';
   db = getFirestore();
@@ -58,6 +62,8 @@ export class GameService {
 
   //Camera
   camera:any;
+  aspect = window.innerWidth / window.innerHeight;
+  distance:number = 15;
   cameraControls:any;
   cameraPosition: Vector3 | any;
   movingCamera:boolean= false;
@@ -104,6 +110,8 @@ export class GameService {
 
   setted:boolean=false;
 
+
+  debugMode:boolean = false;
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
@@ -121,6 +129,15 @@ export class GameService {
     if(colors){
       this.bgColors = colors['colors'];
     }
+
+
+    //Themes
+    const getThemes = doc(this.db, "colors", 'themes');
+    const themes = await (await getDoc(getThemes)).data();
+    if(themes){
+      this.themes = themes['themes'];
+    }
+    //this.setThemesDb()
 
     //PlayerModel
     const playersModelRef = doc(this.db, "playerModel", 'playerModel');
@@ -152,7 +169,9 @@ export class GameService {
   }
 
   chooseSessionColor(){
-    this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
+    //this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
+    this.sessionTheme = this.themes[Math.floor(Math.random()* this.themes.length)];
+    this.sessionColor = this.sessionTheme.background;
   }
   LightenDarkenColor(col:string,amt:number) {
     //Return a lighten / darken color based on the given color
@@ -254,48 +273,36 @@ export class GameService {
   }
 
   async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string) : Promise<any>{
-    //Move the game camere to a given position
-    let xOffset = offset;
-    let zOffset = offset;
-    //If the camera should follow the player then calculate the offset of the camera
-    if(xOffset != undefined && zOffset != undefined && playerMoving != undefined){
-      if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20){
-        xOffset+=0;
-      }else if(30 < this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 39){
-        xOffset-=10;
-      }
-      if(20 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 30){
-        zOffset+=0;
-      }else if(0 <= this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 10){
-        zOffset-=10;
-      }
-    }
+
     //If the camera should follow the player then, based on given axis, move the camera on that axis to the given position. Otherwise move the entire camera position at a time to that position
    if(playerMoving){
     if(axis){
-       if(axis == 'x'){
-        gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: 1000/1000});
-        gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: 1000/1000});
+      if(axis == 'x'){
+        camera._objRef.position.set(0, 10 , -15)
+        /*gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: (-10) + 10, duration: 1000/1000});
+        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: (-10) -10, duration: 1000/1000});*/
        }else if(axis == 'z'){
-        gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: 1000/1000});
-        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: 1000/1000});
+        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: z, duration: 1000/1000});
        }
     }
    }else if(!playerMoving){
-    
+   /* console.log("xOffset", xOffset)
     this.movingCamera = true;
     gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: axis == 'diceRoll' ? x : (xOffset ? (x + xOffset) : x), duration: duration/1000});
     gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: axis == 'diceRoll' ? y : (offset ? (y + (offset/2)) : y), duration: duration/1000});
     gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: axis == 'diceRoll' ? z : (zOffset ? (z + zOffset) : z), duration: duration/1000});
+
+    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: axis == 'diceRoll' ? x : x, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: axis == 'diceRoll' ? y : y, duration: duration/1000});
+    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: axis == 'diceRoll' ? z : z, duration: duration/1000});
     setTimeout(() => {
       this.movingCamera = false;
-     }, duration);
+     }, duration);*/
    }
    //Make the camera look at a target
-   gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: axis == 'diceRoll' ? 0: x, duration: 1000/1000});
+  /* gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: axis == 'diceRoll' ? 0: x, duration: 1000/1000});
    gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: axis == 'diceRoll' ? 0: y, duration: 1000/1000});
-   gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: axis == 'diceRoll' ? 0: z, duration: 1000/1000});
-
+   gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: axis == 'diceRoll' ? 0: z, duration: 1000/1000});*/
   }
 
   getCardPosition(cardIndex:any){
@@ -365,7 +372,7 @@ export class GameService {
       this.randomChance = undefined;
       this.randomChance = undefined;
     }
-    this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
+    //this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
   }
   
   //OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
@@ -1210,5 +1217,235 @@ export class GameService {
 
 
     await setDoc(doc(this.db, "gameTables", "monopolyMap"), {cards: cardsData, chance: chance,communitychest: communitychest});
+  }
+
+
+  async setThemesDb(){
+    const themes = [
+      {
+        background : '#FFF1AA',
+        cardColor :'#006771',
+        cardBorder :'#000000',
+    },
+    {
+        background :'#F9F9F9',
+        cardColor :'#FF677A',
+        cardBorder :'#000000',
+    },
+    {
+        background :'#D3FAF8',
+        cardColor :'#ACAF51',
+        cardBorder :'#000000',
+    },
+    {
+        background :'#E2E5CD',
+        cardColor :'#008A98',
+        cardBorder :'#000000',
+    },
+    {
+        background :'#bbaa91',
+        cardColor :'#d1463f',
+        cardBorder :'#000000',
+    },
+    {
+          background :'#f79d34',
+          cardColor :'#bbccc5',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#bbaa91',
+          cardColor :'#3d466c',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#bbaa91',
+          cardColor :'#643535',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#bbaa91',
+          cardColor :'#35645f',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#3d466c',
+          cardColor :'#bbaa91',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#643535',
+          cardColor :'#35645f',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#DD7596',
+          cardColor :'#B7C3F3',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#404E5C',
+          cardColor :'#B7C3F3',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#404E5C',
+          cardColor :'#4F6272',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#F0EBD8',
+          cardColor :'#4F6272',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#F0EBD8',
+          cardColor :'#B191FF',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#2F2F2F',
+          cardColor :'#90A955',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#D2F898',
+          cardColor :'#90A955',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#132A13',
+          cardColor :'#31572C',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#DAD2D8',
+          cardColor :'#143642',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#0F8B8D',
+          cardColor :'#143642',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#0F8B8D',
+          cardColor :'#DAD2D8',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#A8201A',
+          cardColor :'#143642',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#A8201A',
+          cardColor :'#DAD2D8',
+          cardBorder :'#000000',
+    },
+    {
+          background :'#8693AB',
+          cardColor :'#637074',
+          cardBorder :'#000000',
+    },
+    {
+      background :'#637074',
+      cardColor :'#8693AB',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#D6D5B3',
+      cardColor :'#589051',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#B6C649',
+      cardColor :'#D16666',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#B6C649',
+      cardColor :'#D16666',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#854D27',
+      cardColor :'#2C4251',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#854D27',
+      cardColor :'#DD7230',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#854D27',
+      cardColor :'#F4C95D',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#2E1F27',
+      cardColor :'#DD7230',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#2E1F27',
+      cardColor :'#E7E393',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#2E1F27',
+      cardColor :'#854D27',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#2E1F27',
+      cardColor :'#8B687F',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#8B687F',
+      cardColor :'#9FA0C3',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#8B687F',
+      cardColor :'#7B435B',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#7B435B',
+      cardColor :'#9FA0C3',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#7B435B',
+      cardColor :'#8B687F',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#f79d34',
+      cardColor :'#bbccc5',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#2B2D42',
+      cardColor :'#8D99AE',
+      cardBorder :'#000000',
+    },
+    {
+      background :'#92AA83',
+      cardColor :'#B0BEA9',
+      cardBorder :'#000000',
+    }
+
+  ]
+
+  // {
+  //   background :'#',
+  //   cardColor :'#',
+  //   cardBorder :'#000000',
+  // }
+
+  setDoc(doc(this.db, "colors", "themes"), {themes});
   }
 }

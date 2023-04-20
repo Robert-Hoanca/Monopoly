@@ -157,7 +157,7 @@ export class PlayerComponent implements OnInit {
 
       let xIndex = 0;
       for ((counterOfCards > 0 ? xIndex = 1 : xIndex = -1); (counterOfCards > 0 ? xIndex <= Math.round(counterOfCards) : xIndex >= Math.round(counterOfCards)) ;(counterOfCards > 0 ? xIndex++ : xIndex--)) {
-        this.gameService.setCameraPosition(this.gameService.camera, playerPos +  parseFloat(( xIndex * 2.2).toFixed(1)), position[1], position[2],800,5, true, 'x');
+        //this.gameService.setCameraPosition(this.gameService.camera, playerPos +  parseFloat(( xIndex * 2.2).toFixed(1)), position[1], position[2],800,5, true, 'x');
         let shouldJump : boolean = false;
         let anotherPlayerOffset:number = 0;
         if(xIndex === Math.round(counterOfCards) || xIndex === 1 || xIndex === -1){
@@ -204,7 +204,7 @@ export class PlayerComponent implements OnInit {
       let counterOfCards = Math.round(Math.round(position[2]) != 22 ? (parseFloat(position[2].toFixed(1)) / 2.2) - (playerPos / 2.2) : (22 / 2.2) - (playerPos / 2.2));
       let zIndex = 0;
       for ((counterOfCards > 0 ? zIndex = 1 : zIndex = -1); (counterOfCards > 0 ? zIndex <= Math.round(counterOfCards) : zIndex >= Math.round(counterOfCards)) ;(counterOfCards > 0 ? zIndex++ : zIndex--)) {
-        this.gameService.setCameraPosition(this.gameService.camera, position[0] , position[1], playerPos +  parseFloat(( zIndex * 2.2).toFixed(1)),800,5, true, 'z');
+        //this.gameService.setCameraPosition(this.gameService.camera, position[0] , position[1], playerPos +  parseFloat(( zIndex * 2.2).toFixed(1)),800,5, true, 'z');
         let shouldJump : boolean = false;
         let anotherPlayerOffset:number = 0;
         if(zIndex === Math.round(counterOfCards) || zIndex === 1 || zIndex === -1){

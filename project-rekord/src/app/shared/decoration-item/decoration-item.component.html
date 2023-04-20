@@ -1,0 +1,7 @@
+<div *ngIf="decorationIsIncluded('water_wave')">
+    <app-water-wave-item *ngFor="let item of [].constructor(randomWavesNum)" ></app-water-wave-item>
+</div>
+
+<div *ngIf="decorationIsIncluded('cloud')">
+    <app-cloud-item *ngFor="let item of [].constructor(randomCloudsNum)"></app-cloud-item>
+</div>

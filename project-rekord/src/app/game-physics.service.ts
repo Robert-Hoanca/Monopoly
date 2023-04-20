@@ -173,7 +173,7 @@ export class GamePhysicsService {
       this.openShowDiceResDialog(this.diceRes);
       setTimeout(async () => {
         this.dialog.closeAll()
-        await this.gameService.setCameraPosition(this.gameService.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2],1000,5, false)
+        //await this.gameService.setCameraPosition(this.gameService.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2],1000,5, false)
         setTimeout(() => {
           if(!this.gameService.players[this.gameService.turn].prison.inPrison){
             if(this.diceRes[0]==this.diceRes[1]){
@@ -206,7 +206,7 @@ export class GamePhysicsService {
           this.dicesRolling = false
           this.gameService.diceRes = this.diceRes;
           this.diceRes = [];
-        }, 1100);
+        }, 100);
       }, 2000);
     }
   }

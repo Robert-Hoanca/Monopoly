@@ -30,7 +30,7 @@ export class CardComponent implements OnInit {
   constructor( public gameService: GameService,private service: GLTFLoaderService ) { }
 
   async ngOnInit() {
-    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/definitiveCard/card.gltf':'/assets/blenderModels/card/definitiveCard/card.gltf';
+    this.url= (this.cardIndex/10) % 1 == 0 ? '/assets/blenderModels/card/definitiveCard/card2.gltf':'/assets/blenderModels/card/definitiveCard/card2.gltf';
     this.setCardPosition();
     this.setCarpetPosition();
     this.getCardPosition$ = this.gameService.getCardPosition$.subscribe((diceNumber:any) =>{
