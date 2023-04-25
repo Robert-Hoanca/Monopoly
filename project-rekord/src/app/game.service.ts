@@ -41,6 +41,7 @@ export class GameService {
     playerWhoWonId : '',
     localId: '',
   };
+  loading:boolean = false;
   localSaves:any = {};
   allLocalSaves:Array<any> = [];
   localSaveName:string = '';
@@ -68,6 +69,7 @@ export class GameService {
   cameraPosition: Vector3 | any;
   movingCamera:boolean= false;
   movingPlayer:boolean = false;
+  enableMapControls:boolean = false;
 
   setPlayerToCenter = true;
   beginTime:number = 0;
@@ -170,7 +172,7 @@ export class GameService {
 
   chooseSessionColor(){
     //this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
-    this.sessionTheme = this.themes[Math.floor(Math.random()* this.themes.length)];
+    this.sessionTheme = this.themes[Math.floor(Math.random() * this.themes.length)];
     this.sessionColor = this.sessionTheme.background;
   }
   LightenDarkenColor(col:string,amt:number) {
@@ -207,7 +209,9 @@ export class GameService {
   goBackHome(){
     location.reload();
   }
-
+  switchRouter(url:string){
+    this.router.navigateByUrl(url, { skipLocationChange: true });
+  }
 
   retrieveSavesFromLocal(){
     let localStorageAllSaves = [];
@@ -316,15 +320,13 @@ export class GameService {
   }
 
   async startGame(){
+    this.loading = true;
     if(this.localSaves == 'new'){
       this.beginTime = Date.now();
       const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
       this.gameTable  = (await getDoc(gameTableRef)).data();
       this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
       this.players[this.turn].canDice = true;
-      setTimeout(() => {
-        this.textDialog({text: this.players[this.turn].name + ' begins the game!'}, 'playerWhoBegins')
-      }, 1500);
     }else{
       this.gameTable = this.localSaves.gameTable;
       this.players = this.localSaves.players;
@@ -343,7 +345,7 @@ export class GameService {
         this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!'}, 'finishGame')
       }
     }
-    this.router.navigateByUrl('game', { skipLocationChange: true });
+    this.switchRouter('game');
   }
 
   nextTurn(){
@@ -830,6 +832,15 @@ export class GameService {
         (playerId? this.players.find(player => player.id == playerId) : this.players[this.turn]).money = 0;
       }
     }
+  }
+
+  getContrastColor(bgColor:string) {
+    var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+    var r = parseInt(color.substring(0, 2), 16); // hexToR
+    var g = parseInt(color.substring(2, 4), 16); // hexToG
+    var b = parseInt(color.substring(4, 6), 16); // hexToB
+    return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ?
+    '#000' : '#fff';
   }
 
   test(number?:number){

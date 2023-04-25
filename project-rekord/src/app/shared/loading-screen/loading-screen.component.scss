@@ -1,0 +1,35 @@
+.loading{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+
+    &__container{
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        &__title{
+            text-transform: uppercase;
+            font-size: 24px;
+            font-family: mova;
+            
+        }
+    
+        &__progression-bar{
+            width: 50%;
+            height: 10px;
+            background-color: #fff;
+            margin-top: 20px;
+            border: 1px solid #000;
+            &__inner{
+                height: 10px;
+                width: 100%;
+            }
+        }
+    }
+
+    
+}

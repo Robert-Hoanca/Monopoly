@@ -1,7 +1,11 @@
 <div *ngIf="decorationIsIncluded('water_wave')">
-    <app-water-wave-item *ngFor="let item of [].constructor(randomWavesNum)" ></app-water-wave-item>
+    <app-water-wave-item *ngFor="let item of [].constructor(randomWavesNum)"></app-water-wave-item>
 </div>
 
 <div *ngIf="decorationIsIncluded('cloud')">
-    <app-cloud-item *ngFor="let item of [].constructor(randomCloudsNum)"></app-cloud-item>
+    <app-cloud-item *ngFor="let item of [].constructor(randomCloudsNum)" (recalculateRandomNum)="recalculateRandomNums('cloud')"></app-cloud-item>
+</div>
+
+<div *ngIf="decorationIsIncluded('boat')">
+    <app-boat-item *ngFor="let item of [].constructor(randomBoatNum)" (recalculateRandomNum)="recalculateRandomNums('boat')"></app-boat-item>
 </div>

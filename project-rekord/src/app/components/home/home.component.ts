@@ -29,7 +29,10 @@ export class HomeComponent implements OnInit {
   }
 
   goToChooseModeView(){
-    this.router.navigateByUrl('mode', { skipLocationChange: true });
+    this.gameService.switchRouter('mode')
   }
 
+  returnSessionColor(){
+    return this.gameService.sessionTheme && this.gameService.sessionTheme.background ? this.gameService.sessionTheme.background : '#fff';
+  }
 }

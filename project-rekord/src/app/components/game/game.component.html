@@ -1,4 +1,4 @@
-<div id="gameContainer" fxLayout="column" fxLayoutAlign="center center">
+<div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '']">
     <!-- {background : 'radial-gradient(' + gameService.sessionColor + ',' +  gameService.LightenDarkenColor(this.gameService.sessionColor, -60)+ ')'} -->
     <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="false" [rendererParameters]="rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="changeCardColor(); gamePhysicsService.renderPhysicsWorld()">
         <th-scene [autoUpdate]="true" #scene>
@@ -32,10 +32,10 @@
                 #camera
                 
             >
-                <th-mapControls #cameraControls [enabled]="true" [target]="[8,0,8]"></th-mapControls>
+                <th-mapControls #cameraControls [enabled]="gameService.enableMapControls" [target]="[8,0,8]"></th-mapControls>
             </th-orthographicCamera>
 
-            <app-decoration-item [decorationType]="['water_wave']"></app-decoration-item>
+            <app-decoration-item [decorationType]="['water_wave', 'boat']"></app-decoration-item>
         </th-scene>
       </th-canvas>
       
@@ -62,13 +62,6 @@
     </div>
 
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
-    <div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
-        <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
-        <button mat-raised-button disabled="true">Options</button>
-        <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
-
-        <!-- <button mat-raised-button id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button> -->
-    </div>
 
     <!--
         DELETE
@@ -135,4 +128,12 @@
         </div>
 
     </div>
+</div>
+
+<div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
+    <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
+    <button mat-raised-button disabled="true">Options</button>
+    <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
+
+    <!-- <button mat-raised-button id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button> -->
 </div>

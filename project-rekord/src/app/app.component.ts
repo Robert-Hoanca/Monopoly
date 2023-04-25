@@ -12,8 +12,11 @@ export class AppComponent {
   constructor(public router: Router,public gameService: GameService){}
 
   async ngOnInit(){
-    this.router.navigateByUrl('home', { skipLocationChange: true })
     await this.gameService.retrieveDBData();
     this.gameService.chooseSessionColor();
+    this.gameService.loading = true;
+    setTimeout(() => {
+    this.gameService.switchRouter('home')
+    }, 1500);
   }
 }

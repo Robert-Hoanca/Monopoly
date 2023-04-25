@@ -23,6 +23,15 @@
         text-align: center;
         pointer-events: none;
     }
+    .sideButtons{
+        position: absolute;
+        right: 20px;
+        bottom: 50px;
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        flex-direction: column;
+    }
 }
 
 @media screen and (min-width: 600px) {

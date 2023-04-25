@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import gsap from 'gsap'
 
 @Component({
@@ -8,15 +8,16 @@ import gsap from 'gsap'
 })
 export class CloudItemComponent implements OnInit {
   @ViewChild('cloudRef', { static: true }) cloudRef:any;
+  @Output() recalculateRandomNum: EventEmitter<any> = new EventEmitter();
   //Cloud
   randomCloudWidthX: number = (Math.random() * (5 - 1 + 1)) + 1;
   randomCloudWidthZ: number = (Math.random() * (5 - 1 + 1)) + 1;
   randomCloudHeigthY: number = (Math.random() * (0.5 - 0.2)) + 1;
 
-  randomStartingPointX: number = (Math.round(Math.random()) ? 1 : -1) * (Math.random() * (50 + (0) + 1)) + 1;
-  randomStartingPointZ: number =  100 + ((Math.round(Math.random()) ? 1 : -1) * (Math.random() * (50 - 0 + 1)) + 1);
+  randomStartingPointX: number = (Math.round(Math.random()) ? 1 : -1) *  Math.round((Math.random() * 30 )+ 1);
+  randomStartingPointZ: number =  100 + Math.round((Math.random() * 50 )+ 1);
 
-  randomCloudHeightPos: number = (Math.round(Math.random()) ? 1 : -1) * (Math.random() * (20 - (0) + 2)) + 5;
+  randomCloudHeightPos: number = Math.round((Math.random() * 5 ) + 2);
 
   cloudAnimationDuration: number = 20000;
   cloudOpacity:number = 1;
@@ -29,6 +30,7 @@ export class CloudItemComponent implements OnInit {
   ngAfterViewInit(){
     this.moveCloudAnimation(this.cloudRef);
     setInterval(() => {
+      this.recalculateRandomNum.emit();
       this.cloudOpacity = 1;
       this.moveCloudAnimation(this.cloudRef);
     }, (this.cloudAnimationDuration) + 50)
@@ -36,7 +38,7 @@ export class CloudItemComponent implements OnInit {
 
   moveCloudAnimation(elementRef:any){
     this.cloudOpacity = (Math.random() * (1 - 0)) + 0.2;
-    gsap.fromTo(elementRef._objRef.position, {z: 100}, {z: -50, duration:this.cloudAnimationDuration/1000});
+    gsap.fromTo(elementRef._objRef.position, {z: 100}, {z: -70, duration:this.cloudAnimationDuration/1000});
     setTimeout(() => {
       this.cloudOpacity = 0;
       const newXPosition = (Math.round(Math.random()) ? 1 : -1) * (Math.random() * (30 + (0) + 1)) + 1;

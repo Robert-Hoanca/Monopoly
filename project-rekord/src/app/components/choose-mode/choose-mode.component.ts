@@ -85,7 +85,7 @@ export class ChooseModeComponent implements OnInit {
       this.gameService.localSaves = saveFile;
     }else{
       this.gameService.localSaves = saveFile;
-      this.gameService.startGame()
+      this.gameService.startGame();
     }
   }
 

@@ -47,6 +47,10 @@ import { DecorationItemComponent } from './shared/decoration-item/decoration-ite
 import { RandomNumPipePipe } from './pipes/random-num-pipe.pipe';
 import { WaterWaveItemComponent } from './shared/decorations/water-wave-item/water-wave-item.component';
 import { CloudItemComponent } from './shared/decorations/cloud-item/cloud-item.component';
+import { BoatItemComponent } from './shared/decorations/boat-item/boat-item.component';
+import { LoadingScreenComponent } from './shared/loading-screen/loading-screen.component';
+import { ThemeEditorComponent } from './components/theme-editor/theme-editor.component';
+import { GameTableEditorComponent } from './components/game-table-editor/game-table-editor.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +73,10 @@ import { CloudItemComponent } from './shared/decorations/cloud-item/cloud-item.c
     RandomNumPipePipe,
     WaterWaveItemComponent,
     CloudItemComponent,
+    BoatItemComponent,
+    LoadingScreenComponent,
+    ThemeEditorComponent,
+    GameTableEditorComponent,
   ],
   imports: [
     BrowserModule,

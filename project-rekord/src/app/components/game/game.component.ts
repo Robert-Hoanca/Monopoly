@@ -100,15 +100,26 @@ export class GameComponent implements OnInit {
     this.gameService.addingRemovingMoneyProps();
   }
   ngAfterViewInit(){
+    this.gameService.gameScene = this.scene._objRef;
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.gameService.camera = this.camera;
     this.gameService.cameraControls = this.cameraControls;
-    let evt =  new WheelEvent("wheel", {deltaY:1})
-    document.querySelector("canvas")?.dispatchEvent(evt)
+    this.gameService.enableMapControls = true;
+
+    setTimeout(() => {
+      let evt =  new WheelEvent("wheel", {deltaY:10});
+      document.querySelector("canvas")?.dispatchEvent(evt);
+      this.gameService.enableMapControls = false;
+    }, 500);
+
+    if(this.gameService.localSaves == 'new'){
+      setTimeout(() => {
+        this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' begins the game!'}, 'playerWhoBegins')
+      }, 1500);
+    }
     //this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.activateLocalSave();
-    this.gameService.gameScene = this.scene._objRef;
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
   }
@@ -133,7 +144,7 @@ export class GameComponent implements OnInit {
         this.gameService.localSave.localId = this.gameService.localSaves.localId;
       }
       localStorage.setItem(this.gameService.localSaveName, JSON.stringify(this.gameService.localSave));
-    }, 10000);
+    }, 5000);
   }
   getActualPlayerProps(){
     return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.players[this.gameService.turn].id));
@@ -141,9 +152,11 @@ export class GameComponent implements OnInit {
 
   resizeCanvas(event:any){
     if(this.camera._objRef != undefined && this.camera._objRef.zoom != this.cameraZoom){
+      this.gameService.enableMapControls = true;
       this.camera._objRef.zoom = this.cameraZoom;
       let evt =  new WheelEvent("wheel", {deltaY : this.cameraZoom})
-      document.querySelector("canvas")?.dispatchEvent(evt)
+      document.querySelector("canvas")?.dispatchEvent(evt);
+      this.gameService.enableMapControls = false;
     }
     this.gameService.aspect = event.width / event.height;
   }

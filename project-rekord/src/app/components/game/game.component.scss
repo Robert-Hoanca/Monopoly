@@ -1,6 +1,9 @@
 #gameContainer{
     width: 100%;
     height: 100%;
+    &.paused{
+        filter: blur(5px);
+    }
     #gameCanvas{
         width: 100%;
         height: 100%;
@@ -67,23 +70,6 @@
         top: 10px;
         right: 10px;
         z-index: 1;
-    }
-    .pausedGame{
-        width: 100%;
-        height: 100%;
-        background: rgba(218, 217, 217, 0.493);
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 100;
-        button{
-            margin-top: 30px;
-            width: 300px;
-            height: 50px;
-            &#debugButton{
-                background: #fdfd96;
-            }
-        }
     }
 }
 
@@ -158,6 +144,24 @@
                 width: 25px;
                 height: 25px;
             }
+        }
+    }
+}
+
+.pausedGame{
+    width: 100%;
+    height: 100%;
+    background: rgba(218, 217, 217, 0.493);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    button{
+        margin-top: 30px;
+        width: 300px;
+        height: 50px;
+        &#debugButton{
+            background: #fdfd96;
         }
     }
 }

@@ -1,0 +1,32 @@
+<!-- <th-mesh
+    [position]="[randomStartingPointX,0,randomStartingPointZ]"
+    #boatRef
+>
+
+    <th-boxGeometry [args]="[0.8, 0.2 , 1]"></th-boxGeometry>
+
+    <th-meshBasicMaterial [args]="{color: '#ff0000'}"></th-meshBasicMaterial>
+
+</th-mesh> -->
+
+<th-object3D
+    loadGLTF
+    [url]="'../../../../assets/blenderModels/decorations/boat/boat.gltf'"
+    [position]="[randomStartingPointX,0,randomStartingPointZ]"
+    [rotation]="[0,rotationY,0]"
+    [scale]="[randomscale,randomscale,randomscale]"
+    #boatRef
+>
+</th-object3D>
+
+<th-object3D
+    loadGLTF
+    [url]="'../../../../assets/blenderModels/decorations/boat/boat.gltf'"
+    [position]="[randomStartingPointX,0,randomStartingPointZ]"
+    [rotation]="[0,rotationY,0]"
+    [scale]="[randomscale + 0.05,randomscale + 0.05,randomscale + 0.05]"
+    [name]="'boat_outline'"
+    #boatRefOutline
+>
+</th-object3D>
+

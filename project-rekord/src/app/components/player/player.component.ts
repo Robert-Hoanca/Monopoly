@@ -15,7 +15,8 @@ import { parse } from 'path';
 })
 export class PlayerComponent implements OnInit {
   @Input() player:any;
-  @ViewChild('playerRef', { static: true }) playerRef:any;
+  @ViewChild('playerRef', { static: true }) public playerRef:any;
+  @ViewChild('playerRefOutline', { static: true }) playerRefOutline:any;
   playerPosition: Vector3 | any;
   setPlayerPosition$: Subscription | undefined;
   playerHasRotate:boolean = false;
@@ -45,7 +46,12 @@ export class PlayerComponent implements OnInit {
   async ngAfterViewInit(){
     setTimeout(() => {
       this.rotatePlayer(this.player.pawn.rotation[1], false);
+      
     }, 500);
+
+    setTimeout(() => {
+      this.setOutline();
+    }, 1000);
   }
 
   ngOnDestroy(){
@@ -57,7 +63,9 @@ export class PlayerComponent implements OnInit {
     let actualCardPosition = JSON.parse(JSON.stringify(this.gameService.players[this.gameService.turn].actualCard))
     if(noAnimation){
       this.playerRef._objRef.position.x = position[0];
+      this.playerRefOutline._objRef.position.x = position[0]
       this.playerRef._objRef.position.z = position[2];
+      this.playerRefOutline._objRef.position.z = position[2]
     }else{
       if(oldCardPosition != undefined){
 
@@ -163,8 +171,11 @@ export class PlayerComponent implements OnInit {
         if(xIndex === Math.round(counterOfCards) || xIndex === 1 || xIndex === -1){
           anotherPlayerOffset = this.movePlayerFromBeingOverAnother('x', playerPos ,  xIndex, counterOfCards, position);
         }
+        this.player.pawn.position[0] = playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
         await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + anotherPlayerOffset, duration: 0.8, ease: 'ease-out' ,  onUpdate: (currentValue) => {
           //Check if player has reached the start cell and call the function.
+
+          this.playerRefOutline._objRef.position.x = this.playerRef._objRef.position.x;
           if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
@@ -179,9 +190,6 @@ export class PlayerComponent implements OnInit {
             this.playerJump(false);
           }
         }},);
-        
-        this.player.pawn.position[0] = playerPos + parseFloat(( xIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
-        this.player.pawn.position[2] = JSON.parse(JSON.stringify(this.playerRef._objRef.position.z));
       }
     }else if(this.gameTableSides[index] == 'z' && !this.playerArrived){
       let playerPos = parseFloat(JSON.parse(JSON.stringify(this.playerRef._objRef.position.z)).toFixed(1));
@@ -210,7 +218,9 @@ export class PlayerComponent implements OnInit {
         if(zIndex === Math.round(counterOfCards) || zIndex === 1 || zIndex === -1){
           anotherPlayerOffset = this.movePlayerFromBeingOverAnother('z', playerPos , zIndex, counterOfCards, position);
         }
+        this.player.pawn.position[2] = playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
         await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + anotherPlayerOffset, duration: 0.8, ease: 'ease-out' ,  onUpdate: (currentValue) => {
+          this.playerRefOutline._objRef.position.z = this.playerRef._objRef.position.z;
           if ((this.playerRef._objRef.position.x == 0 && this.playerRef._objRef.position.z == 0) && oldCardPosition!=0 && !this.gameService.players[this.gameService.turn].addingMoney && !this.gameService.players[this.gameService.turn].removingMoney) {
             this.gameService.playerPassedStart()
           }
@@ -223,9 +233,6 @@ export class PlayerComponent implements OnInit {
             this.playerJump(false);
           }
         }},);
-        
-        this.player.pawn.position[0] = JSON.parse(JSON.stringify(this.playerRef._objRef.position.x));
-        this.player.pawn.position[2] = playerPos + parseFloat(( zIndex * 2.2).toFixed(1)) + anotherPlayerOffset;
       }
     }else{
     this.gameService.movingCamera = false;
@@ -258,18 +265,21 @@ export class PlayerComponent implements OnInit {
         rotationValue = this.playerRef._objRef.rotation.y + (this.playerIsGoingBack ? (1.57) : (-1.57));
       }
       if(this.playerRef._objRef.rotation.y != rotationValue && this.playerHasRotate){
-        await this.rotatePlayer(rotationValue, true)
         this.player.pawn.rotation = [0, rotationValue ,0];
+        await this.rotatePlayer(rotationValue, true)
       }
     }
   }
 
   async rotatePlayer(value: number, animation:boolean){
     if(animation){
-      await gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: value, duration: 0.5});
+      await gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: value, duration: 0.5, onUpdate : () =>{
+        this.playerRefOutline._objRef.rotation.y = this.playerRef._objRef.rotation.y;
+      }});
     }else{
       //gsap.fromTo(this.playerRef._objRef.rotation, {y: this.playerRef._objRef.rotation.y}, {y: value});
       this.playerRef._objRef.rotation.y = value;
+      this.playerRefOutline._objRef.rotation.y = value;
     }
   }
 
@@ -294,7 +304,9 @@ export class PlayerComponent implements OnInit {
   }
 
   playerJump(shouldJump:boolean){
-    gsap.fromTo(this.playerRef._objRef.position, {y: this.playerRef._objRef.position.y}, {y: shouldJump ? 1 : 0 , ease: 'ease-out'})
+    gsap.fromTo(this.playerRef._objRef.position, {y: this.playerRef._objRef.position.y}, {y: shouldJump ? 1 : 0 , ease: 'ease-out', onUpdate: ()=>{
+      this.playerRefOutline._objRef.position.y = this.playerRef._objRef.position.y;
+    }})
   }
 
   calculatePassedCards(position:Array<number>){
@@ -381,6 +393,7 @@ export class PlayerComponent implements OnInit {
           }
           this.gameService.players[this.gameService.turn].pawn.cardSection = 3;
         }
+        this.player.pawn.position[2] = finalZNum;
         this.movePlayerGsapNormal('z', finalZNum);
         if(goingBack){
           this.choosePlayerRotation(false , true)
@@ -448,6 +461,7 @@ export class PlayerComponent implements OnInit {
           }
           this.gameService.players[this.gameService.turn].pawn.cardSection = 3;
         }
+        this.player.pawn.position[0] = finalXNum;
         this.movePlayerGsapNormal('x', finalXNum);
         if(goingBack){
           this.choosePlayerRotation(false , true)
@@ -470,9 +484,13 @@ export class PlayerComponent implements OnInit {
 
   async movePlayerGsapNormal(axis:string, value:number){
     if(axis === 'x'){
-      await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: value , ease: 'ease-out'})
+      await gsap.fromTo(this.playerRef._objRef.position, {x: this.playerRef._objRef.position.x}, {x: value , ease: 'ease-out', onUpdate: ()=>{
+        this.playerRefOutline._objRef.position.x = this.playerRef._objRef.position.x;
+      }})
     }else if(axis === 'z'){
-      await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: value , ease: 'ease-out'})
+      await gsap.fromTo(this.playerRef._objRef.position, {z: this.playerRef._objRef.position.z}, {z: value , ease: 'ease-out', onUpdate: ()=>{
+        this.playerRefOutline._objRef.position.z = this.playerRef._objRef.position.z;
+      }})
     }
   }
 
@@ -514,5 +532,17 @@ export class PlayerComponent implements OnInit {
     }else{
       return 0
     }
+  }
+
+
+  setOutline(){
+    this.gameService.gameScene.children.filter((child:any) => child.name.includes('player_outline')).forEach((children:any) => {
+      children.traverse((child:any) => {
+        if(child.isMesh ){
+          const material = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.BackSide});
+          child.material = material
+        }
+      })
+    });
   }
 }

@@ -1,0 +1,9 @@
+<div class="theme-editor">
+    <div class="theme-editor__container">
+        <mat-card class="theme-editor__container__background" *ngFor="let theme of gameService.themes" [ngStyle]="{background : theme.background}">
+            <div class="theme-editor__container__background__cardColor" [ngStyle]="{background : theme.cardColor}">
+    
+            </div>
+        </mat-card>
+    </div>
+</div>

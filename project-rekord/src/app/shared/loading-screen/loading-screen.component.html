@@ -1,0 +1,10 @@
+<div class="loading" [ngStyle]="{'background' : gameService.sessionTheme.background}">
+
+    <div class="loading__container">
+        <span class="loading__container__title" [ngStyle]="{'color' : gameService.getContrastColor(gameService.sessionTheme.background)}">Loading..</span>
+
+        <div class="loading__container__progression-bar" [ngStyle]="{'border-color' : gameService.getContrastColor(gameService.sessionTheme.background)}">
+            <div [@AnimationGrowWidth] class="loading__container__progression-bar__inner" [ngStyle]="{'background' : gameService.sessionTheme.background}"></div>
+        </div>
+    </div>
+</div>

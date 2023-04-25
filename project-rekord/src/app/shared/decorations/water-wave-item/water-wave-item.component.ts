@@ -8,7 +8,7 @@ import { DecorationsService } from '../../decoration-item/decorations.service';
   styleUrls: ['./water-wave-item.component.scss']
 })
 export class WaterWaveItemComponent implements OnInit {
-  @ViewChild('water_waveRef', { static: true }) water_waveRef: ThMesh | undefined;
+  @ViewChild('water_waveRef', { static: true }) water_waveRef: any;
 
   randomWaveSize : number = (Math.random() * (0.5 - 0.2 + 0.5)) + 0.2; //(Math.random() * (max - min + 1)) + min
 
@@ -24,7 +24,7 @@ export class WaterWaveItemComponent implements OnInit {
     this.chooseStartingPoint()
     if(this.water_waveRef){
       setInterval(() => {
-        this.decorationsService.scaleAnimation(this.water_waveRef);
+        this.decorationsService.scaleAnimation(this.water_waveRef._objRef);
       }, 1500 + this.randomInterval)
     }
   }
