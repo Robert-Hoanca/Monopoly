@@ -1,0 +1,22 @@
+<th-mesh
+    [position]="[randomStartingPointX,-0.05,randomStartingPointZ + 0.1]"
+    [rotation]="[0.5 , 0 , 0]"
+>
+    <th-boxGeometry [args]="[0.05, 0.2 , 0.05]"></th-boxGeometry>
+    <th-meshBasicMaterial [args]="{color: gameService.sessionTheme.cardColor}"></th-meshBasicMaterial>
+</th-mesh>
+
+<th-mesh
+    [position]="[randomStartingPointX,0,randomStartingPointZ]"
+>
+    <th-boxGeometry [args]="[0.05, 0.25 , 0.05]"></th-boxGeometry>
+    <th-meshBasicMaterial [args]="{color: gameService.sessionTheme.cardColor}"></th-meshBasicMaterial>
+</th-mesh>
+
+<th-mesh
+    [position]="[randomStartingPointX,-0.05,randomStartingPointZ - 0.1]"
+    [rotation]="[-0.5 , 0 , 0]"
+>
+    <th-boxGeometry [args]="[0.05, 0.2 , 0.05]"></th-boxGeometry>
+    <th-meshBasicMaterial [args]="{color: gameService.sessionTheme.cardColor}"></th-meshBasicMaterial>
+</th-mesh>

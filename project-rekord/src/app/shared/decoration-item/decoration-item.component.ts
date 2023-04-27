@@ -18,6 +18,8 @@ export class DecorationItemComponent implements OnInit {
   randomCloudsNum: number = Math.round((Math.random() * (30 - 1 + 1)) + 1);
   randomWavesNum: number = Math.round((Math.random() * (30 - 1 + 1)) + 10);
   randomBoatNum: number = Math.round((Math.random() * 4 )+ 1);
+  randomGrassNum: number = Math.round((Math.random() * 30 )+ 10);
+  randomRainDropsNum: number = Math.round((Math.random() * 30 )+ 10);
 
   constructor(public gameService: GameService) { }
 

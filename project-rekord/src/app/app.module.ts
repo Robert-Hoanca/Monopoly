@@ -51,6 +51,8 @@ import { BoatItemComponent } from './shared/decorations/boat-item/boat-item.comp
 import { LoadingScreenComponent } from './shared/loading-screen/loading-screen.component';
 import { ThemeEditorComponent } from './components/theme-editor/theme-editor.component';
 import { GameTableEditorComponent } from './components/game-table-editor/game-table-editor.component';
+import { GrassItemComponent } from './shared/decorations/grass-item/grass-item.component';
+import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rain-drops-item.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +79,8 @@ import { GameTableEditorComponent } from './components/game-table-editor/game-ta
     LoadingScreenComponent,
     ThemeEditorComponent,
     GameTableEditorComponent,
+    GrassItemComponent,
+    RainDropsItemComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { Particle } from 'cannon-es';
 import gsap from 'gsap'
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three';
