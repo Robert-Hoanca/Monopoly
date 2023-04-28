@@ -35,11 +35,11 @@
                 <th-mapControls #cameraControls [enabled]="gameService.enableMapControls" [target]="[8,0,8]"></th-mapControls>
             </th-orthographicCamera>
 
-            <app-decoration-item [decorationType]="['water_wave', 'boat', 'rain']"></app-decoration-item>
+            <app-decoration-item [whereAmI]="'insideCanvas'"></app-decoration-item>
         </th-scene>
       </th-canvas>
 
-      <!-- <app-decoration-item [decorationType]="['grain']"></app-decoration-item> -->
+      <app-decoration-item [whereAmI]="'outsideCanvas'"></app-decoration-item>
       
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around start">
         <mat-card *ngFor="let player of gameService.players" [@mmAnimationScale] [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center start">

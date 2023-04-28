@@ -1,24 +1,24 @@
-<div *ngIf="decorationIsIncluded('water_wave')">
+<div *ngIf="decorationsService.decorationIsIncluded('water_wave') && whereAmI === 'insideCanvas'">
     <app-water-wave-item *ngFor="let item of [].constructor(randomWavesNum)"></app-water-wave-item>
 </div>
 
-<div *ngIf="decorationIsIncluded('cloud')">
+<div *ngIf="decorationsService.decorationIsIncluded('cloud') && whereAmI === 'insideCanvas'">
     <app-cloud-item *ngFor="let item of [].constructor(randomCloudsNum)" (recalculateRandomNum)="recalculateRandomNums('cloud')"></app-cloud-item>
 </div>
 
-<div *ngIf="decorationIsIncluded('boat')">
+<div *ngIf="decorationsService.decorationIsIncluded('boat') && whereAmI === 'insideCanvas'">
     <app-boat-item *ngFor="let item of [].constructor(randomBoatNum)" (recalculateRandomNum)="recalculateRandomNums('boat')"></app-boat-item>
 </div>
 
-<div *ngIf="decorationIsIncluded('grain')">
+<div *ngIf="decorationsService.decorationIsIncluded('grain') && whereAmI === 'outsideCanvas'">
     <div id="grainTexture"> </div>
 </div>
 
-<div *ngIf="decorationIsIncluded('grass')">
+<div *ngIf="decorationsService.decorationIsIncluded('grass') && whereAmI === 'insideCanvas'">
     <app-grass-item *ngFor="let item of [].constructor(randomGrassNum)"></app-grass-item>
 </div>
 
-<div *ngIf="decorationIsIncluded('rain')">
+<div *ngIf="decorationsService.decorationIsIncluded('rain') && whereAmI === 'insideCanvas'">
     <app-rain-drops-item *ngFor="let item of [].constructor(randomRainDropsNum)"></app-rain-drops-item>
 </div>
 

@@ -1,8 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { GameService } from 'src/app/game.service';
-import * as THREE from 'three';
-import gsap from 'gsap'
-import { ThMesh } from 'ngx-three';
+import { DecorationsService } from './decorations.service';
 @Component({
   selector: 'app-decoration-item',
   templateUrl: './decoration-item.component.html',
@@ -10,7 +7,7 @@ import { ThMesh } from 'ngx-three';
 })
 export class DecorationItemComponent implements OnInit {
   
-  @Input() decorationType: Array<string> = [];
+  @Input() whereAmI: string = '';
 
   randomNum:number = 0;
   randomDecorationNum:Array<any> = [];
@@ -21,23 +18,9 @@ export class DecorationItemComponent implements OnInit {
   randomGrassNum: number = Math.round((Math.random() * 30 )+ 10);
   randomRainDropsNum: number = Math.round((Math.random() * 30 )+ 10);
 
-  constructor(public gameService: GameService) { }
+  constructor(public decorationsService : DecorationsService) { }
 
   ngOnInit(): void {
-    this.randomNum = Math.round(Math.random() * (10 - 1) + 1);
-
-    for (let index = 0; index < this.randomNum; index++) {
-      this.randomDecorationNum.push({
-        index,
-        firstRandom : Math.round(Math.random() * (40 - 1) + -10),
-        secondRandom : Math.round(Math.random() * (40 - 1) + -10),
-        thirdRandom : Math.round(Math.random() * (40 - 1) + -10),
-      })
-    }
-  }
-
-  decorationIsIncluded(type:string){
-    return this.decorationType.includes(type);
   }
 
   recalculateRandomNums(type:string){

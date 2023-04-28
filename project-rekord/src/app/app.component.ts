@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameService } from './game.service';
+import { DecorationsService } from './shared/decoration-item/decorations.service';
+
 
 @Component({
   selector: 'app-root',
@@ -9,11 +11,12 @@ import { GameService } from './game.service';
 })
 export class AppComponent {
   title = 'monopoly';
-  constructor(public router: Router,public gameService: GameService){}
+  constructor(public router: Router,public gameService: GameService , public decorationsService: DecorationsService){}
 
   async ngOnInit(){
     await this.gameService.retrieveDBData();
     this.gameService.chooseSessionColor();
+    this.decorationsService.chooseDecorations();
     this.gameService.loading = true;
     setTimeout(() => {
     this.gameService.switchRouter('home')
