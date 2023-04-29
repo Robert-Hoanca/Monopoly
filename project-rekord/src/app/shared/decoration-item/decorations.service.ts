@@ -7,7 +7,8 @@ import { GameService } from 'src/app/game.service';
 })
 export class DecorationsService {
 
-  decorations:Array<object> = [{ label: 'water_wave', type: 'water', notCompatibleType : 'ground'}, { label: 'boat', type: 'water', notCompatibleType : 'ground'}, { label: 'rain', type: 'air', notCompatibleType : 'none'}, { label: 'cloud', type: 'air', notCompatibleType : 'none'}, { label: 'grass', type: 'ground' , notCompatibleType : 'water'}, { label: 'grain', type: 'filter' , notCompatibleType : 'none'}];
+  decorations:Array<object> = [{ label: 'water_wave', type: 'water', notCompatibleType : 'ground'}, { label: 'boat', type: 'water', notCompatibleType : 'ground'}, { label: 'rain', type: 'air', notCompatibleType : 'none'}, { label: 'grass', type: 'ground' , notCompatibleType : 'water'}, { label: 'grain', type: 'filter' , notCompatibleType : 'none'}];
+  //{ label: 'cloud', type: 'air', notCompatibleType : 'none'}
   randomChosenDecorations:Array<object> = [];
   howManyDecorations:number = 2;
 
