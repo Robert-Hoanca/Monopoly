@@ -105,7 +105,6 @@ export class GameComponent implements OnInit {
     this.height = window.innerHeight;
     this.gameService.camera = this.camera;
     this.gameService.cameraControls = this.cameraControls;
-    console.log( this.gameService.cameraControls)
     this.gameService.enableMapControls = true;
 
     setTimeout(() => {

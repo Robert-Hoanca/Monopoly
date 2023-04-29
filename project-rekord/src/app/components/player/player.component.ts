@@ -35,7 +35,8 @@ export class PlayerComponent implements OnInit {
         this.playerArrived = false;
       }
       if(this.player.id == this.gameService.players[this.gameService.turn].id){
-        if((this.gameService.randomChance && this.gameService.randomChance.count != undefined) || (this.gameService.randomChest && this.gameService.randomChest != undefined)){
+        if((this.gameService.randomChance && this.gameService.randomChance.count != undefined)){
+          //Only a chance can make the player go back
           this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition, true)
         }else{
           this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition)
@@ -91,6 +92,8 @@ export class PlayerComponent implements OnInit {
         }else if(oldCardPosition >= 0 && oldCardPosition <=10){
           actualSide = 0;
         }
+
+        console.log("actualSide", actualSide , "toGoSide" ,toGoSide, goBack)
         if(!goBack){
           if(actualSide === toGoSide){
             if(oldCardPosition < actualCardPosition){
