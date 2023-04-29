@@ -1,0 +1,309 @@
+.gameTable-editor-container{
+
+    width: 100vw;
+    height: 100vh;
+
+    &__maps, &__newGameTable{
+        width: 200px;
+        height: 200px;
+        cursor: pointer;
+        margin: 0px 20px;
+    }
+
+    &__gameTable{
+        display: grid;
+        grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+        grid-template-rows: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+
+        &__card{
+            display: grid;
+            border-width: 2px;
+            border-style: solid;
+            cursor: pointer;
+            column-gap: 4px;
+            row-gap: 4px;
+            position: relative;
+
+            .property{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+
+                .districtColor{
+                    position: absolute;
+                }
+            }
+            &__0{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__1{
+                grid-column-start: 2;
+                grid-column-end: 2;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__2{
+                grid-column-start: 3;
+                grid-column-end: 3;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__3{
+                grid-column-start: 4;
+                grid-column-end: 4;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__4{
+                grid-column-start: 5;
+                grid-column-end: 5;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__5{
+                grid-column-start: 6;
+                grid-column-end: 6;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__6{
+                grid-column-start: 7;
+                grid-column-end: 7;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__7{
+                grid-column-start: 8;
+                grid-column-end: 8;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__8{
+                grid-column-start: 9;
+                grid-column-end: 9;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__9{
+                grid-column-start: 10;
+                grid-column-end: 10;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+            &__10{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 1;
+                grid-row-end: 1;
+            }
+
+
+            &__11{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 2;
+                grid-row-end: 2;
+            }
+            &__12{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 3;
+                grid-row-end: 3;
+            }
+            &__13{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 4;
+                grid-row-end: 4;
+            }
+            &__14{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 5;
+                grid-row-end: 5;
+            }
+            &__15{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 6;
+                grid-row-end: 6;
+            }
+            &__16{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 7;
+                grid-row-end: 7;
+            }
+            &__17{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 8;
+                grid-row-end: 8;
+            }
+            &__18{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 9;
+                grid-row-end: 9;
+            }
+            &__19{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 10;
+                grid-row-end: 10;
+            }
+            &__20{
+                grid-column-start: 11;
+                grid-column-end: 11;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+
+
+            &__21{
+                grid-column-start: 10;
+                grid-column-end: 10;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__22{
+                grid-column-start: 9;
+                grid-column-end: 9;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__23{
+                grid-column-start: 8;
+                grid-column-end: 8;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__24{
+                grid-column-start: 7;
+                grid-column-end: 7;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__25{
+                grid-column-start: 6;
+                grid-column-end: 6;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__26{
+                grid-column-start: 5;
+                grid-column-end: 5;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__27{
+                grid-column-start: 4;
+                grid-column-end: 4;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__28{
+                grid-column-start: 3;
+                grid-column-end: 3;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__29{
+                grid-column-start: 2;
+                grid-column-end: 2;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+
+
+            &__30{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 11;
+                grid-row-end: 11;
+            }
+            &__31{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 10;
+                grid-row-end: 10;
+            }
+            &__32{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 9;
+                grid-row-end: 9;
+            }
+            &__33{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 8;
+                grid-row-end: 8;
+            }
+            &__34{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 7;
+                grid-row-end: 7;
+            }
+            &__35{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 6;
+                grid-row-end: 6;
+            }
+            &__36{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 5;
+                grid-row-end: 5;
+            }
+            &__37{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 4;
+                grid-row-end: 4;
+            }
+            &__38{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 3;
+                grid-row-end: 3;
+            }
+            &__39{
+                grid-column-start: 1;
+                grid-column-end: 1;
+                grid-row-start: 2;
+                grid-row-end: 2;
+            }
+
+        }
+    }
+
+    &__extras{
+        background: #fff;
+        margin-left: 20px;
+        border-radius: 5px;
+        padding: 20px;
+        .mapName{
+            color: #000!important;
+        }
+
+        button{
+            margin-top: 10px;
+        }
+    }
+
+    &__go-home{
+        position: absolute;
+        top: 20px;
+        left: 20px;
+    }
+
+}

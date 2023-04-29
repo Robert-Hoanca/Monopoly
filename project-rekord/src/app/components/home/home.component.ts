@@ -32,7 +32,11 @@ export class HomeComponent implements OnInit {
     this.gameService.switchRouter('mode')
   }
 
-  returnSessionColor(){
+  returnSessionBg(){
     return this.gameService.sessionTheme && this.gameService.sessionTheme.background ? this.gameService.sessionTheme.background : '#fff';
+  }
+
+  returnSessionColor(){
+    return this.gameService.sessionTheme && this.gameService.sessionTheme.background ? this.gameService.getContrastColor(this.gameService.sessionTheme.background) : '#000'
   }
 }

@@ -1,1 +1,284 @@
-<p>game-table-editor works!</p>
+<div class="gameTable-editor-container" [ngStyle]="{'background': this.gameService.sessionTheme.background , 'color': gameService.getContrastColor(gameService.sessionTheme.background)}" fxLayoutAlign="center center">
+
+    <button class="gameTable-editor-container__go-home" mat-raised-button (click)="gameService.goBackHome()"> <mat-icon> arrow_back </mat-icon> Home</button>
+   
+    <div *ngIf="!chosenMap" fxLayout="row">
+
+        <mat-card  class="gameTable-editor-container__maps" *ngFor="let map of gameService.gameMaps" fxLayoutAlign="center center" (click)="chooseMapToEdit(map)">
+            {{map}}
+        </mat-card>
+
+        <button class="gameTable-editor-container__newGameTable" mat-raised-button (click)="chooseMapToEdit('new')"> <mat-icon> add </mat-icon> </button>
+
+    </div>
+
+    <div *ngIf="chosenMap" class="gameTable-editor-container__gameTable">
+
+        <div 
+            *ngFor="let card of gameTable.cards; let i = index" 
+        
+            [ngClass]="['gameTable-editor-container__gameTable__card', 'gameTable-editor-container__gameTable__card__' + i]" 
+            [ngStyle]="{'background': this.gameService.sessionTheme.cardColor, 'border-color': this.gameService.sessionTheme.cardBorder}" fxLayoutAlign="center center"
+            
+            (click)="openEditDialog(card)"
+            >
+
+            <div *ngIf="card.cardType === 'start'">
+                <mat-icon> flag </mat-icon>
+            </div>
+
+
+            <div class="property " *ngIf="card.cardType === 'property'" fxLayoutAlign="center center">
+                <div class="districtColor" [ngStyle]="{
+                    'background': card.district, 
+                    'bottom' : i < 10 ? '5px' : 'unset',
+                    'left' : (i > 10 && i < 20) ? '5px' : 'unset' ,
+                    'top' : i > 20 && i < 30 ? '5px' : 'unset',
+                    'right' : i > 30 && i <= 39 ? '5px' : 'unset',
+                    'width' : i < 10 || (i > 20 && i <= 30) ? '90%' : '10px',
+                    'height' : (i > 10 && i < 20) || (i > 30 && i <= 39) ? '90%' : '10px'
+                
+                }"></div>
+            </div>
+
+            <div *ngIf="card.cardType === 'station'">
+                <mat-icon> train </mat-icon>
+            </div>
+
+            <div *ngIf="card.cardType === 'plant'">
+                <mat-icon> factory </mat-icon>
+            </div>
+
+            <div *ngIf="card.cardType === 'chance'">
+                <mat-icon> question_mark </mat-icon>
+            </div>
+
+            <div *ngIf="card.cardType === 'communityChest'">
+                <mat-icon> home_repair_service </mat-icon>
+            </div>
+
+            <div *ngIf="card.cardType === 'taxes'">
+                <mat-icon> attach_money </mat-icon>
+            </div>
+
+            <div *ngIf="card.cardType === 'prison'">
+                <mat-icon> view_week </mat-icon>
+            </div>
+
+            <div *ngIf="card.cardType === 'parkArea'">
+                <mat-icon> local_parking </mat-icon>
+            </div>
+
+            <div *ngIf="card.cardType === 'goToPrison'">
+                <mat-icon> local_police </mat-icon>
+            </div>
+        </div>
+        
+    </div>
+
+
+    <div class="gameTable-editor-container__extras" *ngIf="chosenMap" fxLayout="column">
+
+        <mat-form-field class="mapName">
+            <mat-label>Map Name (Please change its name)</mat-label>
+            <input matInput type="text" [(ngModel)]="chosenMap">
+        </mat-form-field>
+
+
+        <button mat-raised-button (click)="openWarningDialog()" color="warn"> Delete Map </button>
+        <button mat-raised-button (click)="saveToDb()" color="warns"><mat-icon>save</mat-icon></button>
+
+    </div>
+
+    <ng-template #cardEditDialogRef>
+
+        <div class="card-editing-container" fxLayout="row">
+
+            <div class="card-editing-container__card" fxLayout="column">
+
+                <mat-card *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'" [ngClass]="['cardForm', 'owned']">
+                    <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(editingCard.district)}" fxLayoutAlign="center center">
+                        <span class="cardName" [ngStyle]="{'color': gameService.getContrastColor(gameService.checkCardColorDistrict(editingCard.district))}">{{editingCard.name}}</span>
+                    </span>
+                    
+                    <div class="cardCosts" fxLayout="column">
+                        <span class="cardCost" fxLayoutAlign="space-between center">
+                            <span>Property cost</span>
+                            <span>{{editingCard.cost}}€</span>
+                        </span>
+                        <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="editingCard.rentCosts">
+                            <span>Rent</span>
+                            <span>{{editingCard.rentCosts.normal}}€</span>
+                        </span>
+                        <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="editingCard.rentCosts && editingCard.rentCosts.completedSeriesBasic">
+                            <span>Rent with color set</span>
+                            <span>{{editingCard.rentCosts.completedSeriesBasic}}€</span>
+                        </span>
+                        <span class="cardCost" *ngIf="editingCard.rentCosts && editingCard.rentCosts.one"> 
+                            <span>Rent with property</span>
+                            <div class="rentsWithProps" fxLayout="row">
+                                <div class="props" fxLayout="column">
+                                    <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>1</span></span>
+                                    <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>2</span></span>
+                                    <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>3</span></span>
+                                    <span class="house" fxLayoutAlign="center center"><mat-icon>cottage</mat-icon><span>4</span></span>
+                                    <span class="hotel" fxLayoutAlign="center center" *ngIf="editingCard.rentCosts && editingCard.rentCosts.hotel"><mat-icon>cottage</mat-icon></span>
+                                </div>
+                                <div class="rent" fxLayout="column" fxLayoutAlign="space-around end">
+                                    <span class="house" fxLayoutAlign="center center">{{editingCard.rentCosts.one}}€</span>
+                                    <span class="house" fxLayoutAlign="center center">{{editingCard.rentCosts.two}}€</span>
+                                    <span class="house" fxLayoutAlign="center center">{{editingCard.rentCosts.three}}€</span>
+                                    <span class="house" fxLayoutAlign="center center">{{editingCard.rentCosts.four}}€</span>
+                                    <span class="hotel" fxLayoutAlign="center center" *ngIf="editingCard.rentCosts && editingCard.rentCosts.hotel">{{editingCard.rentCosts.hotel}}€</span>
+                                </div>
+                            </div>
+                        </span>
+                        <hr class="separator">
+                        <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="editingCard.houseCost">
+                            <span>House price</span>
+                            <span>{{editingCard.houseCost}}€</span>
+                        </span>
+                        <span class="cardCost" fxLayoutAlign="space-between center" *ngIf="editingCard.hotelCost">
+                            <span>Hotel price</span>
+                            <span>{{editingCard.hotelCost}}€</span>
+                        </span>
+                        <span class="cardCost" fxLayoutAlign="space-between center">
+                            <span>Distrain price</span>
+                            <span>{{editingCard.distrainedCost}}€</span>    
+                        </span>
+                    </div>
+                    
+                </mat-card>
+
+                <mat-card *ngIf="editingCard.cardType !== 'property' && editingCard.cardType !== 'station' && editingCard.cardType !== 'plant'" [ngClass]="['cardForm', 'owned']">
+
+                    <span class="propDistrict" fxLayoutAlign="center center" style="border-bottom: 1px solid grey">
+                        <span class="cardName">{{editingCard.name}}</span>
+                    </span>
+
+                </mat-card>
+
+                <button *ngIf="editingCard != {} && editingCard.cardType !== 'start'" class="card-editing-container__card__delete-card" mat-raised-button color="warn" (click)="deleteCard(editingCard)"> Delete card</button>
+
+            </div>
+
+            
+
+
+            <div class="card-editing-container__inputs-container" fxLayout="row">
+
+                <mat-form-field *ngIf="editingCard.cardType !== 'start'">
+                    <mat-label>Card Type</mat-label>
+                    <mat-select [(ngModel)]="editingCard.cardType">
+                        <mat-option *ngFor="let type of cardTypes" [value]="type.value" (click)="changeCardType(type.value)" [disabled]="ifCantBeMoreThanOne(type.value)">
+                            {{type.label}}
+                        </mat-option>
+
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'">
+                    <mat-label>Name</mat-label>
+                    <input matInput type="text" [(ngModel)]="editingCard.name">
+                </mat-form-field>
+    
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'">
+                    <mat-label>Cost</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.cost">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property'">
+                    <mat-label>Normal Rent</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.rentCosts.normal">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property'">
+                    <mat-label>Color Set</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.rentCosts.completedSeriesBasic">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station'">
+                    <mat-label>One house Rent</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.rentCosts.one">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station'">
+                    <mat-label>Two house Rent</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.rentCosts.one">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station'">
+                    <mat-label>Three house Rent</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.rentCosts.one">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station'">
+                    <mat-label>Four house Rent</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.rentCosts.one">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property'">
+                    <mat-label>Hotel Rent</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.rentCosts.one">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property'">
+                    <mat-label>House Price</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.houseCost">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property'">
+                    <mat-label>Hotel Price</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.hotelCost">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'">
+                    <mat-label>Mortgage Price</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.distrainedCost">
+                </mat-form-field>
+    
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'">
+                    <mat-label>District</mat-label>
+                    <div class="card-editing-container__inputs-container__input_wrapper" fxLayout="row">
+                        <input matInput type="text" [(ngModel)]="editingCard.district">
+                        <input matInput type="color" [(ngModel)]="editingCard.district">
+                    </div>
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'start'">
+                    <mat-label>Pass Start reward</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.reward">
+                </mat-form-field>
+
+                <mat-form-field *ngIf="editingCard.cardType === 'taxes'">
+                    <mat-label>Taxes Cost</mat-label>
+                    <input matInput type="number" [(ngModel)]="editingCard.taxesCost">
+                </mat-form-field>
+            </div>
+
+
+        </div>
+
+
+
+    </ng-template>
+
+    <ng-template #warningDeleteDialog>
+
+
+        <div class="warning-container" fxLayout="column">
+
+            <span class="warning-container__title">You are going to delete the map called " {{chosenMap}} ", are you sure ?</span>
+    
+            <div fxLayout="row" class="warning-container__buttons-container" fxLayoutAlign="space-around center">
+    
+                <button mat-raised-button color="warn" (click)="deleteMapFromDB()"> Yes</button>
+                <button mat-raised-button (click)="closeDialog()"> No</button>
+    
+            </div>
+    
+       </div>
+
+
+    </ng-template>
+</div>

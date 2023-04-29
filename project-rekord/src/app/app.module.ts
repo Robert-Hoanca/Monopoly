@@ -29,6 +29,8 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatSliderModule } from '@angular/material/slider';
+import {MatSelectModule} from '@angular/material/select';
+
 
 
 
@@ -101,6 +103,7 @@ import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rai
     MatPaginatorModule,
     NgxThreeModule,
     MatSliderModule,
+    MatSelectModule,
     
     
   ],

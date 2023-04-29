@@ -169,6 +169,169 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
+.theme-edit-dialog{
+  .editing-container{
+
+    &__background{
+
+      width: 300px;
+      height: 300px;
+
+      &__card-color{
+        width: 100px;
+        height: 100px;
+        border-width: 2px;
+        border-style: solid;
+      }
+    }
+
+    &__input-container{
+      padding: 15px;
+      &__input_wrapper{
+        input[type="color"]{
+          width: 25px;
+          height: 25px;
+        }
+      }
+    }
+
+  }
+}
+.save-themes-dialog{
+  width: 300px;
+
+  .save-container{
+
+    padding: 20px;
+  
+    &__title{
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    &__buttons-container{
+      margin-top: 20px;
+    }
+
+  }
+}
+
+
+.card-edit-dialog{
+
+  .card-editing-container{
+    padding: 20px;
+
+    &__card{
+
+      &__delete-card{
+        width: 100%;
+      }
+      .cardForm{
+        width: 220px;
+        height: 350px;
+        position: relative;
+        border-radius: 0px 4px 4px 4px;
+        &.owned{
+            border-radius: 0px 0px 4px 4px;
+        }
+    
+        .propDistrict{
+            position: absolute;
+            height: 50px;
+            width: calc(100% - 32px);
+        }
+        .cardCosts{
+            margin-top: 55px;
+            .rentsWithProps{
+                .props{
+                    .house, .hotel{
+                        height:20px;
+                        position: relative;
+                        margin-top: 5px;
+                        span{
+                            position: absolute;
+                            z-index: 2;
+                            font-size: 10px;
+                            color: #fff;
+                        }
+                    }
+                   .hotel{
+                        mat-icon{
+                            color: red;
+                        }
+                        span{
+                            background: red;
+                        }
+                    }
+                    .house{
+                        mat-icon{
+                            color: green;
+                        }
+                        span{
+                            background: green;
+                        }
+                    }
+                }
+                .rent{
+                    width: 100%;
+                    .house,.hotel{
+                        margin-top: 5px;
+                    }
+                }
+            }
+        }
+        .separator{
+            height: 0.5px;
+            width: 100%;
+            background: grey;
+        }
+    }
+    }
+
+    &__inputs-container{
+
+      padding: 20px;
+      flex-wrap: wrap;
+
+      &__input_wrapper{
+        input[type="color"]{
+          width: 25px;
+          height: 25px;
+        }
+      }
+
+    }
+
+  }
+
+}
+
+.warning-delete-dialog{
+  width: 300px;
+
+  .warning-container{
+
+    padding: 20px;
+  
+    &__title{
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    &__buttons-container{
+      margin-top: 20px;
+    }
+
+  }
+}
+
+.mat-option[aria-disabled="true"]{
+  pointer-events: none;
+}
+
 //On Mobile
 @media screen and (max-width: 600px) {
   .propertyInfo{

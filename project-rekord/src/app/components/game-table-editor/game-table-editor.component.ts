@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { GameService } from 'src/app/game.service';
+import {doc, getDoc } from '@angular/fire/firestore';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-game-table-editor',
@@ -6,10 +9,284 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./game-table-editor.component.scss']
 })
 export class GameTableEditorComponent implements OnInit {
+  @ViewChild('cardEditDialogRef', { static: true }) cardEditDialogRef:any;
+  @ViewChild('warningDeleteDialog', { static: true }) warningDeleteDialog:any;
+  chosenMap:string = '';
 
-  constructor() { }
+  gameTable:any;
+
+  editingCard:any;
+
+  cardTypes:Array<any> = [
+    {label: 'Start', value : 'start'},
+    {label: 'Property', value : 'property'},
+    {label: 'Station', value : 'station'},
+    {label: 'Plant', value : 'plant'},
+    {label: 'Chance', value : 'chance'},
+    {label: 'Community Chest', value : 'communityChest'},
+    {label: 'Taxes', value : 'taxes'},
+    {label: 'Prison', value : 'prison'},
+    {label: 'Park Area', value : 'parkArea'},
+    {label: 'Go To Prison', value : 'goToPrison'},
+  ];
+
+  constructor(public gameService : GameService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
+  }
+
+  async chooseMapToEdit(map:string){
+
+    if(map != 'new'){
+
+      const gameTableRef = doc(this.gameService.db, "gameTables", map);
+      this.gameTable  = (await getDoc(gameTableRef)).data();
+  
+      this.chosenMap = map;
+
+    }else {
+
+      this.gameTable = {
+        cards: [],
+        chance: [],
+        communityChest : [],
+      }
+
+      for (let index = 0; index < 40; index++) {
+
+        if(index == 0){
+          this.gameTable.cards.push({
+            canBuy: false,
+            cardType: "start",
+            name: "Start",
+            reward :  0
+          })
+        }else{
+          this.gameTable.cards.push(
+            {}
+          )
+        }
+        
+      }
+
+      this.chosenMap = 'newMap';
+
+    }
+  }
+
+  openEditDialog(clickedCard:any){
+
+    this.editingCard = clickedCard;
+
+    this.dialog.open(this.cardEditDialogRef, {
+      panelClass: 'card-edit-dialog',
+      hasBackdrop: true,
+      autoFocus: false,
+      disableClose:false,
+    });
+
+  }
+
+  deleteCard(deleteCard:any){
+
+    const deletingCardIndex =  this.gameTable.cards.findIndex((card:any) => card === deleteCard);
+
+    if(deleteCard){
+      this.gameTable.cards[deletingCardIndex] = {};
+      this.editingCard = {};
+
+      this.closeDialog();
+    }
+
+  }
+
+  changeCardType(newType:string){
+
+    const cardIndex = this.gameTable.cards.findIndex( (card:any) => card == this.editingCard);
+
+    if(cardIndex){
+      this.closeDialog();
+
+      let newCard = {};
+
+      switch (newType){
+        case 'start':
+          newCard = {
+            canBuy: false,
+            cardType: "start",
+            name: "Start",
+            reward :  0
+          }
+          
+          break;
+  
+        case 'property':
+          newCard = {
+            canBuy: true,
+            cardType: "property",
+            completedSeries: false,
+            cost: 0,
+            distrained: false,
+            distrainedCost:  0,
+            district: "#000",
+            exchangeSelected:false,
+            hotelCost: 0,
+            hotelCounter: 0,
+            houseCost :  0,
+            housesCounter:  0,
+            name:  "",
+            owner:  "",
+            rentCosts : {
+              four: 0,
+              completedSeriesBasic: 0,
+              one: 0,
+              normal: 0,
+              hotel: 0,
+              two: 0,
+              three: 0
+            }
+          }
+          
+          break;
+        case 'communityChest':
+          newCard = {
+            chests: [],
+            name: "Community Chest",
+            cardType: "communityChest",
+            canBuy: false
+          }
+          
+          break;
+        case 'chance':
+          newCard = {
+            name: "Chance",
+            chances: [],
+            cardType: "chance",
+            distrained: false,
+            canBuy: false
+          } 
+          
+          break;
+        case 'taxes':
+          newCard = {
+            name: "Taxes",
+            cardType: "taxes",
+            canBuy: false,
+            taxesCost: 0
+        }
+          
+          break;
+        case 'station':
+          newCard = {
+            exchangeSelected: false,
+            canBuy: true,
+            district: "station",
+            name: "",
+            cardType: "station",
+            distrainedCost: 0,
+            completedSeries: false,
+            distrained: false,
+            owner: "",
+            rentCosts: {
+                three: 0,
+                two: 0,
+                four: 0,
+                one: 0
+            },
+            cost: 0
+        }
+          
+          break;
+        case 'prison':
+          newCard = {
+            name: "Prison Area",
+            cardType: "prison",
+            canBuy: false
+        }
+          
+          break;
+        case 'parkArea':
+          newCard = {
+            name: "Parking Area",
+            cardType: "parkArea",
+            canBuy: false
+          }
+          
+          break;
+        case 'goToPrison':
+          newCard = {
+            name: "Prison",
+            cardType: "goToPrison",
+            canBuy: false
+          }
+          
+          break;
+        case 'plant':
+          newCard = {
+            cardType: "plant",
+            canBuy: true,
+            exchangeSelected: false,
+            distrained: false,
+            cost: 0,
+            district: "plant",
+            name: "",
+            completedSeries: false,
+            distrainedCost: 0,
+            owner: ""
+          }
+          
+          break;
+        default:
+          break;
+      }
+
+      this.gameTable.cards[cardIndex] = newCard;
+      this.editingCard = {};
+    }
+  }
+
+  ifCantBeMoreThanOne(type:string){
+
+    switch (type) {
+      case 'start':
+        return (type === 'start') && (this.gameTable.cards.find( (card:any) => card.cardType === 'start')) ? true : false;
+      case 'prison':
+        return (type === 'prison') && (this.gameTable.cards.find( (card:any) => card.cardType === 'prison')) ? true : false;
+    
+      default:
+        return false;
+    }
+
+  }
+
+  closeDialog(){
+    this.dialog.closeAll();
+  }
+
+  saveToDb(){
+    if(this.chosenMap !== 'newMap'){
+      this.gameService.saveMapToDb(this.chosenMap , this.gameTable)
+    }
+  }
+
+  openWarningDialog(){
+
+    this.dialog.open(this.warningDeleteDialog, {
+      panelClass: 'warning-delete-dialog',
+      hasBackdrop: true,
+      autoFocus: false,
+      disableClose:false,
+    });
+    
+  }
+
+  deleteMapFromDB(){
+
+    if(this.chosenMap !== 'newMap'){
+      this.gameService.deleteMapFromDb(this.chosenMap);
+    }
+    this.closeDialog();
+
   }
 
 }

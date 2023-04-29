@@ -18,8 +18,6 @@ export class AppComponent {
     this.gameService.chooseSessionColor();
     this.decorationsService.chooseDecorations();
     this.gameService.loading = true;
-    setTimeout(() => {
     this.gameService.switchRouter('home')
-    }, 1500);
   }
 }
