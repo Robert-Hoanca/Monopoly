@@ -65,11 +65,6 @@
 
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
 
-    <!--
-        DELETE
-    <button mat-raised-button (click)="gameService.setDB()">Set db</button>
-    -->
-
     <ng-template #showDiceResultDialog>
         <div *ngFor="let res of gamePhysicsService.diceRes" class="dice" [ngClass]="['dice', getDiceResClass(res)]" [@showDice]>       
             <div class="dotsContainer">
@@ -172,5 +167,5 @@
     <button mat-raised-button disabled="true">Options</button>
     <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
 
-    <button mat-raised-button *ngIf="false" id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button>
+    <button mat-raised-button *ngIf="gameService.godMode" id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button>
 </div>

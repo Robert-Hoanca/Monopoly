@@ -2,7 +2,7 @@
 
     <button class="gameTable-editor-container__go-home" mat-raised-button (click)="gameService.goBackHome()"> <mat-icon> arrow_back </mat-icon> Home</button>
    
-    <div *ngIf="!chosenMap" fxLayout="row">
+    <div *ngIf="!chosenMap" class="gameTable-editor-container__map-chooser">
 
         <mat-card  class="gameTable-editor-container__maps" *ngFor="let map of gameService.gameMaps" fxLayoutAlign="center center" (click)="chooseMapToEdit(map)">
             {{map}}

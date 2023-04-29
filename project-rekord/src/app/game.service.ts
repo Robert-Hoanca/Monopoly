@@ -58,6 +58,7 @@ export class GameService {
 
   choosenMode:string = '';
   db = getFirestore();
+  godData:any;
   chosenMap:string = 'monopolyMap';
 
   //Camera
@@ -113,10 +114,20 @@ export class GameService {
 
 
   debugMode:boolean = false;
+  godMode:boolean = false;
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
     //const storage = getStorage();
+
+    //Debug God
+    const getInfo = doc(this.db, "god", 'debugGod');
+    this.godData = (await getDoc(getInfo)).data();
+
+    let localGodModeValue:any = localStorage.getItem("monopolyGodMode");
+    if(localStorage.getItem("monopolyGodMode") && JSON.parse(localGodModeValue)){
+      this.godMode = true;
+    }
 
     //Maps
     const getMaps = await getDocs(collection(this.db, "gameTables"));

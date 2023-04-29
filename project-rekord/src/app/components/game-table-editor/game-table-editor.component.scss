@@ -7,7 +7,7 @@
         width: 200px;
         height: 200px;
         cursor: pointer;
-        margin: 0px 20px;
+        margin: 20px 20px;
     }
 
     &__gameTable{
@@ -306,4 +306,25 @@
         left: 20px;
     }
 
+    &__map-chooser{
+        display: flex;
+        flex-direction: row;
+    }
+
+}
+
+@media screen and (max-width: 600px) {
+    .gameTable-editor-container{
+
+        flex-direction: column!important;
+
+        &__gameTable{
+            transform: scale(0.6);
+        }
+
+        &__map-chooser{
+            flex-direction: column;
+        }
+       
+    }
 }

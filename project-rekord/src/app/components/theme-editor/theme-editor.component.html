@@ -1,4 +1,7 @@
 <div class="theme-editor">
+
+    <button class="theme-editor__go-home" mat-raised-button (click)="gameService.goBackHome()"> <mat-icon> arrow_back </mat-icon> Home</button>
+
     <div class="theme-editor__container">
         <mat-card class="theme-editor__container__background" *ngFor="let theme of gameService.themes" [ngStyle]="{'background' : theme.background}" (click)="editTheme(theme)">
             <div class="theme-editor__container__background__cardColor" [ngStyle]="{'background' : theme.cardColor, 'border-color ': theme.cardBorder}">
@@ -20,7 +23,7 @@
 
 <ng-template #themeDialogRef>
 
-    <div class="editing-container" fxLayout="row">
+    <div class="editing-container">
         
         <mat-card class="editing-container__background" fxLayoutAlign="center center" [ngStyle]="{'background' : clickedTheme.background}">
 

@@ -172,6 +172,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .theme-edit-dialog{
   .editing-container{
 
+    display: flex;
+    flex-direction: row;
+
     &__background{
 
       width: 300px;
@@ -332,11 +335,41 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   pointer-events: none;
 }
 
+.god-mode-dialog{
+  .god-container{
+    width: 300px;
+    padding: 20px;
+
+    &__title{
+      font-size: 18px;
+      font-weight: bold;
+      &.error{
+        color: red;
+      }
+    }
+  }
+}
+
 //On Mobile
 @media screen and (max-width: 600px) {
   .propertyInfo{
     .mat-dialog-container{
       justify-content: center;
+    }
+  }
+
+  .card-edit-dialog .card-editing-container{
+    padding: 20px;
+    overflow-y: scroll;
+    height: 600px;
+    flex-direction: column!important;
+    align-items: center;
+  }
+
+  .theme-edit-dialog{
+    .editing-container{
+      display: flex;
+      flex-direction: column;
     }
   }
 }
