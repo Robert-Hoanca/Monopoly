@@ -92,7 +92,7 @@ export class GameComponent implements OnInit {
   }
   width:number = 0;
   height:number = 0;
-  cameraZoom:number = 1;
+  cameraZoom:number = 1.2;
 
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
 

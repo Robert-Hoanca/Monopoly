@@ -638,7 +638,8 @@ export class GameService {
   //EVENTS
   goToPrison(){
     this.players[this.turn].prison.inPrison = true;
-    this.getCardPosition$.next(10);
+    const prisonIndex = this.gameTable.cards.findIndex((card: { cardType: string; }) => card.cardType === 'prison');
+    this.getCardPosition$.next(prisonIndex);
     this.players[this.turn].canDice=false;
   }
 //OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
