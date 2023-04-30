@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { collection, getFirestore, doc, getDoc, getDocs, setDoc, deleteDoc } from '@angular/fire/firestore';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
@@ -11,9 +10,8 @@ import { ExchangeComponent } from './shared/exchange/exchange.component';
 import * as uuid from 'uuid';
 import gsap from 'gsap'
 import { Vector3 } from 'three';
-import * as THREE from 'three';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
-import { off } from 'process';
+import * as THREE from 'three';
 
 @Injectable({
   providedIn: 'root'
@@ -70,6 +68,14 @@ export class GameService {
   movingCamera:boolean= false;
   movingPlayer:boolean = false;
   enableMapControls:boolean = false;
+  cameraZoom:number = 1.2;
+
+  //Renderer
+  rendererOptions:any={
+    shadowMap:{
+    },
+    antialias: true,
+  }
 
   setPlayerToCenter = true;
   beginTime:number = 0;
@@ -305,6 +311,41 @@ export class GameService {
 
   getCardPosition(cardIndex:any){
     this.getCardPosition$.next(cardIndex);
+  }
+
+  changeCardColor(scene:any){
+    scene._objRef.children.forEach((child:any) => {
+      if( child.name.includes('cardNumber')){
+        child.traverse((child:any) => {
+          if(child.isMesh ){
+            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -20)});
+            const material = new THREE.MeshBasicMaterial({color: this.sessionTheme.cardColor});
+            child.material = material
+            //this.cardChangedCounter++;
+          }
+        })
+      }else if( child.name.includes('cardOutline')){
+        child.traverse((child:any) => {
+          if(child.isMesh ){
+            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionTheme.cardColor, -30), side: THREE.BackSide});
+            const material = new THREE.MeshBasicMaterial({color: this.sessionTheme.cardBorder, side: THREE.BackSide});
+            child.material = material
+            //this.cardOutlineChangedCounter++;
+          }
+        })
+      }
+    });
+  }
+
+  resizeCanvas(event:any, camera:any){
+    
+    if(camera._objRef != undefined && camera._objRef.zoom != this.cameraZoom){
+      camera._objRef.zoom = this.cameraZoom;
+
+      let evt =  new WheelEvent("wheel", {deltaY : this.cameraZoom})
+      document.querySelector("canvas")?.dispatchEvent(evt);
+    }
+    this.aspect = event.width / event.height;
   }
 
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
@@ -875,6 +916,9 @@ export class GameService {
 
   }
   
+
+  //Database Management
+
   async setThemesDb(themes:any){
     setDoc(doc(this.db, "colors", "themes"), {themes});
   }

@@ -85,14 +85,8 @@ export class GameComponent implements OnInit {
   textDialog:string='';
   cardChangedCounter:number = 0;
   cardOutlineChangedCounter:number = 0;
-  rendererOptions:any={
-    shadowMap:{
-    },
-    antialias: true,
-  }
   width:number = 0;
   height:number = 0;
-  cameraZoom:number = 1.2;
 
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
 
@@ -118,7 +112,6 @@ export class GameComponent implements OnInit {
         this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' begins the game!'}, 'playerWhoBegins')
       }, 1500);
     }
-    //this.gameService.setCameraPosition(this.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2], 2500, 5, false)   
     this.activateLocalSave();
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
@@ -150,21 +143,6 @@ export class GameComponent implements OnInit {
     return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.players[this.gameService.turn].id));
   }
 
-  resizeCanvas(event:any){
-    if(this.camera._objRef != undefined && this.camera._objRef.zoom != this.cameraZoom){
-      this.gameService.enableMapControls = true;
-      this.camera._objRef.zoom = this.cameraZoom;
-      let evt =  new WheelEvent("wheel", {deltaY : this.cameraZoom})
-      document.querySelector("canvas")?.dispatchEvent(evt);
-      this.gameService.enableMapControls = false;
-    }
-    this.gameService.aspect = event.width / event.height;
-  }
-
-  onBeforeRender(element:any){
-    return element; 
-  }
-
   tryToGoNextTurn(){
     if(this.gameService.amountDebt!=0){
       if(this.gameService.debtWithWho == 'player'){
@@ -172,36 +150,10 @@ export class GameComponent implements OnInit {
     
       }else if(this.gameService.debtWithWho == 'bank'){
         this.gameService.textDialog({text:(this.gameService.players[this.gameService.turn].name) + ' have to pay ' + this.gameService.amountDebt + ' of debts to the bank.',debtWithWho: this.gameService.debtWithWho,amountDebt:this.gameService.amountDebt, playerRent:false, playerId:''}, 'payMoney');
-
       }
     }else{
       this.gameService.nextTurn()
     }
-
-   
-  }
-  changeCardColor(){
-    this.scene.objRef.children.forEach((child:any) => {
-      if( child.name.includes('cardNumber') && this.cardChangedCounter < this.gameService.gameTable.cards.length){
-        child.traverse((child:any) => {
-          if(child.isMesh ){
-            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -20)});
-            const material = new THREE.MeshBasicMaterial({color: this.gameService.sessionTheme.cardColor});
-            child.material = material
-            //this.cardChangedCounter++;
-          }
-        })
-      }else if( child.name.includes('cardOutline') && this.cardOutlineChangedCounter < this.gameService.gameTable.cards.length){
-        child.traverse((child:any) => {
-          if(child.isMesh ){
-            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionTheme.cardColor, -30), side: THREE.BackSide});
-            const material = new THREE.MeshBasicMaterial({color: this.gameService.sessionTheme.cardBorder, side: THREE.BackSide});
-            child.material = material
-            //this.cardOutlineChangedCounter++;
-          }
-        })
-      }
-    });
   }
 
   async rollTheDice(){
@@ -255,5 +207,9 @@ export class GameComponent implements OnInit {
         break;
     }
     return returnClass;
+  }
+
+  resizeCanvas(event:any){
+    event.renderer.setSize( window.innerWidth, window.innerHeight );
   }
 }

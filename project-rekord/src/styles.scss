@@ -350,6 +350,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
+.home-info-dialog{
+  width: 400xp;
+  font-size: 18px;
+  .info-container{
+    padding: 20px;
+
+    .bold{
+      font-weight: bold;
+    }
+
+  }
+}
+
 //On Mobile
 @media screen and (max-width: 600px) {
   .propertyInfo{

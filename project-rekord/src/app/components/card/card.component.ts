@@ -126,4 +126,8 @@ export class CardComponent implements OnInit {
   }
   hoverCard(type:string){
   }
+
+  ngOnDestroy(){
+    this.getCardPosition$?.unsubscribe();
+  }
 }

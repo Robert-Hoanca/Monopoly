@@ -1,6 +1,6 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '']">
-    <!-- {background : 'radial-gradient(' + gameService.sessionColor + ',' +  gameService.LightenDarkenColor(this.gameService.sessionColor, -60)+ ')'} -->
-    <th-canvas id="gameCanvas" #canvas (onResize)=resizeCanvas($event) [shadow]="false" [rendererParameters]="rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="changeCardColor(); gamePhysicsService.renderPhysicsWorld()">
+
+    <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event);gameService.changeCardColor(scene); gamePhysicsService.renderPhysicsWorld()">
         <th-scene [autoUpdate]="true" #scene> <!--[thStats]="true"-->
             
             <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
@@ -11,15 +11,6 @@
             <app-dice *ngIf="gameService.startToDice"></app-dice>
             <app-dice *ngIf="gameService.startToDice"></app-dice>
 
-            <!-- <th-perspectiveCamera
-                [args]="[100, 2, 0.1, 1000]"
-                [position]="gameService.cameraPosition"
-                #camera
-            >
-                <th-mapControls #cameraControls [enabled]="!gameService.movingCamera && gameService.choosenMode == 'local'"></th-mapControls>
-            </th-perspectiveCamera> -->
-
-
             <th-orthographicCamera
                 [left]="-gameService.distance * this.gameService.aspect"
                 [right]="(gameService.distance * this.gameService.aspect)"
@@ -28,18 +19,18 @@
                 [near]="-1000"
                 [far]="2000"
                 [position]="[-10,10,-10]"
-                [zoom]="cameraZoom"
+                [zoom]="gameService.cameraZoom"
                 #camera
                 
             >
-                <th-mapControls #cameraControls [enabled]="gameService.enableMapControls" [target]="[8,0,8]"></th-mapControls>
+                <th-mapControls #cameraControls [target]="[8,0,8]" [enablePan]="false" [enableZoom]="true" [enableDamping]="false" [enableRotate]="false"></th-mapControls>
             </th-orthographicCamera>
 
             <app-decoration-item [whereAmI]="'insideCanvas'"></app-decoration-item>
         </th-scene>
-      </th-canvas>
+    </th-canvas>
 
-      <app-decoration-item [whereAmI]="'outsideCanvas'"></app-decoration-item>
+    <app-decoration-item [whereAmI]="'outsideCanvas'"></app-decoration-item>
       
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around start">
         <mat-card *ngFor="let player of gameService.players" [@mmAnimationScale] [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center start">
@@ -112,7 +103,7 @@
                 <mat-label>Card Color</mat-label>
                 <div class="colorContainer" fxLayoutAlign="start center">
                     <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardColor">
-                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="changeCardColor()">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor(scene)">
                 </div>
             </mat-form-field>
             <mat-form-field>

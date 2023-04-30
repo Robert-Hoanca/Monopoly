@@ -1,23 +1,53 @@
-<div id="home" (click)="goToChooseModeView()" [ngStyle]="{'background-color': returnSessionBg(), 'color' : returnSessionColor()}" fxLayout="column" fxLayoutAlign="center center">
-    <h1 id="title" (click)="$event.stopPropagation()">Monopoly</h1>
+<div class="home"  (click)="goToChooseModeView()" [ngStyle]="{'background-color': returnSessionBg(), 'color' : returnSessionColor()}" fxLayout="column" fxLayoutAlign="center center"> <!--(click)="goToChooseModeView()"-->
     
-    <span class="playText">PLAY</span>
+    <div class="home__ui-container" fxLayout="column" fxLayoutAlign="center center">
+        <h1 class="home__ui-container__title" (click)="$event.stopPropagation()" fxLayoutAlign="center center" fxLayout="column">
+            Monopoly  
+            <!-- <span>Js Edition</span> -->
+        </h1>
+    
+        <span class="playText">PLAY</span>
 
-    <span class="rightsSection" (click)="$event.stopPropagation()">@Hoanca Robert 2022 All Rights Reserved</span>
+        <span class="rightsSection" (click)="$event.stopPropagation()">@Hoanca Robert 2022 All Rights Reserved</span>
 
-
-    <div class="sideButtons" >
-        <button mat-icon-button id="theme-editor-btn" (click)="$event.stopPropagation();openGodModePopup()" [matTooltipPosition]="'left'" matTooltip="Settings" [disabled]="errorGodMode"><mat-icon>settings</mat-icon></button>
-        <button mat-icon-button *ngIf="gameService.godMode" id="theme-editor-btn" (click)="$event.stopPropagation();gameService.switchRouter('theme-editor')" [matTooltipPosition]="'left'" matTooltip="Edit Themes"><mat-icon>format_paint</mat-icon></button>
-        <button mat-icon-button *ngIf="gameService.godMode" id="gameTable-editor-btn" (click)="$event.stopPropagation();gameService.switchRouter('gameTable-editor')" [matTooltipPosition]="'left'" matTooltip="Edit GameTable"><mat-icon>edit_note</mat-icon></button>
+        <div class="sideButtons" >
+            <button mat-icon-button id="info-btn" (click)="$event.stopPropagation(); openInfoPopup()" [matTooltipPosition]="'left'" matTooltip="Info"><mat-icon class="material-symbols-outlined">info</mat-icon></button>
+            <button mat-icon-button id="settings-btn" (click)="$event.stopPropagation();openGodModePopup()" [matTooltipPosition]="'left'" matTooltip="Settings" [disabled]="errorGodMode"><mat-icon class="material-symbols-outlined">settings</mat-icon></button>
+            <button mat-icon-button *ngIf="gameService.godMode" id="theme-editor-btn" (click)="$event.stopPropagation();gameService.switchRouter('theme-editor')" [matTooltipPosition]="'left'" matTooltip="Edit Themes"><mat-icon class="material-symbols-outlined">format_paint</mat-icon></button>
+            <button mat-icon-button *ngIf="gameService.godMode" id="gameTable-editor-btn" (click)="$event.stopPropagation();gameService.switchRouter('gameTable-editor')" [matTooltipPosition]="'left'" matTooltip="Edit GameTable"><mat-icon class="material-symbols-outlined">edit_note</mat-icon></button>
+        </div>
     </div>
+
+    <th-canvas id="homeCanvas" #canvas [rendererParameters]="gameService.rendererOptions" [shadow]="false" (onResize)="gameService.resizeCanvas($event, camera)" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event);gameService.changeCardColor(scene)">
+        <th-scene [autoUpdate]="true" #scene>
+            
+            <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
+            <th-hemisphereLight [castShadow]="false"></th-hemisphereLight>
+            <app-card *ngFor="let card of homeGameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
+    
+            <th-orthographicCamera
+                [left]="-homeCameraDistance * this.gameService.aspect"
+                [right]="(homeCameraDistance * this.gameService.aspect)"
+                [top]="homeCameraDistance"
+                [bottom]="-homeCameraDistance"
+                [near]="-1000"
+                [far]="2000"
+                [position]="[-10,10,-10]"
+                [zoom]="1"
+                #camera
+                
+            >
+                <th-mapControls #cameraControls [enabled]="true" [target]="[8,0,8]"></th-mapControls>
+            </th-orthographicCamera>
+        </th-scene>
+    </th-canvas>
 </div>
 
 <ng-template #godModeDialogRef>
 
     <div class="god-container" fxLayoutAlign="center center" fxLayout="column">
 
-        <span [ngClass]="['god-container__title', errorGodMode ? 'error' : '']"> {{ errorGodMode ? ' Wrong Password, retry :D ' : 'Insert the god Password' }}</span>
+        <span [ngClass]="['god-container__title', errorGodMode ? 'error' : '']"> {{ errorGodMode ? ' Wrong Password, retry :D ' : 'Insert the Password' }}</span>
 
         <mat-form-field *ngIf="!errorGodMode">
             <mat-label>Password</mat-label>
@@ -28,5 +58,29 @@
 
     </div>
 
+
+</ng-template>
+
+
+<ng-template #infoDialogRef>
+
+    <div class="info-container">
+
+        Hi,<br>
+        My name is <span class="bold">Robert</span>, a <span class="bold">junior Front End Developer</span> based in <span class="bold">Italy</span>.<br><br>
+        This is a copy of the board game called "Monopoly", <br><br>
+        but in <span class="bold">3D</span>... and in a website. <br><br>
+
+        Tecnologies used in this project:<br>
+        - Angular<br>
+        - RxJs<br>
+        - Three js / ngx-Three<br>
+        - Cannon Js<br>
+        - Firebase Database<br>
+        - Blender<br><br>
+
+        Hope you enjoy playing it! :D
+
+    </div>
 
 </ng-template>
