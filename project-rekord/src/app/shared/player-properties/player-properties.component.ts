@@ -21,6 +21,10 @@ export class PlayerPropertiesComponent implements OnInit {
     return  this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerId));
   }
 
+  getPlayerGetOutCards(){
+    return  this.gameService.players.find(player => player.id === this.playerId).prison.getOutCards;
+  }
+
   selectProperty(property:any){
     if(this.imInExchange){
       property.exchangeSelected = !property.exchangeSelected;
