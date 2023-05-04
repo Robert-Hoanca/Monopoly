@@ -99,12 +99,36 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     box-shadow: none;
     padding: 0;
     display: flex;
-    height: 150px;
+    height: 325px;
     width: 300px;
     align-items: center;
     justify-content: space-evenly;
+    position: relative;
+  }
+  .doubleDiceTitle{
+    background: #fff;
+    position: absolute;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-radius: 10px;
+    h1{
+      margin: 0px;
+    }
+    span{
+      margin-top: 20px;
+      margin-left: 10px;
+    }
   }
   .dice{
+    &.double_one{
+      background-color: #f1f16f;
+      border-radius: 5px;
+    }
+    &.double_two{
+      background-color: #e14b4b;
+    }
     width: 100px;
     height: 100px;
     background: #fff;

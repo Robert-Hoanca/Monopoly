@@ -209,7 +209,24 @@ export class GameComponent implements OnInit {
     return returnClass;
   }
 
+  getDoubleDiceCounter(){
+    let returnClass = '';
+    switch (this.gameService.players[this.gameService.turn].prison.doubleDiceCounter) {
+      case 1:
+        returnClass = 'double_one';
+        break;
+      case 2:
+        returnClass = 'double_two';
+        break;
+    
+      default:
+        break;
+    }
+    return returnClass;
+  }
+
   resizeCanvas(event:any){
     event.renderer.setSize( window.innerWidth, window.innerHeight );
+    event.renderer.setPixelRatio(window.devicePixelRatio);
   }
 }

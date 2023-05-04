@@ -4,10 +4,6 @@ import { GameService } from 'src/app/game.service';
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import gsap from 'gsap'
-import { json } from 'stream/consumers';
-import { count } from 'console';
-import { parse } from 'path';
-
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
@@ -17,32 +13,46 @@ export class PlayerComponent implements OnInit {
   @Input() player:any;
   @ViewChild('playerRef', { static: true }) public playerRef:any;
   @ViewChild('playerRefOutline', { static: true }) playerRefOutline:any;
+  @ViewChild('cageRef', { static: true }) cageRef:any;
   playerPosition: Vector3 | any;
-  setPlayerPosition$: Subscription | undefined;
   playerHasRotate:boolean = false;
   playerIsGoingBack:boolean = false;
   playerArrived:boolean = false;
   gameTableSides:Array<string> = [
     'x', 'z', 'x', 'z'
   ];
+  playerInCage:boolean = false;
+  cagePosition: [x: number, y: number, z: number] = [0, 0, 0];
+  subscriptions$:Array<any> = [];
 
   constructor(public gameService: GameService) { }
 
   async ngOnInit() {
     this.setPlayerPosition(this.player.pawn.position,true);
-    this.setPlayerPosition$ = this.gameService.setPlayerPosition$.subscribe((data:any) =>{
-      if(this.playerArrived){
-        this.playerArrived = false;
-      }
-      if(this.player.id == this.gameService.players[this.gameService.turn].id){
-        if((this.gameService.randomChance && this.gameService.randomChance.count != undefined)){
-          //Only a chance can make the player go back
-          this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition, true)
-        }else{
-          this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition)
+    this.subscriptions$.push(
+      this.gameService.setPlayerPosition$.subscribe((data:any) =>{
+        if(this.playerArrived){
+          this.playerArrived = false;
         }
-      }
-    })
+        if(this.player.id == this.gameService.players[this.gameService.turn].id){
+          if((this.gameService.randomChance && this.gameService.randomChance.count != undefined)){
+            //Only a chance can make the player go back
+            this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition, true)
+          }else{
+            this.setPlayerPosition(data.cardPosition, false ,data.oldCardPosition)
+          }
+        }
+      })
+  
+    )
+    this.subscriptions$.push(
+      this.gameService.shouldRemovePlayerCage$.subscribe((data:any) => {
+        if(data.oldCardPosition !== undefined && this.player.id === data.playerId){
+          this.shouldRemovePrison(data.oldCardPosition);
+        }
+      })
+    )
+
   }
   async ngAfterViewInit(){
     setTimeout(() => {
@@ -53,10 +63,6 @@ export class PlayerComponent implements OnInit {
     setTimeout(() => {
       this.setOutline();
     }, 1000);
-  }
-
-  ngOnDestroy(){
-    this.setPlayerPosition$?.unsubscribe();
   }
 
   async setPlayerPosition(position:any, noAnimation?:boolean ,oldCardPosition?:number, goBack? :boolean){
@@ -93,7 +99,6 @@ export class PlayerComponent implements OnInit {
           actualSide = 0;
         }
 
-        console.log("actualSide", actualSide , "toGoSide" ,toGoSide, goBack)
         if(!goBack){
           if(actualSide === toGoSide){
             if(oldCardPosition < actualCardPosition){
@@ -194,6 +199,7 @@ export class PlayerComponent implements OnInit {
           }
         }},);
       }
+      this.ShouldSpawnPrison();
     }else if(this.gameTableSides[index] == 'z' && !this.playerArrived){
       let playerPos = parseFloat(JSON.parse(JSON.stringify(this.playerRef._objRef.position.z)).toFixed(1));
       let confrontatePosition:boolean = false;
@@ -237,13 +243,14 @@ export class PlayerComponent implements OnInit {
           }
         }},);
       }
+      this.ShouldSpawnPrison();
     }else{
     this.gameService.movingCamera = false;
     }
     this.playerHasRotate = false;
   }
 
-   async choosePlayerRotation(rotateBack:boolean, rotateforward:boolean){
+  async choosePlayerRotation(rotateBack:boolean, rotateforward:boolean){
     if(!this.playerHasRotate){
       let rotationValue = 0;
       if(rotateBack || rotateforward){
@@ -471,6 +478,7 @@ export class PlayerComponent implements OnInit {
         }
         return finalZNum;
       }  
+
       return 0;
       
     }else if(counterOfCards > 0 ? (index < counterOfCards) : (index > counterOfCards)){
@@ -548,4 +556,66 @@ export class PlayerComponent implements OnInit {
       })
     });
   }
+
+  ShouldSpawnPrison(){
+
+    const playerCardIndex = this.player.actualCard;
+
+    const prisonCardIndex = this.gameService.gameTable.cards.findIndex((card:any) => card.cardType === 'prison');
+
+    if(prisonCardIndex != -1 && playerCardIndex === prisonCardIndex && this.player.prison.inPrison){
+
+      this.playerInCage = true;
+      this.cagePosition = [this.player.pawn.position[0], 2 ,this.player.pawn.position[2]]
+      this.spawnCage(this.cageRef._objRef, 500);
+
+    }else{
+      this.playerInCage = false;
+    }
+
+  }
+
+  shouldRemovePrison(startingCardIndex:number){
+
+    const prisonCardIndex = this.gameService.gameTable.cards.findIndex((card:any) => card.cardType === 'prison');
+
+    if(prisonCardIndex != -1 && startingCardIndex === prisonCardIndex && this.playerInCage){
+      this.playerInCage = false;
+      this.deleteCage(this.cageRef._objRef, 500);
+    }
+
+  }
+
+  spawnCage(elementRef:any, duration:number){
+    if(elementRef){
+      gsap.fromTo(elementRef.scale, {x: elementRef.scale.x}, {x: 1, duration: duration/1000});
+      gsap.fromTo(elementRef.scale, {y: elementRef.scale.y}, {y: 1, duration: duration/1000});
+      gsap.fromTo(elementRef.scale, {z: elementRef.scale.z}, {z: 1, duration: duration/1000});
+
+      setTimeout(() => {
+        gsap.fromTo(elementRef.position, {y: elementRef.position.y}, {y: 0, duration: duration/1000});
+      }, duration);
+    }
+  }
+
+  deleteCage(elementRef:any, duration:number){
+    if(elementRef){
+
+      gsap.fromTo(elementRef.position, {y: elementRef.position.y}, {y: 2, duration: duration/1000});
+
+      setTimeout(() => {
+        gsap.fromTo(elementRef.scale, {x: elementRef.scale.x}, {x: 0, duration: duration/1000});
+        gsap.fromTo(elementRef.scale, {y: elementRef.scale.y}, {y: 0, duration: duration/1000});
+        gsap.fromTo(elementRef.scale, {z: elementRef.scale.z}, {z: 0, duration: duration/1000});
+      }, duration);
+
+    }
+  }
+
+  ngOnDestroy(){
+    this.subscriptions$.forEach(sub => {
+      sub.unsubscribe();
+    });
+  }
+
 }

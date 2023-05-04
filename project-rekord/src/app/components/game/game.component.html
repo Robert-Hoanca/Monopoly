@@ -57,7 +57,12 @@
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
 
     <ng-template #showDiceResultDialog>
-        <div *ngFor="let res of gamePhysicsService.diceRes" class="dice" [ngClass]="['dice', getDiceResClass(res)]" [@showDice]>       
+
+        <div class="doubleDiceTitle" *ngIf="gameService.players[gameService.turn].prison.doubleDiceCounter">
+            <h1>DOUBLE!! </h1> <span>x{{gameService.players[gameService.turn].prison.doubleDiceCounter}}</span>
+        </div>
+        <!-- [ngClass]="['dice', getDiceResClass(res), getDoubleDiceCounter() ]" -->
+        <div *ngFor="let res of gamePhysicsService.diceRes" [ngClass]="['dice', getDiceResClass(res)]" [@showDice]>       
             <div class="dotsContainer">
                 <div class="dot" *ngIf="res < 4"></div>
                 <div class="dot" *ngIf="res >= 2 && res <= 3"></div>

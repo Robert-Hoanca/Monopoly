@@ -170,14 +170,15 @@ export class GamePhysicsService {
 
   async showRollResults(){
     if(this.diceRes.length === 2){
+      if(this.diceRes[0]==this.diceRes[1]){
+        this.gameService.players[this.gameService.turn].prison.doubleDiceCounter++;
+      }
       this.openShowDiceResDialog(this.diceRes);
       setTimeout(async () => {
         this.dialog.closeAll()
-        //await this.gameService.setCameraPosition(this.gameService.camera, this.gameService.players[this.gameService.turn].pawn.position[0],this.gameService.players[this.gameService.turn].pawn.position[1],this.gameService.players[this.gameService.turn].pawn.position[2],1000,5, false)
         setTimeout(() => {
           if(!this.gameService.players[this.gameService.turn].prison.inPrison){
             if(this.diceRes[0]==this.diceRes[1]){
-              this.gameService.players[this.gameService.turn].prison.doubleDiceCounter++;
               this.gameService.players[this.gameService.turn].canDice = true;
             }else{
               this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;

@@ -101,6 +101,7 @@ export class GameService {
   getCardPosition$ = new Subject();
   setPlayerPosition$ = new Subject();
   openTextDialog$ = new Subject();
+  shouldRemovePlayerCage$ = new Subject();
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
@@ -717,6 +718,13 @@ export class GameService {
       this.textDialog({text:this.players[this.turn].name + ' exit from prison using free card.', actualPlayer: this.players[this.turn],shouldPay, exitFromDice}, 'exitFromPrison');
       this.players[this.turn].canDice=true;
     }
+
+    console.log("this.players[this.turn].actualCard", this.players[this.turn].actualCard)
+    this.shouldRemovePlayerCage$.next({
+      playerId: this.players[this.turn].id,
+      oldCardPosition: this.players[this.turn].actualCard
+    })
+
     this.players[this.turn].prison.inPrison=false;
     this.players[this.turn].prison.doubleDiceCounter=0;
     this.players[this.turn].prison.inPrisonTurnCounter=0;
