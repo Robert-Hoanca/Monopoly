@@ -8,6 +8,9 @@
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
     [scale]="[1,1,1]"
+    (onMouseEnter)="changeCardBorderColor('#ffffff')"
+    (onMouseExit)="changeCardBorderColor(this.gameService.sessionTheme.cardBorder)"
+    (onLoaded)="changeCardColor(this.gameService.sessionTheme.cardColor)"
     #cardRef
 >
 </th-object3D>
@@ -19,6 +22,7 @@
     [scale]="[1.05, 1.05, 1.05]"
     [name]="'cardOutline'+ cardIndex"
     #cardOutlineRef
+    (onLoaded)="changeCardBorderColor(this.gameService.sessionTheme.cardBorder)"
 >
 </th-object3D>
 

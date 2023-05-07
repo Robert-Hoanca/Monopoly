@@ -1,6 +1,6 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '']">
 
-    <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event);gameService.changeCardColor(scene); gamePhysicsService.renderPhysicsWorld()">
+    <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event); gamePhysicsService.renderPhysicsWorld()">
         <th-scene [autoUpdate]="true" #scene> <!--[thStats]="true"-->
             
             <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
@@ -109,15 +109,15 @@
             <mat-form-field>
                 <mat-label>Card Color</mat-label>
                 <div class="colorContainer" fxLayoutAlign="start center">
-                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardColor">
-                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor(scene)">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor()">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor()">
                 </div>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Card Border</mat-label>
                 <div class="colorContainer" fxLayoutAlign="start center" fxLayoutAlign="start center">
-                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardBorder">
-                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardBorder">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor()">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor()">
                 </div>
             </mat-form-field>
         </div>

@@ -314,24 +314,20 @@ export class GameService {
     this.getCardPosition$.next(cardIndex);
   }
 
-  changeCardColor(scene:any){
-    scene._objRef.children.forEach((child:any) => {
+  changeCardColor(){
+    this.gameScene.children.forEach((child:any) => {
       if( child.name.includes('cardNumber')){
         child.traverse((child:any) => {
           if(child.isMesh ){
-            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionColor, -20)});
             const material = new THREE.MeshBasicMaterial({color: this.sessionTheme.cardColor});
             child.material = material
-            //this.cardChangedCounter++;
           }
         })
       }else if( child.name.includes('cardOutline')){
         child.traverse((child:any) => {
           if(child.isMesh ){
-            //const material = new THREE.MeshBasicMaterial({color: this.gameService.LightenDarkenColor(this.gameService.sessionTheme.cardColor, -30), side: THREE.BackSide});
-            const material = new THREE.MeshBasicMaterial({color: this.sessionTheme.cardBorder, side: THREE.BackSide});
+           const material = new THREE.MeshBasicMaterial({color: this.sessionTheme.cardBorder, side: THREE.BackSide});
             child.material = material
-            //this.cardOutlineChangedCounter++;
           }
         })
       }

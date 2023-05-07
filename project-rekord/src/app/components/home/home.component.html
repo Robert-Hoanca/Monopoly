@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <th-canvas id="homeCanvas" #canvas [rendererParameters]="gameService.rendererOptions" [shadow]="false" (onResize)="gameService.resizeCanvas($event, camera)" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event);gameService.changeCardColor(scene)">
+    <th-canvas id="homeCanvas" #canvas [rendererParameters]="gameService.rendererOptions" [shadow]="false" (onResize)="gameService.resizeCanvas($event, camera)" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event)">
         <th-scene [autoUpdate]="true" #scene>
             
             <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>

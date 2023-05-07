@@ -41,6 +41,7 @@ export class CardComponent implements OnInit {
   }
 
   ngAfterViewInit(){
+
   }
   setCardPosition(){
     if( this.cardIndex==11 || this.cardIndex==21 || this.cardIndex==31){
@@ -124,8 +125,28 @@ export class CardComponent implements OnInit {
 
    
   }
-  hoverCard(type:string){
+
+  changeCardColor(color:any){
+    
+    this.cardRef._objRef.traverse((child:any) => {
+        if(child.isMesh ){
+          const material = new THREE.MeshBasicMaterial({color: color});
+          child.material = material
+        }
+      })
   }
+
+
+  changeCardBorderColor(color:string){
+
+    this.cardOutlineRef._objRef.traverse((child:any) => {
+      if(child.isMesh ){
+        const material = new THREE.MeshBasicMaterial({color: color, side: THREE.BackSide});
+        child.material = material
+      }
+    })
+  }
+  
 
   ngOnDestroy(){
     this.getCardPosition$?.unsubscribe();
