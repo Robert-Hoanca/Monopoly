@@ -882,47 +882,40 @@ export class GameService {
   }
 
   test(number?:number){
-    // if(number !== undefined){
-    //   this.randomChance = {
-    //     title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-    //     action: "move",
-    //     tileid: "trafalgarsquare",
-    //     cardIndex: number
-    //   };
-    //    this.textDialog({
-    //    title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-    //    action: "move",
-    //    tileid: "trafalgarsquare",
-    //    cardIndex: number
-    //    },'chance');
+    if(number !== undefined){
+      this.randomChance = {
+        title: "Advance to Trafalgar Square - If you pass Go, collect $200",
+        action: "move",
+        tileid: "trafalgarsquare",
+        cardIndex: number
+      };
+       this.textDialog({
+       title: "Advance to Trafalgar Square - If you pass Go, collect $200",
+       action: "move",
+       tileid: "trafalgarsquare",
+       cardIndex: number
+       },'chance');
 
-    // }else{
+    }else{
 
-    //   // this.randomChance = {
-    //   //   title: "Advance to Go (Collect $200)",
-    //   //   action: "move",
-    //   //   tileid: "go",
-    //   //   cardIndex: 0
-    //   // };
+      // this.randomChance = {
+      //   title: "Advance to Go (Collect $200)",
+      //   action: "move",
+      //   tileid: "go",
+      //   cardIndex: 0
+      // };
   
-    //   // this.textDialog( this.randomChance,'chance');
+      // this.textDialog( this.randomChance,'chance');
 
-    //   this.randomChest = {
-    //     title: "Test",
-    //     action: "jail",
-    //     subaction: 'goto'
-    //   };
-  
-    //   this.textDialog( this.randomChest,'communityChest');
-    // }
-
-          this.randomChest = {
+      this.randomChest = {
         title: "Test",
         action: "jail",
         subaction: 'goto'
       };
   
       this.textDialog( this.randomChest,'communityChest');
+    }
+
 
   }
   
