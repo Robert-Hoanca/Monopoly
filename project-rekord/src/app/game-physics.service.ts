@@ -171,19 +171,22 @@ export class GamePhysicsService {
   async showRollResults(){
     if(this.diceRes.length === 2){
       if(this.diceRes[0]==this.diceRes[1]){
-        this.gameService.players[this.gameService.turn].prison.doubleDiceCounter++;
+        this.gameService.players[this.gameService.turn].canDice = true;
+      }else{
+        this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
+        this.gameService.players[this.gameService.turn].canDice = false;
       }
       this.openShowDiceResDialog(this.diceRes);
       setTimeout(async () => {
         this.dialog.closeAll()
         setTimeout(() => {
           if(!this.gameService.players[this.gameService.turn].prison.inPrison){
-            if(this.diceRes[0]==this.diceRes[1]){
-              this.gameService.players[this.gameService.turn].canDice = true;
-            }else{
-              this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
-              this.gameService.players[this.gameService.turn].canDice = false;
-            }
+            // if(this.diceRes[0]==this.diceRes[1]){
+            //   this.gameService.players[this.gameService.turn].canDice = true;
+            // }else{
+            //   this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
+            //   this.gameService.players[this.gameService.turn].canDice = false;
+            // }
             this.gameService.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.gameService.players[this.gameService.turn].actualCard);
             if(this.gameService.diceNumber && this.gameService.diceNumber > (this.gameService.gameTable.cards.length - 1)){
               this.gameService.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameService.gameTable.cards.length - 1) - this.gameService.players[this.gameService.turn].actualCard)) - 1);

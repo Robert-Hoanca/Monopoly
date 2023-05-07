@@ -920,7 +920,13 @@ export class GameService {
     //   this.textDialog( this.randomChest,'communityChest');
     // }
 
-    this.players[this.turn].prison.getOutCards ++;
+          this.randomChest = {
+        title: "Test",
+        action: "jail",
+        subaction: 'goto'
+      };
+  
+      this.textDialog( this.randomChest,'communityChest');
 
   }
   

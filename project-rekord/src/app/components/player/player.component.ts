@@ -72,7 +72,8 @@ export class PlayerComponent implements OnInit {
       this.playerRef._objRef.position.x = position[0];
       this.playerRefOutline._objRef.position.x = position[0]
       this.playerRef._objRef.position.z = position[2];
-      this.playerRefOutline._objRef.position.z = position[2]
+      this.playerRefOutline._objRef.position.z = position[2];
+      this.ShouldSpawnPrison();
     }else{
       if(oldCardPosition != undefined){
 
