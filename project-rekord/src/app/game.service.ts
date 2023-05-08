@@ -137,10 +137,7 @@ export class GameService {
     }
 
     //Maps
-    const getMaps = await getDocs(collection(this.db, "gameTables"));
-    getMaps.forEach((doc) => {
-      this.gameMaps.push(doc.id)
-    });
+    await this.getGameMaps(); 
 
 
     //bgColors
@@ -169,6 +166,14 @@ export class GameService {
     });
     this.pawnTypes.forEach((pawn:any) => {
         this.pawnUrls.push('/assets/blenderModels/pawns/' + pawn.value + '/scene.gltf')
+    });
+  }
+
+  async getGameMaps(){
+    const getMaps = await getDocs(collection(this.db, "gameTables"));
+    this.gameMaps = [];
+    getMaps.forEach((doc) => {
+      this.gameMaps.push(doc.id)
     });
   }
 

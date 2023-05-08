@@ -280,10 +280,12 @@ export class GameTableEditorComponent implements OnInit {
     
   }
 
-  deleteMapFromDB(){
+  async deleteMapFromDB(){
 
     if(this.chosenMap !== 'newMap'){
       this.gameService.deleteMapFromDb(this.chosenMap);
+      await this.gameService.getGameMaps();
+      this.chosenMap = '';
     }
     this.closeDialog();
 
