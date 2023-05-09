@@ -149,9 +149,9 @@ export class GamePhysicsService {
 
   diceRoll(dice:any){
     this.dicesRolling = true;
-    dice.body.position.x = 10;
-    dice.body.position.z = 10;
-    dice.body.position.y = 10;
+    dice.body.position.x = Math.round((Math.random() * 12 ) + 10);
+    dice.body.position.z = Math.round((Math.random() * 12 ) + 10);
+    dice.body.position.y = Math.round((Math.random() * 12 ) + 10);
 
     dice.body.velocity.setZero();
     dice.body.angularVelocity.setZero();
@@ -160,7 +160,7 @@ export class GamePhysicsService {
     dice.mesh.rotation.set(2 * Math.PI * Math.random(), 0, 2 * Math.PI * Math.random())
     dice.body.quaternion.copy(dice.mesh.quaternion);
 
-    const force = 3 + 5 * Math.random();
+    const force = 3 + 0 * Math.random();
     dice.body.applyImpulse(
       new CANNON.Vec3(force , 0, force),
       new CANNON.Vec3(0, 0.2 ,0 )
@@ -177,6 +177,9 @@ export class GamePhysicsService {
         this.gameService.players[this.gameService.turn].prison.doubleDiceCounter=0;
         this.gameService.players[this.gameService.turn].canDice = false;
       }
+
+      this.gameService.setCameraOnPlayer(1000)
+
       this.openShowDiceResDialog(this.diceRes);
       setTimeout(async () => {
         this.dialog.closeAll()

@@ -106,15 +106,16 @@ export class GameComponent implements OnInit {
       document.querySelector("canvas")?.dispatchEvent(evt);
       this.gameService.enableMapControls = false;
     }, 500);
-
     if(this.gameService.localSaves == 'new'){
       setTimeout(() => {
         this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' begins the game!'}, 'playerWhoBegins')
       }, 1500);
     }
+    this.gameService.setCameraOnPlayer(1500)
     this.activateLocalSave();
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
+    
   }
   activateLocalSave(){
     setInterval(() => {
@@ -152,26 +153,27 @@ export class GameComponent implements OnInit {
         this.gameService.textDialog({text:(this.gameService.players[this.gameService.turn].name) + ' have to pay ' + this.gameService.amountDebt + ' of debts to the bank.',debtWithWho: this.gameService.debtWithWho,amountDebt:this.gameService.amountDebt, playerRent:false, playerId:''}, 'payMoney');
       }
     }else{
-      this.gameService.nextTurn()
+      this.gameService.nextTurn();
     }
   }
 
   async rollTheDice(){
-    //setcamera position on the corner opposite the start
-    //await this.gameService.setCameraPosition(this.gameService.camera, 25,15,25,1000,5, false,'diceRoll')
+    this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000)
 
     if(this.gameService.startToDice){
       this.gameService.startToDice = false;
     }
-    if(!this.gameService.players[this.gameService.turn].prison.inPrison){
-      this.gameService.startToDice = true;
-      this.gamePhysicsService.diceArray.forEach(dice => {
-        this.gamePhysicsService.diceRoll(dice);
-      });
-     
-    }else{
-     this.whatToDoInPrison('prisonRoll')
-    }
+    setTimeout(() => {
+      if(!this.gameService.players[this.gameService.turn].prison.inPrison){
+        this.gameService.startToDice = true;
+        let index = 0;
+        this.gamePhysicsService.diceArray.forEach(dice => {
+          this.gamePhysicsService.diceRoll(dice);
+        });
+      }else{
+       this.whatToDoInPrison('prisonRoll')
+      }
+    }, 1000);
   }
 
   whatToDoInPrison(action:string){

@@ -52,7 +52,7 @@
         <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="rollTheDice()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" [matTooltipPosition]="'above'" matTooltip="Dice"><mat-icon>casino</mat-icon></button>
         <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" (click)="whatToDoInPrison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay and exit"><mat-icon>payments</mat-icon></button>
         <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" [matTooltipPosition]="'above'" matTooltip="Use free card and exit"><mat-icon>exit_to_app</mat-icon></button>  
-        <!-- <button mat-raised-button (click)="gameService.test(30)">test</button> -->
+        <button mat-raised-button (click)="gameService.test()">test</button>
     </div>
 
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon>pause</mat-icon></button>
@@ -122,7 +122,7 @@
         </div>
 
         <div class="camera" fxLayout="column">
-            <span class="title">Camera controls</span>
+            <span class="title">Camera</span>
 
             <mat-form-field>
                 <mat-label>Position X</mat-label>
@@ -139,21 +139,42 @@
                 <input matInput type="number" [(ngModel)]="gameService.camera._objRef.position.z">
             </mat-form-field>
 
+            <mat-form-field>
+                <mat-label>Zoom</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.zoom">
+            </mat-form-field>
+
+            <!-- <mat-form-field>
+                <mat-label>Rotation X</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.rotation.x">
+            </mat-form-field>
 
             <mat-form-field>
-                <mat-label>Position X</mat-label>
+                <mat-label>Rotation Y</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.rotation.y">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Rotation Z</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.rotation.z">
+            </mat-form-field> -->
+
+            <span class="title">Camera Controls </span>
+            <mat-form-field>
+                <mat-label>Target X</mat-label>
                 <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.x">
             </mat-form-field>
 
             <mat-form-field>
-                <mat-label>Position Y</mat-label>
+                <mat-label>Target Y</mat-label>
                 <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.y">
             </mat-form-field>
 
             <mat-form-field>
-                <mat-label>Position Z</mat-label>
+                <mat-label>Target Z</mat-label>
                 <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.z">
             </mat-form-field>
+
         </div>
 
     </div>

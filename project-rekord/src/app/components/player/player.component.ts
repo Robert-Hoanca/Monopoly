@@ -174,7 +174,12 @@ export class PlayerComponent implements OnInit {
 
       let xIndex = 0;
       for ((counterOfCards > 0 ? xIndex = 1 : xIndex = -1); (counterOfCards > 0 ? xIndex <= Math.round(counterOfCards) : xIndex >= Math.round(counterOfCards)) ;(counterOfCards > 0 ? xIndex++ : xIndex--)) {
-        //this.gameService.setCameraPosition(this.gameService.camera, playerPos +  parseFloat(( xIndex * 2.2).toFixed(1)), position[1], position[2],800,5, true, 'x');
+        if(counterOfCards > 0){
+          this.gameService.setCameraPosition([(this.gameService.camera._objRef.position.x) + 1 , 10 , this.gameService.camera._objRef.position.z - 1], [this.gameService.cameraControls._objRef.target.x + 1, 0 , this.gameService.cameraControls._objRef.target.z - 1], 1000)
+        }else{
+          this.gameService.setCameraPosition([this.gameService.camera._objRef.position.x - 1 , 10 , this.gameService.camera._objRef.position.z + 1], [this.gameService.cameraControls._objRef.target.x - 1, 0 , this.gameService.cameraControls._objRef.target.z + 1], 1000)
+        }
+
         let shouldJump : boolean = false;
         let anotherPlayerOffset:number = 0;
         if(xIndex === Math.round(counterOfCards) || xIndex === 1 || xIndex === -1){
@@ -224,7 +229,13 @@ export class PlayerComponent implements OnInit {
       let counterOfCards = Math.round(Math.round(position[2]) != 22 ? (parseFloat(position[2].toFixed(1)) / 2.2) - (playerPos / 2.2) : (22 / 2.2) - (playerPos / 2.2));
       let zIndex = 0;
       for ((counterOfCards > 0 ? zIndex = 1 : zIndex = -1); (counterOfCards > 0 ? zIndex <= Math.round(counterOfCards) : zIndex >= Math.round(counterOfCards)) ;(counterOfCards > 0 ? zIndex++ : zIndex--)) {
-        //this.gameService.setCameraPosition(this.gameService.camera, position[0] , position[1], playerPos +  parseFloat(( zIndex * 2.2).toFixed(1)),800,5, true, 'z');
+        if(counterOfCards > 0){
+          this.gameService.setCameraPosition([this.gameService.camera._objRef.position.x - 1 , 10 , this.gameService.camera._objRef.position.z + 1], [this.gameService.cameraControls._objRef.target.x - 1, 0 , this.gameService.cameraControls._objRef.target.z + 1], 1000)
+        }else{
+          
+          this.gameService.setCameraPosition([this.gameService.camera._objRef.position.x + 1 , 10 , this.gameService.camera._objRef.position.z - 1], [this.gameService.cameraControls._objRef.target.x + 1, 0 , this.gameService.cameraControls._objRef.target.z - 1], 1000)
+        }
+        
         let shouldJump : boolean = false;
         let anotherPlayerOffset:number = 0;
         if(zIndex === Math.round(counterOfCards) || zIndex === 1 || zIndex === -1){
@@ -566,7 +577,7 @@ export class PlayerComponent implements OnInit {
 
     const prisonCardIndex = this.gameService.gameTable.cards.findIndex((card:any) => card.cardType === 'prison');
 
-    if(prisonCardIndex != -1 && playerCardIndex === prisonCardIndex && this.player.prison.inPrison){
+    if(prisonCardIndex != -1 && playerCardIndex === prisonCardIndex && this.player.prison.inPrison && this.playerArrived){
 
       this.playerInCage = true;
       this.cagePosition = [this.player.pawn.position[0], 2 ,this.player.pawn.position[2]]

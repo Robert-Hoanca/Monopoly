@@ -139,7 +139,6 @@ export class GameService {
     //Maps
     await this.getGameMaps(); 
 
-
     //bgColors
     const getBgColors = doc(this.db, "colors", 'bgColors');
     const colors = await (await getDoc(getBgColors)).data();
@@ -282,37 +281,47 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string) : Promise<any>{
-
-    //If the camera should follow the player then, based on given axis, move the camera on that axis to the given position. Otherwise move the entire camera position at a time to that position
-   if(playerMoving){
-    if(axis){
-      if(axis == 'x'){
-        camera._objRef.position.set(0, 10 , -15)
-        /*gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: (-10) + 10, duration: 1000/1000});
-        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: (-10) -10, duration: 1000/1000});*/
-       }else if(axis == 'z'){
-        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: z, duration: 1000/1000});
-       }
+  setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number){
+    //Camera
+    if(this.userDevice.includes('phone')){
+      if(cameraPosition){
+        gsap.fromTo(this.camera._objRef.position, {x: this.camera._objRef.position.x}, {x: cameraPosition[0], duration: duration/1000});
+        gsap.fromTo(this.camera._objRef.position, {y: this.camera._objRef.position.y}, {y: cameraPosition[1], duration: duration/1000});
+        gsap.fromTo(this.camera._objRef.position, {z: this.camera._objRef.position.z}, {z: cameraPosition[2], duration: duration/1000});
+      }
+  
+      //Camera Controls 
+      if(cameraControlsPosition){
+        gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: cameraControlsPosition[0], duration: duration/1000});
+        gsap.fromTo(this.cameraControls._objRef.target, {y:this.cameraControls._objRef.target.y}, {y: cameraControlsPosition[1], duration: duration/1000});
+        gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: cameraControlsPosition[2], duration: duration/1000});
+      }
     }
-   }else if(!playerMoving){
-   /* console.log("xOffset", xOffset)
-    this.movingCamera = true;
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: axis == 'diceRoll' ? x : (xOffset ? (x + xOffset) : x), duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: axis == 'diceRoll' ? y : (offset ? (y + (offset/2)) : y), duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: axis == 'diceRoll' ? z : (zOffset ? (z + zOffset) : z), duration: duration/1000});
+  }
 
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: axis == 'diceRoll' ? x : x, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: axis == 'diceRoll' ? y : y, duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: axis == 'diceRoll' ? z : z, duration: duration/1000});
-    setTimeout(() => {
-      this.movingCamera = false;
-     }, duration);*/
-   }
-   //Make the camera look at a target
-  /* gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: axis == 'diceRoll' ? 0: x, duration: 1000/1000});
-   gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: axis == 'diceRoll' ? 0: y, duration: 1000/1000});
-   gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: axis == 'diceRoll' ? 0: z, duration: 1000/1000});*/
+  setCameraOnPlayer(timeOutTimer:number){
+
+    if(this.userDevice.includes('phone')){
+      const playerCardIndex = this.players[this.turn].actualCard;
+      let numberToSumSub = 0;
+  
+      if(playerCardIndex <= 10){
+        numberToSumSub = playerCardIndex;
+      } else if (playerCardIndex >= 10 && playerCardIndex <= 20){
+        numberToSumSub = 10 - (playerCardIndex - 10);
+      }else if (playerCardIndex >= 20 && playerCardIndex <= 30){
+        numberToSumSub = - (playerCardIndex - 20);
+      }else if (playerCardIndex >= 30 && playerCardIndex <= 39){
+        numberToSumSub = - (40 - playerCardIndex);
+      }
+  
+      if(playerCardIndex){
+        setTimeout(() => {
+          this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000)
+        }, timeOutTimer);
+      }
+    }
+    
   }
 
   getCardPosition(cardIndex:any){
@@ -403,7 +412,8 @@ export class GameService {
         }
       }
     }
-    this.players[this.turn] = this.players[this.turn];
+    //this.players[this.turn] = this.players[this.turn];
+    this.setCameraOnPlayer(0)
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
     
@@ -411,37 +421,6 @@ export class GameService {
       this.randomChance = undefined;
       this.randomChance = undefined;
     }
-    //this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
-  }
-  
-  //OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
-  async rollTheDice(){
-    if(!this.players[this.turn].prison.inPrison){
-      this.startToDice = true;
-      /* this.diceRes = this.getDiceRoll();
-      if(this.diceRes[0]==this.diceRes[1]){
-        this.players[this.turn].prison.doubleDiceCounter++;
-        this.players[this.turn].canDice = true;
-      }else{
-        this.players[this.turn].prison.doubleDiceCounter=0;
-        this.players[this.turn].canDice = false;
-      }
-      this.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.players[this.turn].actualCard);
-      if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
-        this.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameTable.cards.length - 1) - this.players[this.turn].actualCard)) - 1);
-      }*/
-      // this.getCardPosition(this.diceNumber)
-     
-    }else{
-     this.whatToDoInprison('prisonRoll')
-    }
-  }
-
-  getDiceRoll(){
-    //ADD doubleDiceCounter COLORING TO THE DICE
-    const dice1 = Math.round(Math.random() * (6 - 1) + 1);
-    const dice2 = Math.round(Math.random() * (6 - 1) + 1);
-    return [dice1,dice2];
   }
 
   payTaxes(property:any){
@@ -685,25 +664,6 @@ export class GameService {
     this.getCardPosition$.next(prisonIndex);
     this.players[this.turn].canDice=false;
   }
-//OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
-  whatToDoInprison(action:string){
-    if(action == 'payToExit'){
-      this.exitFromPrison(true, false);
-    }if(action == 'freeExit'){
-      this.exitFromPrison(false, false);
-    }else if(action == 'prisonRoll'){
-      const diceRes = this.getDiceRoll();
-      if(diceRes[0] == diceRes[1]){
-        this.exitFromPrison(false, true,diceRes[0],diceRes[1]);
-        
-      }else if(this.players[this.turn].prison.inPrisonTurnCounter == 2){
-        this.exitFromPrison(true, false,diceRes[0],diceRes[1]);
-      }else{
-        this.players[this.turn].prison.inPrisonTurnCounter++;
-        this.players[this.turn].canDice = false;
-      }
-    }
-  }
 
   exitFromPrison(shouldPay:boolean, exitFromDice:boolean, dice1?:number, dice2?:number){
     if(shouldPay && !exitFromDice){
@@ -886,44 +846,11 @@ export class GameService {
     '#000' : '#fff';
   }
 
-  test(number?:number){
-    if(number !== undefined){
-      this.randomChance = {
-        title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-        action: "move",
-        tileid: "trafalgarsquare",
-        cardIndex: number
-      };
-       this.textDialog({
-       title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-       action: "move",
-       tileid: "trafalgarsquare",
-       cardIndex: number
-       },'chance');
 
-    }else{
-
-      // this.randomChance = {
-      //   title: "Advance to Go (Collect $200)",
-      //   action: "move",
-      //   tileid: "go",
-      //   cardIndex: 0
-      // };
-  
-      // this.textDialog( this.randomChance,'chance');
-
-      this.randomChest = {
-        title: "Test",
-        action: "jail",
-        subaction: 'goto'
-      };
-  
-      this.textDialog( this.randomChest,'communityChest');
-    }
-
-
+  test(){
+    this.randomChance = this.gameTable.chance[8];
+      this.textDialog(this.randomChance,'chance');
   }
-  
 
   //Database Management
 
