@@ -18,7 +18,7 @@ export class BoatItemComponent implements OnInit {
   randomStartingPointX: number = Math.round((Math.random() * (50 + (0) + 1))) + 50;
   randomStartingPointZ: number = Math.round((Math.random() * (50 + (0) + 1))) + 50;
   rotationY:number = 0;
-  randomscale:number = (Math.random() * (0.5 - 0.2 + 0.5)) + 0.2;
+  randomscale:number = ((Math.random() * 0.8 ) + 0.5)
 
   randomAnimDuration: number =  Math.round((Math.random() * 20 ) + 15);
   
@@ -40,7 +40,7 @@ export class BoatItemComponent implements OnInit {
       this.setOutline();
       
       setTimeout(() => {
-        this.recalculateRandomNum.emit();
+        //this.recalculateRandomNum.emit();
         this.chooseStartingPoint();
       }, 100 * this.randomTimeout);
 
@@ -55,21 +55,25 @@ export class BoatItemComponent implements OnInit {
     if( this.direction < 0 ){
       if( this.axis > 0){
         this.rotationY = -Math.PI;
+        this.moveGSAP(this.boatRef._objRef, 'y', this.rotationY , 0);
         this.moveGSAP(this.boatRef._objRef, 'x', (Math.round((Math.random() * (50 + (0) + 1))) + 50) , 0);
         this.moveGSAP(this.boatRef._objRef, 'z',  ((Math.round(Math.random()) ? 1 : -1) * (Math.round(Math.random() * (10 + (0) + 1)) + 24)) , 0);
       }else if( this.axis < 0){
         this.rotationY = Math.PI/2;
+        this.moveGSAP(this.boatRef._objRef, 'y', this.rotationY , 0);
         this.moveGSAP(this.boatRef._objRef, 'z', (Math.round((Math.random() * (50 + (0) + 1))) + 50) , 0);
         this.moveGSAP(this.boatRef._objRef, 'x',  (Math.round(Math.random()) ? 1 : -1) * (Math.round(Math.random() * (20 + (0) + 1)) + 24) , 0);
       }
     }else if( this.direction > 0 ){
       if( this.axis > 0){        
         this.rotationY = 0;
+        this.moveGSAP(this.boatRef._objRef, 'y', this.rotationY , 0);
         this.moveGSAP(this.boatRef._objRef, 'x', -(Math.round(Math.random() * (50 + (0) + 1)) + 50) , 0);
         this.moveGSAP(this.boatRef._objRef, 'z',  (Math.round(Math.random()) ? 1 : -1) * (-Math.round(Math.random() * (10 + (0) + 1))  -24) , 0);
 
       }else if( this.axis < 0){
         this.rotationY = -Math.PI/2;
+        this.moveGSAP(this.boatRef._objRef, 'y', this.rotationY , 0);
         this.moveGSAP(this.boatRef._objRef, 'z', -(Math.round(Math.random() * (50 + (0) + 1)) + 50) , 0);
         this.moveGSAP(this.boatRef._objRef, 'x',  (Math.round(Math.random()) ? 1 : -1) * (-Math.round(Math.random() * (10 + (0) + 1))  -24) , 0);
       }
@@ -154,6 +158,10 @@ export class BoatItemComponent implements OnInit {
         gsap.fromTo(element.position, {z: element.position.z}, {z: toPosition, duration: duration});
         gsap.fromTo(this.boatRefOutline._objRef.position, {z: this.boatRefOutline._objRef.position.z}, {z: toPosition, duration: duration});
       }
+    }else if(axis === 'y'){
+     console.log("wdwadwa", toPosition)
+      gsap.fromTo(element.rotation, {y: element.rotation.y}, {y: toPosition, duration: duration});
+      gsap.fromTo(this.boatRefOutline._objRef.rotation, {y: this.boatRefOutline._objRef.rotation.y}, {y: toPosition, duration: duration});
     }
   }
 

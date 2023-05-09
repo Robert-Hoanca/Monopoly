@@ -111,7 +111,7 @@ export class GameComponent implements OnInit {
         this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' begins the game!'}, 'playerWhoBegins')
       }, 1500);
     }
-    this.gameService.setCameraOnPlayer(1500)
+    this.gameService.setCameraOnPlayer(1500);
     this.activateLocalSave();
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;

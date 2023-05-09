@@ -18,7 +18,6 @@ export class DecorationsService {
     this.randomChosenDecorations = [];
     let decoration1:any = this.decorations[Math.round((Math.random() * (this.decorations.length - 1)) + 0)];
     let decoration2:any = this.decorations[Math.round((Math.random() * (this.decorations.length - 1)) + 0)]
-
     if(decoration1.type.includes(decoration2.notCompatibleType) || decoration1.type.includes(decoration2.type)){
       while(decoration1.type.includes(decoration2.notCompatibleType) || decoration1.type.includes(decoration2.type)){
         decoration2 = this.decorations[Math.round((Math.random() * (this.decorations.length - 1)) + 0)]
