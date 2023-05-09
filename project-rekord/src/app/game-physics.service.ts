@@ -149,9 +149,9 @@ export class GamePhysicsService {
 
   diceRoll(dice:any){
     this.dicesRolling = true;
-    dice.body.position.x = Math.round((Math.random() * 12 ) + 10);
-    dice.body.position.z = Math.round((Math.random() * 12 ) + 10);
-    dice.body.position.y = Math.round((Math.random() * 12 ) + 10);
+    dice.body.position.x = Math.round((Math.random() * 9 ) + 7);
+    dice.body.position.z = Math.round((Math.random() * 10 ) + 7);
+    dice.body.position.y = Math.round((Math.random() * 9 ) + 7);
 
     dice.body.velocity.setZero();
     dice.body.angularVelocity.setZero();

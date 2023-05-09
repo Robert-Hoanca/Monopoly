@@ -315,11 +315,9 @@ export class GameService {
         numberToSumSub = - (40 - playerCardIndex);
       }
   
-      if(playerCardIndex){
-        setTimeout(() => {
-          this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000)
-        }, timeOutTimer);
-      }
+      setTimeout(() => {
+        this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000)
+      }, timeOutTimer)
     }
     
   }
