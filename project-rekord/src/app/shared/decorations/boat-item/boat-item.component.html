@@ -13,6 +13,7 @@
     [position]="[randomStartingPointX,0,randomStartingPointZ]"
     [scale]="[randomscale + 0.05,randomscale + 0.05,randomscale + 0.05]"
     [name]="'boat_outline'"
+    (onLoaded)="setOutline()"
     #boatRefOutline
 >
 </th-object3D>

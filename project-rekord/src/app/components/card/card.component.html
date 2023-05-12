@@ -8,8 +8,8 @@
     [castShadow]="true"
     [name]="'cardNumber'+ cardIndex"
     [scale]="[1,1,1]"
-    (onMouseEnter)="changeCardBorderColor('#ffffff')"
-    (onMouseExit)="changeCardBorderColor(this.gameService.sessionTheme.cardBorder)"
+    (onMouseEnter)="this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant' ? changeCardBorderColor('#ffffff') : ''; enableCursorOnHover(true)"
+    (onMouseExit)="this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant' ? changeCardBorderColor(this.gameService.sessionTheme.cardBorder) : ''; enableCursorOnHover(false)"
     (onLoaded)="changeCardColor(this.gameService.sessionTheme.cardColor)"
     #cardRef
 >

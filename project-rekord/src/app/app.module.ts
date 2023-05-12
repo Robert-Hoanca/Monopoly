@@ -46,7 +46,6 @@ import { MessageDialogComponent } from './shared/message-dialog/message-dialog.c
 import { PlayerPropertiesComponent } from './shared/player-properties/player-properties.component';
 import { DiceComponent } from './shared/dice/dice.component';
 import { DecorationItemComponent } from './shared/decoration-item/decoration-item.component';
-import { RandomNumPipePipe } from './pipes/random-num-pipe.pipe';
 import { WaterWaveItemComponent } from './shared/decorations/water-wave-item/water-wave-item.component';
 import { CloudItemComponent } from './shared/decorations/cloud-item/cloud-item.component';
 import { BoatItemComponent } from './shared/decorations/boat-item/boat-item.component';
@@ -74,7 +73,6 @@ import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rai
     PlayerPropertiesComponent,
     DiceComponent,
     DecorationItemComponent,
-    RandomNumPipePipe,
     WaterWaveItemComponent,
     CloudItemComponent,
     BoatItemComponent,

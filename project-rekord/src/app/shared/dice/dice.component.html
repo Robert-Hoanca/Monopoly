@@ -1,8 +1,9 @@
 <th-object3D
-loadGLTF
-[url]="'../../../assets/blenderModels/dice/dice.gltf'"
-[position]="[10,10,10]"
-[scale]="[0.5,0.5,0.5]"
-#diceRef
+  loadGLTF
+  [url]="'../../../assets/blenderModels/dice/dice.gltf'"
+  [position]="[10, 10, 10]"
+  [scale]="[0, 0, 0]"
+  (onLoaded)="diceScaleAnimation()"
+  #diceRef
 >
 </th-object3D>

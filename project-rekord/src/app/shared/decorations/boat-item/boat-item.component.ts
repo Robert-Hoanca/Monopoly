@@ -37,8 +37,6 @@ export class BoatItemComponent implements OnInit {
 
   ngAfterViewInit(){
     setTimeout(() => {
-      this.setOutline();
-      
       setTimeout(() => {
         //this.recalculateRandomNum.emit();
         this.chooseStartingPoint();
@@ -159,7 +157,6 @@ export class BoatItemComponent implements OnInit {
         gsap.fromTo(this.boatRefOutline._objRef.position, {z: this.boatRefOutline._objRef.position.z}, {z: toPosition, duration: duration});
       }
     }else if(axis === 'y'){
-     console.log("wdwadwa", toPosition)
       gsap.fromTo(element.rotation, {y: element.rotation.y}, {y: toPosition, duration: duration});
       gsap.fromTo(this.boatRefOutline._objRef.rotation, {y: this.boatRefOutline._objRef.rotation.y}, {y: toPosition, duration: duration});
     }

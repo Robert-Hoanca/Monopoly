@@ -122,6 +122,7 @@ export class GameService {
 
   debugMode:boolean = false;
   godMode:boolean = false;
+  enableCursor:boolean = false;
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
  
   async retrieveDBData(){
@@ -694,7 +695,7 @@ export class GameService {
   }
 
   //Find if a player has completed a completed series of the given card
-  checkCompletedSeries(properties:Array<any>){ //property:any,playerId:string
+  checkCompletedSeries(properties:Array<any>){
     const possibleDistricts:any = [];
     const foundCompleted:Array<any> = [];
     properties.forEach(property => {

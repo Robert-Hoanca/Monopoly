@@ -11,6 +11,7 @@
     [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '/scene.gltf'"
     [scale]="[0.053,0.053, 0.053]"
     [name]="'player_outline'"
+    (onLoaded)="setOutline();rotatePlayer(player.pawn.rotation[1], false)"
     #playerRefOutline
 >
 </th-object3D>

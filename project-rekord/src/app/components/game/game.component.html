@@ -1,7 +1,7 @@
-<div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '']">
+<div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '', gameService.enableCursor ? 'hoveringCard' : '']">
 
     <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event); gamePhysicsService.renderPhysicsWorld()">
-        <th-scene [autoUpdate]="true" #scene> <!--[thStats]="true"-->
+        <th-scene [autoUpdate]="true" #scene>
             
             <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
             <th-hemisphereLight [castShadow]="false"></th-hemisphereLight>
@@ -61,7 +61,6 @@
         <div class="doubleDiceTitle" *ngIf="gameService.players[gameService.turn].prison.doubleDiceCounter">
             <h1>DOUBLE!! </h1> <span>x{{gameService.players[gameService.turn].prison.doubleDiceCounter}}</span>
         </div>
-        <!-- [ngClass]="['dice', getDiceResClass(res), getDoubleDiceCounter() ]" -->
         <div *ngFor="let res of gamePhysicsService.diceRes" [ngClass]="['dice', getDiceResClass(res)]" [@showDice]>       
             <div class="dotsContainer">
                 <div class="dot" *ngIf="res < 4"></div>
@@ -142,21 +141,6 @@
                 <mat-label>Zoom</mat-label>
                 <input matInput type="number" [(ngModel)]="gameService.camera._objRef.zoom">
             </mat-form-field>
-
-            <!-- <mat-form-field>
-                <mat-label>Rotation X</mat-label>
-                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.rotation.x">
-            </mat-form-field>
-
-            <mat-form-field>
-                <mat-label>Rotation Y</mat-label>
-                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.rotation.y">
-            </mat-form-field>
-
-            <mat-form-field>
-                <mat-label>Rotation Z</mat-label>
-                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.rotation.z">
-            </mat-form-field> -->
 
             <span class="title">Camera Controls </span>
             <mat-form-field>

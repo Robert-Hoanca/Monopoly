@@ -4,6 +4,9 @@
     &.paused{
         filter: blur(5px);
     }
+    &.hoveringCard{
+        cursor: pointer;
+    }
     #gameCanvas{
         width: 100%;
         height: 100%;

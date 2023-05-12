@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import * as CANNON from 'cannon-es'
 import { GamePhysicsService } from 'src/app/game-physics.service';
+import gsap from 'gsap';
 @Component({
   selector: 'app-dice',
   templateUrl: './dice.component.html',
@@ -20,6 +21,13 @@ export class DiceComponent implements OnInit {
   constructor(public gamePhysicsService : GamePhysicsService) { }
 
   ngOnInit(): void {
+    this.setDicePhysics()
+  }
+
+  ngAfterViewInit(){
+  }
+
+  setDicePhysics(){
     this.diceMesh = this.diceRef._objRef;
     this.gamePhysicsService.diceArray.push({
       mesh: this.diceMesh,
@@ -30,6 +38,26 @@ export class DiceComponent implements OnInit {
       mesh: this.diceMesh,
       body: this.diceBody
     })
+  }
+
+  diceScaleAnimation(){
+    if(this.diceRef){
+      gsap.fromTo(
+        this.diceRef._objRef.scale,
+        { x: this.diceRef._objRef.scale.x },
+        { x: 0.5, duration: 0.25}
+      );
+      gsap.fromTo(
+        this.diceRef._objRef.scale, 
+        { y: this.diceRef._objRef.scale.y },
+        { y: 0.5, duration: 0.25 }
+      );
+      gsap.fromTo(
+        this.diceRef._objRef.scale,
+        { z: this.diceRef._objRef.scale.z },
+        { z: 0.5, duration: 0.25 }
+      );
+    }
   }
 
 
