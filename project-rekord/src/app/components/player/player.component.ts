@@ -768,6 +768,7 @@ export class PlayerComponent implements OnInit {
       this.gameService.movingPlayer = false;
       this.gameService.movingCamera = false;
       this.playerArrived = true;
+      this.gameService.changeCardBorderColor$.next({type: 'playerArrivedReturnToNormal', color: this.gameService.sessionTheme.cardBorder});
       this.playerIsGoingBack = false;
       let finalZNum = 0;
       let finalXNum = 0;

@@ -23,6 +23,7 @@ export class CardComponent implements OnInit {
   rotation: [x: number, y: number, z: number] = [0, 0, 0];
   carpetPosistion: [x: number, y: number, z: number] = [0, 0, 0];
   getCardPosition$: Subscription | undefined;
+  subscriptions$: Array<any> = [];
   @ViewChild('cardRef', { static: true }) cardRef: any;
   @ViewChild('cardOutlineRef', { static: true }) cardOutlineRef: any;
   @ViewChild('carpetRef', { static: true }) carpetRef: any;
@@ -38,8 +39,23 @@ export class CardComponent implements OnInit {
         : '/assets/blenderModels/card/definitiveCard/card2.gltf';
     this.setCardPosition();
     this.setCarpetPosition();
-    this.getCardPosition$ = this.gameService.getCardPosition$.subscribe(
+
+    this.subscriptions$.push(
+      this.gameService.changeCardBorderColor$.subscribe(
+        (data:any) => {
+          if(data.type === 'hoverFromPlayerMoving'){
+            this.shouldColorThisCard(data);
+          }else if(data.type === 'playerArrivedReturnToNormal'){
+            this.changeCardBorderColor(data.color);
+          }
+        }
+      )
+    )
+
+   this.subscriptions$.push(
+    this.gameService.getCardPosition$.subscribe(
       (diceNumber: any) => {
+
         if (diceNumber == this.cardIndex) {
           this.gameService.setPlayerPosition(
             [
@@ -50,8 +66,10 @@ export class CardComponent implements OnInit {
             diceNumber
           );
         }
+
       }
-    );
+    )
+   )
   }
 
   ngAfterViewInit() {}
@@ -170,7 +188,38 @@ export class CardComponent implements OnInit {
     }
   }
 
+  shouldColorThisCard(data:any){
+
+    const cellToGo = data.newCardIndex;
+    const cardIndex = this.cardIndex;
+    const playerActualCard = this.gameService.players[this.gameService.turn].actualCard;
+    const playerIsGoingBack =  this.gameService.randomChance && this.gameService.randomChance.count != undefined;
+
+    if(!playerIsGoingBack){
+      const isPassingZero = cellToGo <= playerActualCard && (playerActualCard <= 39  && playerActualCard >=0);
+      const isNotPassingZero = cellToGo > playerActualCard && cellToGo > playerActualCard && cellToGo <= 39;
+      const thisCardIsInRange = (((cardIndex <= cellToGo) || (cardIndex > playerActualCard)) && isPassingZero) || (cardIndex > playerActualCard && cardIndex <= cellToGo && isNotPassingZero)
+      const cardIsNotPlayerPos = cardIndex != playerActualCard;
+
+      if((isPassingZero || isNotPassingZero) && thisCardIsInRange && cardIsNotPlayerPos){
+        this.changeCardBorderColor(data.color);
+      }
+    } else if(playerIsGoingBack){
+      const isPassingZero = cellToGo > playerActualCard;
+      const isNotPassingZero = cellToGo >= 0 && cellToGo < playerActualCard;
+      const thisCardIsInRange = (((cardIndex < playerActualCard) || cardIndex >= cellToGo) && isPassingZero) || ((cardIndex < playerActualCard) && (cardIndex >= cellToGo) && isNotPassingZero)
+      const cardIsNotPlayerPos = cardIndex != playerActualCard;
+
+      if((isPassingZero || isNotPassingZero) && thisCardIsInRange && cardIsNotPlayerPos){
+        this.changeCardBorderColor(data.color);
+      }
+    }
+
+  }
+
   ngOnDestroy() {
-    this.getCardPosition$?.unsubscribe();
+    this.subscriptions$.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }

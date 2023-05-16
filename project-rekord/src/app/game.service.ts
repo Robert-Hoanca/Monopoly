@@ -102,6 +102,7 @@ export class GameService {
   setPlayerPosition$ = new Subject();
   openTextDialog$ = new Subject();
   shouldRemovePlayerCage$ = new Subject();
+  changeCardBorderColor$ = new Subject();
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
@@ -360,6 +361,7 @@ export class GameService {
 
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
     let oldCardPosition = JSON.parse(JSON.stringify((this.players[this.turn].actualCard)));
+    this.changeCardBorderColor$.next({type: 'hoverFromPlayerMoving',color: '#ffffff', newCardIndex:newCardNum})
     this.players[this.turn].actualCard = newCardNum;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
   }
@@ -847,8 +849,8 @@ export class GameService {
 
 
   test(){
-    this.randomChance = this.gameTable.chance[8];
-      this.textDialog(this.randomChance,'chance');
+    this.randomChance = this.gameTable.chance[7];
+    this.textDialog(this.randomChance,'chance');
   }
 
   //Database Management
