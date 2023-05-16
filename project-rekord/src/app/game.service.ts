@@ -3,7 +3,7 @@ import { collection, getFirestore, doc, getDoc, getDocs, setDoc, deleteDoc } fro
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, take, timer } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CardDialogComponent } from './shared/card-dialog/card-dialog.component';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
@@ -316,10 +316,12 @@ export class GameService {
       }else if (playerCardIndex >= 30 && playerCardIndex <= 39){
         numberToSumSub = - (40 - playerCardIndex);
       }
-  
-      setTimeout(() => {
-        this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000)
-      }, timeOutTimer)
+
+      timer(timeOutTimer).pipe(take(1)).subscribe({
+        complete: () => {
+          this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000)
+        }
+      })
     }
     
   }

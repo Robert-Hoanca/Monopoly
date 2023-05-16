@@ -575,15 +575,14 @@ export class PlayerComponent implements OnInit {
           JSON.parse(JSON.stringify(this.playerRef._objRef.rotation.y)) +
           (rotateBack ? 3.14 : -3.14);
         this.playerHasRotate = true;
-      }
-      if (
+      } else if (
         this.playerRef._objRef.position.x >= -1 &&
         this.playerRef._objRef.position.x < 1 &&
         this.playerRef._objRef.position.z >= -1 &&
         this.playerRef._objRef.position.z < 1 &&
         ((this.player.pawn.rotationSide === 3 && !this.playerIsGoingBack) ||
           (this.player.pawn.rotationSide === 0 && this.playerIsGoingBack))
-      ) {
+      ) { 
         this.playerHasRotate = true;
         this.player.pawn.rotationSide = this.playerIsGoingBack ? 3 : 0;
         rotationValue =
@@ -770,6 +769,12 @@ export class PlayerComponent implements OnInit {
       this.playerArrived = true;
       this.gameService.changeCardBorderColor$.next({type: 'playerArrivedReturnToNormal', color: this.gameService.sessionTheme.cardBorder});
       this.playerIsGoingBack = false;
+
+      if(this.gameService.randomChance || this.gameService.randomChest){
+        this.gameService.randomChance = undefined;
+        this.gameService.randomChance = undefined;
+      }
+
       let finalZNum = 0;
       let finalXNum = 0;
       if (axis === 'x') {

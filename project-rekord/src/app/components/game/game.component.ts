@@ -1,7 +1,7 @@
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
+import { Subscription, take, timer } from 'rxjs';
 import { GamePhysicsService } from 'src/app/game-physics.service';
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three'
@@ -157,23 +157,28 @@ export class GameComponent implements OnInit {
     }
   }
 
-  async rollTheDice(){
+  rollTheDice(){
     this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000)
 
-    if(this.gameService.startToDice){
-      this.gameService.startToDice = false;
-    }
-    setTimeout(() => {
-      if(!this.gameService.players[this.gameService.turn].prison.inPrison){
-        this.gameService.startToDice = true;
-        let index = 0;
-        this.gamePhysicsService.diceArray.forEach(dice => {
-          this.gamePhysicsService.diceRoll(dice);
-        });
-      }else{
-       this.whatToDoInPrison('prisonRoll')
+    timer(1000).pipe(take(1)).subscribe({
+      complete: ()=> {
+
+        if(this.gameService.startToDice){
+          this.gameService.startToDice = false;
+        }
+
+        if(!this.gameService.players[this.gameService.turn].prison.inPrison){
+          this.gameService.startToDice = true;
+          let index = 0;
+          this.gamePhysicsService.diceArray.forEach(dice => {
+            this.gamePhysicsService.diceRoll(dice);
+          });
+        }else{
+         this.whatToDoInPrison('prisonRoll')
+        }
+
       }
-    }, 1000);
+    })
   }
 
   whatToDoInPrison(action:string){
