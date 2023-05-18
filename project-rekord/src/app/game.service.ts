@@ -422,7 +422,8 @@ export class GameService {
       }
     }
     //this.players[this.turn] = this.players[this.turn];
-    this.setCameraOnPlayer(0)
+    this.textDialog({playerName: this.players[this.turn].name},'changeTurn');
+    this.setCameraOnPlayer(0);
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
 

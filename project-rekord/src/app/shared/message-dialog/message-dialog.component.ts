@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Subject } from 'rxjs';
+import { Subject, take, timer } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 import { CardDialogComponent } from '../card-dialog/card-dialog.component';
 
@@ -17,7 +17,13 @@ export class MessageDialogComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
 
   ngOnInit(): void {
-
+    if(this.data.eventType === 'changeTurn'){
+      timer(1000).pipe(take(1)).subscribe({
+        complete: () => {
+          this.closeDialog();
+        } 
+      })
+    }
   }
 
   ngAfterViewInit(){

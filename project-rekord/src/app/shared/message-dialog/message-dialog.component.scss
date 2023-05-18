@@ -27,6 +27,13 @@
         .messageText{
             font-size: 18px;
         }
+        .changedTurn{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
     }
 
     .specialCardContainer{
