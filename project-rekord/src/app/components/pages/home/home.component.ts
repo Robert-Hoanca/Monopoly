@@ -18,9 +18,9 @@ export class HomeComponent implements OnInit {
   @ViewChild('camera', { static: true }) camera:any;
 
   @ViewChild('godModeDialogRef', { static: true }) godModeDialogRef:any;
-
   
-  @ViewChild('infoDialogRef', { static: true }) infoDialogRef:any;
+  // @ViewChild('infoDialogRef', { static: true }) infoDialogRef:any;
+  enabledAboutPage:boolean = false;
   
   enableSettingsView:boolean = false;
 
@@ -116,13 +116,6 @@ export class HomeComponent implements OnInit {
   }
 
   openInfoPopup(){
-
-    this.dialog.open(this.infoDialogRef, {
-      panelClass: 'home-info-dialog',
-      hasBackdrop: true,
-      autoFocus: false,
-      disableClose:false,
-    });
-
+    //this.gameService.switchRouter('about')
   }
 }

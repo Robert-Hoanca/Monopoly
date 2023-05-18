@@ -3,8 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './components/home/home.component';
-import { GameComponent } from './components/game/game.component';
+import { HomeComponent } from './components/pages/home/home.component';
+import { GameComponent } from './components/pages/game/game.component';
 import { CardComponent } from './components/card/card.component';
 import { PawnComponent } from './components/pawn/pawn.component';
 
@@ -22,7 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { CardDialogComponent } from './shared/card-dialog/card-dialog.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { ChooseModeComponent } from './components/choose-mode/choose-mode.component';
+import { ChooseModeComponent } from './components/pages/choose-mode/choose-mode.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -38,7 +38,6 @@ import {MatSelectModule} from '@angular/material/select';
 import { NgxThreeModule } from 'ngx-three';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
 import { PlayerComponent } from './components/player/player.component';
-import { MapComponent } from './components/map/map.component';
 import { HouseComponent } from './shared/house/house.component';
 import { HotelComponent } from './shared/hotel/hotel.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -50,10 +49,11 @@ import { WaterWaveItemComponent } from './shared/decorations/water-wave-item/wat
 import { CloudItemComponent } from './shared/decorations/cloud-item/cloud-item.component';
 import { BoatItemComponent } from './shared/decorations/boat-item/boat-item.component';
 import { LoadingScreenComponent } from './shared/loading-screen/loading-screen.component';
-import { ThemeEditorComponent } from './components/theme-editor/theme-editor.component';
-import { GameTableEditorComponent } from './components/game-table-editor/game-table-editor.component';
+import { ThemeEditorComponent } from './components/pages/theme-editor/theme-editor.component';
+import { GameTableEditorComponent } from './components/pages/game-table-editor/game-table-editor.component';
 import { GrassItemComponent } from './shared/decorations/grass-item/grass-item.component';
 import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rain-drops-item.component';
+import { AboutComponent } from './components/pages/about/about.component';
 
 @NgModule({
   declarations: [
@@ -66,7 +66,6 @@ import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rai
     ChooseModeComponent,
     ExchangeComponent,
     PlayerComponent,
-    MapComponent,
     HouseComponent,
     HotelComponent,
     MessageDialogComponent,
@@ -81,6 +80,7 @@ import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rai
     GameTableEditorComponent,
     GrassItemComponent,
     RainDropsItemComponent,
+    AboutComponent,
   ],
   imports: [
     BrowserModule,

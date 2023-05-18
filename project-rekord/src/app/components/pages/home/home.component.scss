@@ -49,10 +49,21 @@
     }
 }
 
-
 #homeCanvas{
     opacity: 0.8;
 }
+
+.about-page{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+
+
 @media screen and (min-width: 600px) {
 
     .home{
