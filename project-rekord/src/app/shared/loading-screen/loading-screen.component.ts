@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameService } from 'src/app/game.service';import { animate, style, transition, trigger } from '@angular/animations';
+import { take, timer } from 'rxjs';
 
 @Component({
   selector: 'app-loading-screen',
@@ -29,8 +30,13 @@ export class LoadingScreenComponent implements OnInit {
   constructor(public gameService:GameService) { }
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.gameService.loading = false;
-    }, 1500);
+
+    timer(1500).pipe(take(1)).subscribe({
+      complete: () => {
+        this.gameService.loading = false;
+        this.gameService.screenLoaded$.next(false)
+      }
+    })
+    
   }
 }

@@ -88,12 +88,25 @@ export class GameComponent implements OnInit {
   width:number = 0;
   height:number = 0;
 
+  subscriptions:Array<Subscription> = [];
+
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
 
   ngOnInit(): void {
     this.gameService.addingRemovingMoneyProps();
   }
   ngAfterViewInit(){
+
+    this.subscriptions.push(
+      this.gameService.screenLoaded$.pipe(take(1)).subscribe({
+        next : data => {
+          if(this.gameService.localSaves == 'new'){
+            this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' begins the game!'}, 'playerWhoBegins')
+          }
+        }
+      })
+    )
+
     this.gameService.gameScene = this.scene._objRef;
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -101,16 +114,13 @@ export class GameComponent implements OnInit {
     this.gameService.cameraControls = this.cameraControls;
     this.gameService.enableMapControls = true;
 
-    setTimeout(() => {
-      let evt =  new WheelEvent("wheel", {deltaY:10});
-      document.querySelector("canvas")?.dispatchEvent(evt);
-      this.gameService.enableMapControls = false;
-    }, 500);
-    if(this.gameService.localSaves == 'new'){
-      setTimeout(() => {
-        this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' begins the game!'}, 'playerWhoBegins')
-      }, 1500);
-    }
+    timer(500).pipe(take(1)).subscribe({
+      complete : () =>{
+        let evt =  new WheelEvent("wheel", {deltaY:10});
+        document.querySelector("canvas")?.dispatchEvent(evt);
+        this.gameService.enableMapControls = false;
+      }
+    })
     this.gameService.setCameraOnPlayer(1500);
     this.activateLocalSave();
     this.gamePhysicsService.initWorld();
@@ -235,5 +245,11 @@ export class GameComponent implements OnInit {
   resizeCanvas(event:any){
     event.renderer.setSize( window.innerWidth, window.innerHeight );
     event.renderer.setPixelRatio(window.devicePixelRatio);
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }

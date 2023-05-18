@@ -3,7 +3,7 @@ import { collection, getFirestore, doc, getDoc, getDocs, setDoc, deleteDoc } fro
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
-import { Subject, take, timer } from 'rxjs';
+import { Observable, Subject, switchMap, take, timer } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CardDialogComponent } from './shared/card-dialog/card-dialog.component';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
@@ -77,7 +77,9 @@ export class GameService {
     antialias: true,
   }
 
-  setPlayerToCenter = true;
+  // --- Game --- //
+
+  //GameTime
   beginTime:number = 0;
   endTime:number = 0;
   gameAmountTime:string = '';
@@ -90,26 +92,8 @@ export class GameService {
   pawnUrls:Array<any> = [];
   specialPawnTypes: any = [];
   specialPawn:String='';
-  diceNumber:number|undefined;
-  startToDice:boolean = false;
-  playerWhoWonId:string = '';
-  addingPlayerMoney:boolean=false;
-  removingPlayerMoney:boolean=false;
-  playerMoneyChangeValue:number= 0;
-  
-
-  getCardPosition$ = new Subject();
-  setPlayerPosition$ = new Subject();
-  openTextDialog$ = new Subject();
-  shouldRemovePlayerCage$ = new Subject();
-  changeCardBorderColor$ = new Subject();
-
-  //DIALOGS
-  cardInfoRef: MatDialogRef<any> | undefined;
-  exchangeRef: MatDialogRef<any> | undefined;
   randomChest:any;
   randomChance:any;
-
   turn:number= 0;
   amountRent:number=0;
   amountDebt:number=0;
@@ -118,14 +102,32 @@ export class GameService {
   debtWithWho:string='';
   diceRes:Array<number> = [];
 
-  setted:boolean=false;
+  //Dice
+  diceNumber:number|undefined;
+  startToDice:boolean = false;
+  playerWhoWonId:string = '';
+  addingPlayerMoney:boolean=false;
+  removingPlayerMoney:boolean=false;
+  playerMoneyChangeValue:number= 0;
 
+  //Subjects
+  getCardPosition$ = new Subject();
+  setPlayerPosition$ = new Subject();
+  openTextDialog$ = new Subject();
+  shouldRemovePlayerCage$ = new Subject();
+  changeCardBorderColor$ = new Subject();
+  screenLoaded$ = new Subject();
 
+  //DIALOGS
+  cardInfoRef: MatDialogRef<any> | undefined;
+  exchangeRef: MatDialogRef<any> | undefined;
+
+  //Extra Options
   debugMode:boolean = false;
   godMode:boolean = false;
   enableCursor:boolean = false;
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
- 
+
   async retrieveDBData(){
     //const storage = getStorage();
 
@@ -139,11 +141,13 @@ export class GameService {
     }
 
     //Maps
-    await this.getGameMaps(); 
+    await this.getGameMaps();
 
     //bgColors
     const getBgColors = doc(this.db, "colors", 'bgColors');
-    const colors = await (await getDoc(getBgColors)).data();
+
+
+    const colors = (await getDoc(getBgColors)).data();
     if(colors){
       this.bgColors = colors['colors'];
     }
@@ -168,6 +172,8 @@ export class GameService {
     this.pawnTypes.forEach((pawn:any) => {
         this.pawnUrls.push('/assets/blenderModels/pawns/' + pawn.value + '/scene.gltf')
     });
+
+    this.loading = false;
   }
 
   async getGameMaps(){
@@ -270,7 +276,7 @@ export class GameService {
         newPlayer.pawn.position = [-0.5,0,0.5]
         newPlayer.pawn.cardSection = 3;
         break;
-    
+
       default:
         newPlayer.pawn.position = [0,0,0]
         break;
@@ -279,7 +285,7 @@ export class GameService {
     newPlayer.canDice = false;
     newPlayer.actualCard = 0;
     this.players.push(newPlayer);
-    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1); 
+    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1);
     this.specialPawn= '';
   }
 
@@ -291,8 +297,8 @@ export class GameService {
         gsap.fromTo(this.camera._objRef.position, {y: this.camera._objRef.position.y}, {y: cameraPosition[1], duration: duration/1000});
         gsap.fromTo(this.camera._objRef.position, {z: this.camera._objRef.position.z}, {z: cameraPosition[2], duration: duration/1000});
       }
-  
-      //Camera Controls 
+
+      //Camera Controls
       if(cameraControlsPosition){
         gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: cameraControlsPosition[0], duration: duration/1000});
         gsap.fromTo(this.cameraControls._objRef.target, {y:this.cameraControls._objRef.target.y}, {y: cameraControlsPosition[1], duration: duration/1000});
@@ -306,7 +312,7 @@ export class GameService {
     if(this.userDevice.includes('phone')){
       const playerCardIndex = this.players[this.turn].actualCard;
       let numberToSumSub = 0;
-  
+
       if(playerCardIndex <= 10){
         numberToSumSub = playerCardIndex;
       } else if (playerCardIndex >= 10 && playerCardIndex <= 20){
@@ -323,7 +329,7 @@ export class GameService {
         }
       })
     }
-    
+
   }
 
   getCardPosition(cardIndex:any){
@@ -351,7 +357,7 @@ export class GameService {
   }
 
   resizeCanvas(event:any, camera:any){
-    
+
     if(camera._objRef != undefined && camera._objRef.zoom != this.cameraZoom){
       camera._objRef.zoom = this.cameraZoom;
 
@@ -419,7 +425,7 @@ export class GameService {
     this.setCameraOnPlayer(0)
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
-    
+
     if(this.randomChance || this.randomChest){
       this.randomChance = undefined;
       this.randomChance = undefined;
@@ -468,7 +474,7 @@ export class GameService {
         return property.rentCosts.normal;
       }
     }else if(property.cardType == 'station'){
-      const numOfStations = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'station').length; 
+      const numOfStations = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'station').length;
       switch(numOfStations){
         case 1:
           return property.rentCosts.one;
@@ -495,7 +501,7 @@ export class GameService {
       this.openCardDialog(this.gameTable.cards[this.players[this.turn].actualCard]);
       if(this.gameTable.cards[(this.players[this.turn].actualCard)].owner && this.gameTable.cards[(this.players[this.turn].actualCard)].owner!=this.players[this.turn].id && !this.gameTable.cards[(this.players[this.turn].actualCard)].distrained){
         this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.players[this.turn].actualCard)],this.diceRes);
-        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney'); 
+        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney');
       }
     }else if(property.cardType == 'goToPrison' || this.players[this.turn].prison.doubleDiceCounter == 3){
       this.textDialog({text: this.players[this.turn].name + ' have to go to prison.'}, 'goingToPrison');
@@ -509,24 +515,29 @@ export class GameService {
   }
 
   addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
-    this.playerMoneyChangeValue = amount;
-    if(type=='add'){
-      player? player.addingMoney = true : this.players[this.turn].addingMoney = true;
-      player != undefined? player.money += amount : this.players[this.turn].money += amount;
-      setTimeout(() => {
-        player? player.addingMoney = false : this.players[this.turn].addingMoney = false;
-      }, duration);
 
-    }else if(type=='remove'){
-      player? player.removingMoney = true : this.players[this.turn].removingMoney = true;
-      player != undefined? player.money -= amount : this.players[this.turn].money -= amount;
-      setTimeout(() => {
-        player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
-      }, duration);
-    }
-    setTimeout(() => {
-      this.addingRemovingMoneyProps()
-    }, (duration + 500))
+    new Observable((subscriber) => {
+      this.playerMoneyChangeValue = amount;
+      if(type=='add'){
+        player? player.addingMoney = true : this.players[this.turn].addingMoney = true;
+        player != undefined? player.money += amount : this.players[this.turn].money += amount;
+      }else if(type=='remove'){
+        player? player.removingMoney = true : this.players[this.turn].removingMoney = true;
+        player != undefined? player.money -= amount : this.players[this.turn].money -= amount;
+      }
+      subscriber.next(duration)
+    }).pipe(switchMap((data:any):any => {
+      return timer(data)
+    })).pipe(take(1)).subscribe({
+      next : (data) => {
+        if(type=='add'){
+          player? player.addingMoney = false : this.players[this.turn].addingMoney = false;
+        }else if(type=='remove'){
+          player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
+        }
+      }
+    })
+
   }
 
   addingRemovingMoneyProps(){
@@ -725,7 +736,7 @@ export class GameService {
     this.openCompletedSeriesDialog(foundCompleted);
   }
 
-  //Get a chanche or communityChest card 
+  //Get a chanche or communityChest card
   getChestChance(cardType:string){
     if(cardType=='chance'){
       const randomNum = (Math.round(Math.random() * ( this.gameTable.chance.length - 1) ) + 0);
@@ -793,7 +804,7 @@ export class GameService {
             foundCard.hotelCounter = 0;
           }
         }
-       
+
       });
       this.nextTurn()
     }
@@ -851,7 +862,12 @@ export class GameService {
 
 
   test(){
-    this.randomChance = this.gameTable.chance[7];
+    const numOfCells = -10
+    this.randomChance = {
+      action: "move",
+      count: numOfCells,
+      title: 'Go Back' + Math.abs(numOfCells) + 'Spaces'
+    };
     this.textDialog(this.randomChance,'chance');
   }
 
@@ -868,5 +884,5 @@ export class GameService {
   async deleteMapFromDb(mapName:string){
     deleteDoc(doc(this.db, "gameTables", mapName));
   }
-  
+
 }

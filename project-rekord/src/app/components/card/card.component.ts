@@ -3,12 +3,6 @@ import { GLTFLoaderService } from 'ngx-three';
 import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
-import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
-import gsap from 'gsap';
-import { setTimeout } from 'timers';
-
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',

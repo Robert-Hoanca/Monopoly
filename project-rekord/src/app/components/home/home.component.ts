@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameService } from 'src/app/game.service';
 import {  doc, getDoc } from '@angular/fire/firestore';
+import { switchMap, take, tap, timer } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -90,13 +91,23 @@ export class HomeComponent implements OnInit {
       localStorage.setItem('monopolyGodMode', JSON.stringify(this.gameService.godMode));
     }else{
       this.errorGodMode = true;
-      setTimeout(() => {
-        this.dialog.closeAll();
 
-        setTimeout(() => {
+      timer(2000).pipe(
+        tap(() => {
+
+          this.dialog.closeAll();
+
+        }), 
+        switchMap( (data:any):any =>{
+
+          return timer(500)
+
+        }),
+        take(1)).subscribe({
+        complete : () => {
           this.errorGodMode = false;
-        }, 500);
-      }, 2000);
+        }
+      });
     }
   }
 
