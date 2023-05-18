@@ -176,6 +176,7 @@ export class MessageDialogComponent implements OnInit {
             this.gameService.calculateAmountDebt(removefundstoplayersAmount, otherPlayer.id)
           }
         });
+
         setTimeout(() => {
           this.gameService.addingRemovingMoney('remove',removefundstoplayersAmount, 1000)
         }, 1000);

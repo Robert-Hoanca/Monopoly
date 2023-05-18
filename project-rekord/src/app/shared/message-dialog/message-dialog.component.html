@@ -13,7 +13,7 @@
             <div class="time">{{gameService.gameAmountTime}}</div>
         </div>
     
-        <div *ngIf="gameService.playerWhoWonId != '' || data.textData.showPlayerProps || this.data.eventType !== 'changeTurn'" class="playerProps">
+        <div *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps )" class="playerProps">
             <h3>Player properties:</h3>
             <app-player-properties [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
         </div>

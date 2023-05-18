@@ -37,11 +37,10 @@ export class DecorationsService {
   scaleAnimation(elementRef:any){
     if(elementRef){
       gsap.fromTo(elementRef.scale, {x: elementRef.scale.x}, {x: 0.2, duration: 750/1000});
-      gsap.fromTo(elementRef.scale, {z: elementRef.scale.z}, {z: 0.2, duration: 750/1000});
-      setTimeout(() => {
+      gsap.fromTo(elementRef.scale, {z: elementRef.scale.z}, {z: 0.2, duration: 750/1000, onComplete: () => {
         gsap.fromTo(elementRef.scale, {x: elementRef.scale.x}, {x: 1, duration: 750/1000});
         gsap.fromTo(elementRef.scale, {z: elementRef.scale.z}, {z: 1, duration: 750/1000});
-      }, 750);
+      }});
     }
   }
 

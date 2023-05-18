@@ -38,15 +38,13 @@ export class CloudItemComponent implements OnInit {
 
   moveCloudAnimation(elementRef:any){
     this.cloudOpacity = (Math.random() * (1 - 0)) + 0.2;
-    gsap.fromTo(elementRef._objRef.position, {z: 100}, {z: -70, duration:this.cloudAnimationDuration/1000});
-    setTimeout(() => {
+    gsap.fromTo(elementRef._objRef.position, {z: 100}, {z: -70, duration:this.cloudAnimationDuration/1000, onComplete: () =>{
       this.cloudOpacity = 0;
       const newXPosition = (Math.round(Math.random()) ? 1 : -1) * (Math.random() * (30 + (0) + 1)) + 1;
       const newZPosition = (100 + ((Math.round(Math.random()) ? 1 : -1) * (Math.random() * (30 - 0 + 1)) + 1))
       gsap.fromTo(elementRef._objRef.position, {x: elementRef._objRef.position.x}, {x: newXPosition, duration:0});
       gsap.fromTo(elementRef._objRef.position, {z: elementRef._objRef.position.z}, {z: newZPosition, duration:0});
-    }, this.cloudAnimationDuration );
-
+    }});
   }
 
 }

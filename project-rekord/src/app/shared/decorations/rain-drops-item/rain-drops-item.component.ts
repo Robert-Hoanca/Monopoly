@@ -28,9 +28,7 @@ export class RainDropsItemComponent implements OnInit {
     this.moveGSAP(this.rainDropRef._objRef, Math.round((Math.random() * 120 ) + 100), 0)
 
     setTimeout(() => {
-
       this.rainDropAnimation();
-
     }, this.randomTimeout * 100);
     
   }

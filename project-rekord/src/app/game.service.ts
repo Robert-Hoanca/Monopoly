@@ -867,12 +867,13 @@ export class GameService {
 
 
   test(){
-    const numOfCells = -10
-    this.randomChance = {
-      action: "move",
-      count: numOfCells,
-      title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
-    };
+    // const numOfCells = -10
+    // this.randomChance = {
+    //   action: "move",
+    //   count: numOfCells,
+    //   title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
+    // };
+    this.randomChance = this.gameTable.chance[8]
     this.textDialog(this.randomChance,'chance');
   }
 
