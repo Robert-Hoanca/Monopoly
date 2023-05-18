@@ -500,8 +500,12 @@ export class GameService {
     if(property.cardType == 'property' || property.cardType == 'station' || property.cardType == 'plant'){
       this.openCardDialog(this.gameTable.cards[this.players[this.turn].actualCard]);
       if(this.gameTable.cards[(this.players[this.turn].actualCard)].owner && this.gameTable.cards[(this.players[this.turn].actualCard)].owner!=this.players[this.turn].id && !this.gameTable.cards[(this.players[this.turn].actualCard)].distrained){
-        this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.players[this.turn].actualCard)],this.diceRes);
-        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney');
+        
+        if(this.diceNumber !== undefined || property.cardType == 'property' || property.cardType == 'station'){
+          this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.players[this.turn].actualCard)],this.diceRes);
+          this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney');
+        }
+      
       }
     }else if(property.cardType == 'goToPrison' || this.players[this.turn].prison.doubleDiceCounter == 3){
       this.textDialog({text: this.players[this.turn].name + ' have to go to prison.'}, 'goingToPrison');
@@ -866,7 +870,7 @@ export class GameService {
     this.randomChance = {
       action: "move",
       count: numOfCells,
-      title: 'Go Back' + Math.abs(numOfCells) + 'Spaces'
+      title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
     };
     this.textDialog(this.randomChance,'chance');
   }
