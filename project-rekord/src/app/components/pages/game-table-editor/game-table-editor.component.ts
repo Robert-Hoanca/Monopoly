@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { GameService } from 'src/app/game.service';
 import {doc, getDoc } from '@angular/fire/firestore';
 import { MatDialog } from '@angular/material/dialog';
+import { take, timer } from 'rxjs';
 
 @Component({
   selector: 'app-game-table-editor',
@@ -10,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class GameTableEditorComponent implements OnInit {
   @ViewChild('cardEditDialogRef', { static: true }) cardEditDialogRef:any;
-  @ViewChild('warningDeleteDialog', { static: true }) warningDeleteDialog:any;
+  @ViewChild('warningDialog', { static: true }) warningDialog:any;
   chosenMap:string = '';
 
   gameTable:any;
@@ -29,6 +30,8 @@ export class GameTableEditorComponent implements OnInit {
     {label: 'Park Area', value : 'parkArea'},
     {label: 'Go To Prison', value : 'goToPrison'},
   ];
+
+  warningDialodData: any = {};
 
   constructor(public gameService : GameService, private dialog: MatDialog) { }
 
@@ -252,6 +255,8 @@ export class GameTableEditorComponent implements OnInit {
         return (type === 'start') && (this.gameTable.cards.find( (card:any) => card.cardType === 'start')) ? true : false;
       case 'prison':
         return (type === 'prison') && (this.gameTable.cards.find( (card:any) => card.cardType === 'prison')) ? true : false;
+      case 'station':
+        return (this.gameTable.cards.filter( (card:any) => card.cardType === 'station')).length == 4 ? true : false;
     
       default:
         return false;
@@ -264,19 +269,39 @@ export class GameTableEditorComponent implements OnInit {
   }
 
   saveToDb(){
-    if(this.chosenMap !== 'newMap'){
-      this.gameService.saveMapToDb(this.chosenMap , this.gameTable)
+    const foundPrison = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === 'prison').length ? true : false;
+    const foundGoToPrisonCell = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === 'goToPrison').length ? true : false;;
+
+    if(foundPrison && foundGoToPrisonCell){
+      if(this.chosenMap !== 'newMap'){
+        this.gameService.saveMapToDb(this.chosenMap , this.gameTable);
+        this.openWarningDialog('save', 'Saved ' + this.chosenMap)
+      }
+    }else{
+      this.openWarningDialog('saveFail', 'There is a problem, check if you have setted at least one "prison-area" card and one "go-to-prison" card')
     }
+    
   }
 
-  openWarningDialog(){
-
-    this.dialog.open(this.warningDeleteDialog, {
+  openWarningDialog(type:string, text:string){
+    this.warningDialodData = {
+      text: text,
+      type: type
+    }
+    this.dialog.open(this.warningDialog, {
       panelClass: 'warning-delete-dialog',
       hasBackdrop: true,
       autoFocus: false,
-      disableClose:false,
+      disableClose:true,
     });
+
+    if(type ==='save'){
+      timer(1000).pipe(take(1)).subscribe({
+        complete: () => {
+          this.closeDialog()
+        }
+      })
+    }
     
   }
 

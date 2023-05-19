@@ -85,7 +85,7 @@
         </mat-form-field>
 
 
-        <button mat-raised-button (click)="openWarningDialog()" color="warn"> Delete Map </button>
+        <button mat-raised-button (click)="openWarningDialog('delete', 'You are going to delete the map called'  + chosenMap + ', are you sure ?')" color="warn"> Delete Map </button>
         <button mat-raised-button (click)="saveToDb()" color="warns"><mat-icon>save</mat-icon></button>
 
     </div>
@@ -234,11 +234,11 @@
                     <input matInput type="number" [(ngModel)]="editingCard.distrainedCost">
                 </mat-form-field>
     
-                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'">
+                <mat-form-field *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'" >
                     <mat-label>District</mat-label>
                     <div class="card-editing-container__inputs-container__input_wrapper" fxLayout="row">
-                        <input matInput type="text" [(ngModel)]="editingCard.district">
-                        <input matInput type="color" [(ngModel)]="editingCard.district">
+                        <input matInput type="text" [(ngModel)]="editingCard.district" [disabled]="editingCard.cardType === 'station' || editingCard.cardType === 'plant'">
+                        <input matInput type="color" [(ngModel)]="editingCard.district" [disabled]="editingCard.cardType === 'station' || editingCard.cardType === 'plant'">
                     </div>
                 </mat-form-field>
 
@@ -257,17 +257,23 @@
 
     </ng-template>
 
-    <ng-template #warningDeleteDialog>
+    <ng-template #warningDialog>
 
 
         <div class="warning-container" fxLayout="column">
 
-            <span class="warning-container__title">You are going to delete the map called " {{chosenMap}} ", are you sure ?</span>
+            <span class="warning-container__title">{{warningDialodData.text ?? ''}}</span>
     
-            <div fxLayout="row" class="warning-container__buttons-container" fxLayoutAlign="space-around center">
+            <div *ngIf="warningDialodData.type === 'delete'" fxLayout="row" class="warning-container__buttons-container" fxLayoutAlign="space-around center">
     
                 <button mat-raised-button color="warn" (click)="deleteMapFromDB()"> Yes</button>
                 <button mat-raised-button (click)="closeDialog()"> No</button>
+    
+            </div>
+
+            <div *ngIf="warningDialodData.type === 'saveFail'" fxLayout="row" class="warning-container__buttons-container" fxLayoutAlign="space-around center">
+    
+                <button mat-raised-button (click)="closeDialog()"> Ok </button>
     
             </div>
     

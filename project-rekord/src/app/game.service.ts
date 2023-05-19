@@ -487,11 +487,12 @@ export class GameService {
           return property.rentCosts.four;
       }
     }else if(property.cardType == 'plant'){
+      const maxPlants = this.gameTable.cards.filter((prop: { cardType: any; }) => prop.cardType == 'plant').length;
       const numOfPlants = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'plant').length;
       switch(numOfPlants){
         case 1:
           return ((diceNumber[0] + diceNumber[1]) *4);
-        case 2:
+        case maxPlants:
           return ((diceNumber[0] + diceNumber[1]) * 10);
       }
     }
@@ -867,13 +868,20 @@ export class GameService {
 
 
   test(){
-    // const numOfCells = -10
+    // const numOfCells = 5
     // this.randomChance = {
     //   action: "move",
     //   count: numOfCells,
     //   title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
     // };
-    this.randomChance = this.gameTable.chance[8]
+    //this.randomChance = this.gameTable.chance[8]
+
+    this.randomChance = {
+      action: "jail",
+      subaction: 'goto',
+      title: 'Go To Prison '
+    };
+
     this.textDialog(this.randomChance,'chance');
   }
 

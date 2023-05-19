@@ -1118,7 +1118,7 @@ export class PlayerComponent implements OnInit {
 
   ShouldSpawnPrison() {
     const playerCardIndex = this.player.actualCard;
-
+    
     const prisonCardIndex = this.gameService.gameTable.cards.findIndex(
       (card: any) => card.cardType === 'prison'
     );
@@ -1172,13 +1172,17 @@ export class PlayerComponent implements OnInit {
         elementRef.scale,
         { z: elementRef.scale.z },
         { z: 1, duration: duration / 1000, onComplete: () =>{
-          gsap.fromTo(
-            elementRef.position,
-            { y: elementRef.position.y },
-            { y: 0, duration: duration / 1000 }
-          );
+          
         } }
       );
+
+      setTimeout(() => {
+        gsap.fromTo(
+          elementRef.position,
+          { y: elementRef.position.y },
+          { y: 0, duration: duration / 1000 }
+        );
+      }, duration);
     }
   }
 
@@ -1187,24 +1191,26 @@ export class PlayerComponent implements OnInit {
       gsap.fromTo(
         elementRef.position,
         { y: elementRef.position.y },
-        { y: 2, duration: duration / 1000, onComplete: () => {
-          gsap.fromTo(
-            elementRef.scale,
-            { x: elementRef.scale.x },
-            { x: 0, duration: duration / 1000 }
-          );
-          gsap.fromTo(
-            elementRef.scale,
-            { y: elementRef.scale.y },
-            { y: 0, duration: duration / 1000 }
-          );
-          gsap.fromTo(
-            elementRef.scale,
-            { z: elementRef.scale.z },
-            { z: 0, duration: duration / 1000 }
-          );
-        } }
+        { y: 2, duration: duration / 1000 }
       );
+
+      setTimeout(() => {
+        gsap.fromTo(
+          elementRef.scale,
+          { x: elementRef.scale.x },
+          { x: 0, duration: duration / 1000 }
+        );
+        gsap.fromTo(
+          elementRef.scale,
+          { y: elementRef.scale.y },
+          { y: 0, duration: duration / 1000 }
+        );
+        gsap.fromTo(
+          elementRef.scale,
+          { z: elementRef.scale.z },
+          { z: 0, duration: duration / 1000 }
+        );
+      }, duration);
     }
   }
 
