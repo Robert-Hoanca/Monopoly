@@ -61,11 +61,20 @@
     }
     #gameButtons{
         position: absolute;
-        bottom: 20px;
+        bottom: 0px;
         width: 100%;
         pointer-events: none;
+        padding: 10px;
+        background: #ffffff08;
         button{
             pointer-events: all;
+            .title{
+                font-weight: bold;
+            }
+
+            &[disabled="true"] mat-icon.info{
+                background:unset;
+            }
         }
     }
     #pauseBtn{
@@ -106,6 +115,45 @@
             }
         }
     }
+
+    #gameButtons{
+        button{
+            .title{
+                display: none;
+            }
+            height: 45px;
+            &#seeProperties{
+                mat-icon.info{
+                    position: absolute;
+                    top: 20px;
+                    right: 8px;
+                    background: #fff;
+                    border-radius: 50%;
+                    font-size: 18px;
+                    height: 18px;
+                    width: 18px;
+                    margin: 0;
+                }
+            }
+
+            &#bankRupt{
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:after{
+                    content: '';
+                    width: 2px;
+                    background: #fff;
+                    height: 65%;
+                    position: absolute;
+                    transform: rotate(-45deg);
+                }
+            }
+        }
+    }
+   
+
 }
 
 @media screen and (min-width: 600px) {
@@ -118,6 +166,44 @@
                 height: 25px;
                 display: flex;
                 align-items: center;
+            }
+        }
+    }
+
+    #gameButtons{
+        button{
+            height: 50px;
+            &#seeProperties{
+                mat-icon.info{
+                    position: absolute;
+                    top: 20px;
+                    right: 8px;
+                    background: #fff;
+                    border-radius: 50%;
+                    font-size: 18px;
+                    height: 18px;
+                    width: 18px;
+                    margin: 0;
+                }
+            }
+
+            &#bankRupt{
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:after{
+                    content: '';
+                    width: 2px;
+                    background: #fff;
+                    height: 50%;
+                    position: absolute;
+                    transform: rotate(-45deg);
+                }
+            }
+
+            &:not(#bankRupt) mat-icon{
+                margin-left: 5px;
             }
         }
     }

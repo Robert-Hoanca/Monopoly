@@ -1,10 +1,5 @@
 <div id="chooseMode" [style]="{background: gameService.sessionColor}">
 
-    <div *ngIf="!gameService.choosenMode" class="chooseModeContainer">
-        <button mat-raised-button (click)="chooseMode('local')" fxLayoutAlign="center center"><span>Local</span><img src="./../../../assets/icons/chooseMode/person.svg" alt=""></button>
-        <button mat-raised-button (click)="chooseMode('online')" [disabled]="true" fxLayoutAlign="center center"> <span>Online</span><img src="./../../../assets/icons/chooseMode/groups.svg" alt=""></button>
-    </div>
-
     <div *ngIf="gameService.choosenMode == 'local' && !gameService.localSaveName" id="localSaves">
         <mat-card *ngFor="let saveFile of gameService.allLocalSaves; let i = index"  class="localSave" (click)="createOrUploadGame(saveFile,i)">
             <div *ngIf="saveFile == 'new'" fxLayoutAlign="center center" class="saveContainer" fxLayout="column">
@@ -35,7 +30,7 @@
     <div *ngIf="gameService.choosenMode && gameService.localSaveName" id="players">
         <button class="go-back-home" mat-raised-button (click)="gameService.goBackHome()"><mat-icon>arrow_back</mat-icon> Home</button>
 
-        <div id="createdPlayers" [fxLayout]="gameService.returnInclude(gameService.userDevice, 'computer' )? 'row' : 'column-reverse'" fxLayoutAlign="center center">
+        <div id="createdPlayers" [fxLayout]="gameService.returnInclude(gameService.userDevice, 'computer' )? 'row' : 'column-reverse'">
 
             <div class="createdPlayersContainer" fxLayout="row" fxLayoutAlign="center center">
                 <mat-card class="playerCard" *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around" [@mmAnimationScale]>
@@ -113,7 +108,7 @@
                         
                     </div>
         
-                   <div fxLayout="column" fxLayoutAlign="center space-around">
+                   <div class="pawnInfoContainer" fxLayout="column" fxLayoutAlign="center space-around">
                         <mat-form-field>
                             <mat-label>Choose Your Name</mat-label>
                             <input matInput autocomplete="off" placeholder="Insert Here Your Name" [(ngModel)]="playerName" [maxLength]="12">
@@ -136,10 +131,10 @@
            
         </div>
 
-        <div id="mapsContainer" fxLayout="row" [fxLayoutAlign]="(gameService.returnInclude(gameService.userDevice, 'computer' ) ? 'end' : 'center') + ' center'">
-            <mat-card class="map" *ngFor="let map of gameService.gameMaps" (click)="gameService.chosenMap = map" fxLayout="column" fxLayoutAlign="space-evenly center">
-                <span class="chosenMap" fxLayoutAlign="center center"><mat-icon *ngIf="gameService.chosenMap==map">check</mat-icon></span>
-                <span>{{map}}</span>
+        <div id="mapsContainer">
+            <mat-card class="map" *ngFor="let map of gameService.gameMaps" fxLayout="row">
+                <span class="chosenMap" (click)="gameService.chosenMap = map" fxLayoutAlign="center center"><mat-icon *ngIf="gameService.chosenMap==map">check</mat-icon></span>
+                <span class="title">{{map}}</span>
             </mat-card>
         </div>
         <div id="startGame" [fxLayoutAlign]="(gameService.returnInclude(gameService.userDevice, 'computer' ) ? 'end' : 'center') + ' center'">

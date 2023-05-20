@@ -1,12 +1,12 @@
 .theme-editor{
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     position: absolute;
     top: 0;
     left: 0;
     &__container{
         width: 100vw;
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
         justify-content: start;
         align-items: center;
@@ -36,9 +36,17 @@
     }
 
     &__go-home{
-        position: absolute;
+        position: fixed;
         top: 20px;
         left: 20px;
         z-index: 1;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .theme-editor{
+        &__container{
+            justify-content: center;
+        }
     }
 }

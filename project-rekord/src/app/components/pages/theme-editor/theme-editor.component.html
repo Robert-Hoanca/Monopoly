@@ -1,4 +1,4 @@
-<div class="theme-editor">
+<div class="theme-editor" [ngStyle]="{'background': gameService.sessionTheme.background}">
 
     <button class="theme-editor__go-home" mat-raised-button (click)="gameService.goBackHome()"> <mat-icon> arrow_back </mat-icon> Home</button>
 

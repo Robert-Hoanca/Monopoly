@@ -4,18 +4,41 @@ import { Router } from '@angular/router';
 import { GameService } from 'src/app/game.service';
 import {  doc, getDoc } from '@angular/fire/firestore';
 import { switchMap, take, tap, timer } from 'rxjs';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  animations: [
+    trigger(
+      'AnimationScale',
+      [
+        transition(
+          ':enter', [
+          style({ height: '0' , opacity : '0'}),
+          animate('0.2s ease-in', style({height: '*' , opacity : '1'}))
+        ]
+        ),
+        transition(
+          ':leave', [
+          style({height: '*' , opacity : '1'}),
+          animate('0.2s ease-out', style({ height: '*' , opacity : '0' }))
+        ])
+      ]
+    ),
+  ]
 })
 export class HomeComponent implements OnInit {
   
-  @ViewChild('canvas', { static: true }) canvas:any;
-  @ViewChild('scene', { static: true }) scene:any;
+  // @ViewChild('canvas', { static: true }) canvas:any;
+  // @ViewChild('scene', { static: true }) scene:any;
 
-  @ViewChild('camera', { static: true }) camera:any;
+  // @ViewChild('camera', { static: true }) camera:any;
+
+  // homeGameTable:any = [];
+
+  // homeCameraDistance:number = 30;
 
   @ViewChild('godModeDialogRef', { static: true }) godModeDialogRef:any;
   
@@ -28,9 +51,8 @@ export class HomeComponent implements OnInit {
 
   errorGodMode:boolean = false;
 
-  homeGameTable:any = [];
+  choosingMode:boolean = false;
 
-  homeCameraDistance:number = 30;
 
   constructor(public router: Router, public gameService: GameService, private dialog: MatDialog) { }
 
@@ -43,13 +65,13 @@ export class HomeComponent implements OnInit {
     }else if(window.navigator.userAgent.includes('iPhone')){
       this.gameService.userDevice = 'phone_ios'
     }
-    this.homeCameraDistance = this.gameService.userDevice.includes('phone') ? 50 : 30;
+    // this.homeCameraDistance = this.gameService.userDevice.includes('phone') ? 50 : 30;
 
-    const gameTableRef = doc(this.gameService.db, "gameTables", 'monopolyMap');
-    this.homeGameTable = (await getDoc(gameTableRef)).data();
+    // const gameTableRef = doc(this.gameService.db, "gameTables", 'monopolyMap');
+    // this.homeGameTable = (await getDoc(gameTableRef)).data();
 
-    let evt =  new WheelEvent("wheel", {deltaY:10});
-    document.querySelector("canvas")?.dispatchEvent(evt);
+    // let evt =  new WheelEvent("wheel", {deltaY:10});
+    // document.querySelector("canvas")?.dispatchEvent(evt);
     /*
     to do mac
     lse if(window.navigator.userAgent.includes('Windows')){
@@ -59,8 +81,15 @@ export class HomeComponent implements OnInit {
   }
 
   goToChooseModeView(){
-    this.gameService.cardsPositionCounter = 0;
-    this.homeGameTable = {};
+    // this.gameService.cardsPositionCounter = 0;
+    // this.homeGameTable = {};
+    // this.gameService.switchRouter('mode')
+
+    this.choosingMode = true;
+  }
+
+  chooseMode(mode:string){
+    this.gameService.choosenMode = mode;
     this.gameService.switchRouter('mode')
   }
 

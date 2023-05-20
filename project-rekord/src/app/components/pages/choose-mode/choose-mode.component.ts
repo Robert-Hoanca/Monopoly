@@ -41,9 +41,6 @@ export class ChooseModeComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  chooseMode(mode:string){
-    this.gameService.choosenMode = mode;
-  }
 
   changeModel(way:string,){
     if(way == 'minus'){

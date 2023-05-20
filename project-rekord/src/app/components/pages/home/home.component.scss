@@ -2,7 +2,7 @@
     width: 100vw;
     height: 100vh;
     font-family: mova;
-
+    overflow: hidden;
     &__ui-container{
         position: absolute;
         z-index: 1;
@@ -29,6 +29,18 @@
         text-align: center;
         pointer-events: none;
         animation: scaleAnimation infinite 1.5s;
+    }
+
+    .chooseModeContainer {
+        position: absolute;
+        bottom: 100px;
+        width: 100%;
+        button{
+            overflow: hidden;
+        }
+        button:first-child{
+            margin-right: 20px;
+        }
     }
 
     .rightsSection{
@@ -63,6 +75,12 @@
 }
 
 
+#diceSvg{
+    path{
+        stroke-width: 10px;
+    }
+}
+
 
 @media screen and (min-width: 600px) {
 
@@ -86,6 +104,35 @@
     .rightsSection{
         font-size: 15px;
     }
+
+    .chooseModeContainer {
+        button{
+            width: 180px;
+            height: 65px;
+            font-size: 24px;
+            font-family: 'mova';
+            ::ng-deep .mat-button-wrapper{
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+                span{
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                }
+                mat-icon{
+                    margin-left: 10px;
+                    font-size: 30px;
+                    height: 30px;
+                    width: 30px;
+                }
+            }
+           
+        }
+    }
+
 }
 
 @media screen and (max-width: 600px) {
@@ -109,6 +156,40 @@
     .rightsSection{
         font-size: 10px;
     }
+
+    .chooseModeContainer {
+        button{
+            width: 110px;
+            height: 50px;
+            font-size: 18px;
+            font-family: 'mova';
+            ::ng-deep .mat-button-wrapper{
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+                span{
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                }
+                img{
+                    margin-left: 10px;
+                    font-size: 30px;
+                    height: 30px;
+                    width: 30px;
+                }
+            }
+           
+        }
+    }
+
+    #diceSvg{
+      width: 130%;
+    }
+    
+
 }
 
 @keyframes scaleAnimation {

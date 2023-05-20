@@ -1,7 +1,7 @@
 .gameTable-editor-container{
 
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
 
     &__maps, &__newGameTable{
         width: 200px;
@@ -301,14 +301,16 @@
     }
 
     &__go-home{
-        position: absolute;
+        position: fixed;
         top: 20px;
         left: 20px;
+        z-index: 1;
     }
 
     &__map-chooser{
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
     }
 
 }

@@ -29,7 +29,20 @@
                 width: 100%;
             }
         }
-    }
+    }    
+}
+#diceSvg{
+   width: 200px;
+   height: 200px;
+   animation: spin 0.5s ease infinite;
+}
 
-    
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }
