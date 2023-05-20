@@ -180,7 +180,6 @@ export class GamePhysicsService {
 
   showRollResults() {
     if (this.diceRes.length === 2) {
-      this.diceRes = [2,2]
       if (this.diceRes[0] == this.diceRes[1]) {
         this.gameService.players[this.gameService.turn].canDice = true;
         this.gameService.players[this.gameService.turn].prison
