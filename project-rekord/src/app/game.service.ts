@@ -681,6 +681,7 @@ export class GameService {
   goToPrison(){
     this.players[this.turn].prison.inPrison = true;
     const prisonIndex = this.gameTable.cards.findIndex((card: { cardType: string; }) => card.cardType === 'prison');
+    this.players[this.turn].prison.doubleDiceCounter = 0;
     this.getCardPosition$.next(prisonIndex);
     this.players[this.turn].canDice=false;
   }

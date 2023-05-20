@@ -85,7 +85,7 @@ export class PlayerComponent implements OnInit {
       this.playerRefOutline._objRef.position.x = position[0];
       this.playerRef._objRef.position.z = position[2];
       this.playerRefOutline._objRef.position.z = position[2];
-      this.ShouldSpawnPrison();
+      this.ShouldSpawnPrison(true);
     } else {
       if (oldCardPosition != undefined) {
         let actualSide = 0;
@@ -395,7 +395,7 @@ export class PlayerComponent implements OnInit {
 
         this.playerHasRotate = false;
       }
-      this.ShouldSpawnPrison();
+      this.ShouldSpawnPrison(false);
     } else if (this.gameTableSides[index] == 'z' && !this.playerArrived) {
       let playerPos = parseFloat(
         JSON.parse(JSON.stringify(this.playerRef._objRef.position.z)).toFixed(1)
@@ -561,7 +561,7 @@ export class PlayerComponent implements OnInit {
         );
         this.playerHasRotate = false;
       }
-      this.ShouldSpawnPrison();
+      this.ShouldSpawnPrison(false);
     } else {
       this.gameService.movingCamera = false;
     }
@@ -1116,7 +1116,7 @@ export class PlayerComponent implements OnInit {
       });
   }
 
-  ShouldSpawnPrison() {
+  ShouldSpawnPrison(force:boolean) {
     const playerCardIndex = this.player.actualCard;
     
     const prisonCardIndex = this.gameService.gameTable.cards.findIndex(
@@ -1127,7 +1127,7 @@ export class PlayerComponent implements OnInit {
       prisonCardIndex != -1 &&
       playerCardIndex === prisonCardIndex &&
       this.player.prison.inPrison &&
-      this.playerArrived
+       (this.playerArrived || force)
     ) {
       this.playerInCage = true;
       this.cagePosition = [

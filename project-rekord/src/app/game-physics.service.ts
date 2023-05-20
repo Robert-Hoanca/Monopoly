@@ -105,7 +105,7 @@ export class GamePhysicsService {
 
   addDiceEvents(dice: any) {
     fromEvent(dice.body, 'sleep')
-      .pipe(take(1))
+      .pipe()
       .subscribe({
         next: (e: any) => {
           dice.body.allowSleep = false;
@@ -135,7 +135,7 @@ export class GamePhysicsService {
               this.showRollResults();
             } else {
               // landed on edge => wait to fall on side and fire the event again
-              dice.body.applyImpulse(new CANNON.Vec3(0.5, 0, 0.5));
+              dice.body.applyImpulse(new CANNON.Vec3(1.5, 0, 1.5));
               dice.body.allowSleep = true;
             }
           } else if (isHalfPi(euler.z)) {
@@ -146,7 +146,7 @@ export class GamePhysicsService {
             this.showRollResults();
           } else {
             // landed on edge => wait to fall on side and fire the event again
-            dice.body.applyImpulse(new CANNON.Vec3(0.5, 0, 0.5));
+            dice.body.applyImpulse(new CANNON.Vec3(1.5, 0, 1.5));
             dice.body.allowSleep = true;
           }
         },
@@ -180,6 +180,7 @@ export class GamePhysicsService {
 
   showRollResults() {
     if (this.diceRes.length === 2) {
+      this.diceRes = [2,2]
       if (this.diceRes[0] == this.diceRes[1]) {
         this.gameService.players[this.gameService.turn].canDice = true;
         this.gameService.players[this.gameService.turn].prison
@@ -209,13 +210,11 @@ export class GamePhysicsService {
 
     timer(2000)
       .pipe(
-        tap(()=>{
-          this.dialog.closeAll();
-        }),
         take(1)
       )
       .subscribe({
         complete: () => {
+          this.dialog.closeAll();
           this.doAfterRollingTheDice();
         },
       });
