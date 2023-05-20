@@ -53,6 +53,26 @@
                 width: 70%;
             }
         }
+        .playerProps{
+            max-height: 208px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #E8E8E8;
+            border-radius: 5px;
+            padding: 0px 10px;
+            padding-bottom: 10px;
+
+            /* Scrollbar */
+            &::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            /* Handle */
+            &::-webkit-scrollbar-thumb {
+                background: #c4c4c4;
+                border-radius: 5px;
+            }
+        }
     }
 
     .specialCardContainer{
