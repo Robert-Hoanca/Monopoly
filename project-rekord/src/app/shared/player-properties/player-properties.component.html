@@ -1,12 +1,17 @@
-<div fxLayout="row" class="propertiesContainer" *ngIf="getPlayerProps().length || getPlayerGetOutCards()">
-    <mat-card class="property" *ngFor="let property of getPlayerProps()" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="selectProperty(property)">
-        <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(property.district)}"></span>
-        <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center" >check</mat-icon></span>
-    </mat-card>
+<div fxLayout="column" class="propertiesContainer" *ngIf="playerProps.length || playerGetOutCards">
 
-    <mat-card class="getOutCard" [matTooltipPosition]="'above'" matTooltip="Get Out Free Card" fxLayout="column" fxLayoutAlign="center center">
+    <div *ngFor="let district of dividedPlayerProps" fxLayout="row">
+        <mat-card class="property" *ngFor="let property of district" [matTooltipPosition]="'above'" matTooltip="{{property.name}}" (click)="selectProperty(property)">
+            <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(property.district)}"></span>
+            <span *ngIf="property.exchangeSelected" class="chosenProperty" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center" >check</mat-icon></span>
+        </mat-card>
+    </div>
+
+  
+
+    <mat-card *ngIf="playerGetOutCards" class="getOutCard" [matTooltipPosition]="'above'" matTooltip="Get Out Free Card" fxLayout="column" fxLayoutAlign="center center">
         <mat-icon>exit_to_app</mat-icon>
-        <span class="counter"> {{getPlayerGetOutCards()}} </span>
+        <span class="counter"> {{playerGetOutCards}} </span>
     </mat-card>
 
 </div>

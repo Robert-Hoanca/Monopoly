@@ -1,15 +1,17 @@
 #messageContainer{
     overflow: hidden;
+    padding: 20px;
+    background: #fff;
     .messageTitle{
         width: 100%;
         box-shadow: 0px 6px 9px -11px #000000;
         background-color: #fff;
-        padding: 20px;
         z-index: 1;
         position: relative;
+        padding: 5px 0px;
         h1{
             margin: 0;
-            font-size: 18px;
+            font-size: 14px;
         }
         .closeDialog{
             height: 40px;
@@ -22,8 +24,8 @@
     .messageDialogTextContainer{
         min-width: 250px;
         max-width: 300px;
-        padding: 20px;
         background-color: #fff;
+        padding: 5px 0px;
         .messageText{
             font-size: 18px;
         }
@@ -33,6 +35,23 @@
             justify-content: center;
             font-weight: bold;
             font-size: 16px;
+        }
+        .playerInfos{
+            padding: 5px 0px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            .icon{
+                width: 10%;
+            }
+            .money{
+                width: 20%;
+                text-align: end;
+            }
+            .name{
+                width: 70%;
+            }
         }
     }
 
@@ -90,6 +109,12 @@
         .bankRuptBtn{
             width: 100px;
         }
+    }
+    .messageDivider{
+        height: 1px;
+        background: #A8A8A8;
+        border: none;
+        margin: 0;
     }
    
 }

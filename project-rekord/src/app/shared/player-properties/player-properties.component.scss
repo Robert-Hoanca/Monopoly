@@ -1,13 +1,14 @@
 .propertiesContainer{
     flex-wrap: wrap;
     width: 250px;
-    padding: 10px;
     .property{
-        width: 10px;
-        height: 15px;
+        width: 5px;
+        height: 10px;
         position: relative;
-        margin-left: 10px;
         margin-top: 10px;
+        &:not(:first-child){
+            margin-left: 10px;
+        }
         cursor: pointer;
         .propDistrict{
             position: absolute;
@@ -22,7 +23,6 @@
         width: 42px;
         height: 47px;
         position: relative;
-        margin-left: 10px;
         margin-top: 10px;
         padding: 0;
         mat-icon{
