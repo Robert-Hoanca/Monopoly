@@ -50,10 +50,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   overflow: hidden;
 }
 .exchangePanel{
-  max-width: 60%;
+  max-width: 90vw!important;
   max-height: 80%;
   .mat-dialog-container{
-    border-radius: 0px 5px 5px 5px;
+    border-radius: 5px;
     position: relative;
     overflow: visible;
   }
