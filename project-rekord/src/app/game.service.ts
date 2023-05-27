@@ -861,6 +861,12 @@ export class GameService {
     '#000' : '#fff';
   }
 
+  getObjectScreenPosition(object:any){
+
+   
+
+
+  }
 
   test(){
     // const numOfCells = 5

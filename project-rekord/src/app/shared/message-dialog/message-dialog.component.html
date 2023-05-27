@@ -1,11 +1,15 @@
-<div id="messageContainer">
+<div id="messageContainer" [ngStyle]="{background : data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest' ? '#fff' : ''}">
 
     <div *ngIf="data.eventType === 'showPlayerProps'" class="messageTitle" fxLayoutAlign="space-between center">
         <h1>Player Info</h1>
         <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
 
     </div>
-    <hr class="messageDivider" *ngIf="data.eventType === 'showPlayerProps'">
+
+    <div *ngIf="data.eventType === 'goBankRupt' || data.eventType === 'payMoney' || data.eventType === 'exitFromPrison' || data.eventType === 'changeTurn'" fxLayoutAlign="space-between center" class="messageTitle">
+        <h1>Message</h1>
+    </div>
+    <hr class="messageDivider" *ngIf="data.eventType === 'showPlayerProps' || data.eventType === 'goBankRupt' || data.eventType === 'payMoney' || data.eventType === 'exitFromPrison' || data.eventType === 'changeTurn'">
 
     <div *ngIf="data.eventType != 'showDiceResult' && data.eventType != 'chance' && data.eventType != 'communityChest'" class="messageDialogTextContainer">
         <h1 *ngIf="this.data.eventType !== 'changeTurn' && !data.textData.showPlayerProps" class="messageText">{{data.textData.text ?? data.textData.title}}</h1>
@@ -30,13 +34,13 @@
         <div *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps )" class="playerProps">
             <app-player-properties [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
         </div>
-        <div *ngIf="this.data.eventType !== 'changeTurn' && !data.textData.showPlayerProps" class="finishWarning" fxLayoutAlign="space-evenly center">
+        <div *ngIf="data.eventType !== 'changeTurn' && !data.textData.showPlayerProps" class="finishWarning" fxLayoutAlign="space-evenly center">
             <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn" class="bankRuptBtn">Confirm</button>
             <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt" class="bankRuptBtn">No</button>
             <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps'" class="okBtn">Ok</button>
         </div>
         
-        <div *ngIf="this.data.eventType === 'changeTurn'" class="changedTurn">
+        <div *ngIf="data.eventType === 'changeTurn'" class="changedTurn">
             <span> It's {{data.textData.playerName }} turn.</span>
         </div>
 

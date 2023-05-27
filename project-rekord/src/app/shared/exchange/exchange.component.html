@@ -26,7 +26,7 @@
               <div class="exchangeOptions" [@mmAnimationGrowHeight] *ngIf="(actualExpanded == gameService.players[gameService.turn].id) || gameService.userDevice.includes('computer')" fxLayout="column" fxLayoutAlign="start center">
                 <mat-form-field appearance="fill">
                     <mat-label>Amount of Money</mat-label>
-                    <input matInput type="number" [(ngModel)]="moneyToExchange[0]">
+                    <input matInput type="number" [(ngModel)]="moneyToExchange[0]" [min]="0" [max]="playerToExchangeWith.money">
                 </mat-form-field>
                 <div class="playerProperties">
                     <app-player-properties [playerId]="gameService.players[gameService.turn].id" [imInExchange]="true"></app-player-properties>
@@ -46,7 +46,7 @@
               <div  class="exchangeOptions" *ngIf="(actualExpanded == playerToExchangeWith.id) || gameService.userDevice.includes('computer')" [@mmAnimationGrowHeight] fxLayout="column" fxLayoutAlign="start center">
                 <mat-form-field appearance="fill">
                     <mat-label>Amount of Money</mat-label>
-                    <input matInput type="number" [(ngModel)]="moneyToExchange[1]">
+                    <input matInput type="number" [(ngModel)]="moneyToExchange[1]" [min]="0" [max]="gameService.players[gameService.turn].money">
                 </mat-form-field>
                 <div class="playerProperties">
                     <app-player-properties [playerId]="playerToExchangeWith.id" [imInExchange]="true"></app-player-properties>

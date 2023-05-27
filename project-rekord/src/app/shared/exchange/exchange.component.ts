@@ -38,7 +38,7 @@ export class ExchangeComponent implements OnInit {
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<ExchangeComponent>, public gameService: GameService) { }
 
   ngOnInit(): void {
-   
+    this.resetSelectedProps();
   }
   ngAfterViewInit(){
   }
@@ -119,6 +119,10 @@ export class ExchangeComponent implements OnInit {
     this.actualExpanded = this.actualExpanded == playerId ? '' : playerId;
   }
   ngOnDestroy(){
+   this.resetSelectedProps();
+  }
+
+  resetSelectedProps(){
     this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerToExchangeWith.id)).forEach(property => {
       if(property.exchangeSelected){
         property.exchangeSelected = false;
@@ -131,7 +135,12 @@ export class ExchangeComponent implements OnInit {
     });;
   }
   checkIfCanExchange(){
-    if(this.moneyToExchange[0] > 0 || this.moneyToExchange[1] > 0 || this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length || this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
+    if((this.moneyToExchange[0] > 0 
+      || this.moneyToExchange[1] > 0 
+      || this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length 
+      || this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length)
+      &&  (this.moneyToExchange[0] <= this.playerToExchangeWith.money && this.moneyToExchange[1] <= this.gameService.players[this.gameService.turn].money)
+        ){
       return false;
     }else{
       return true;

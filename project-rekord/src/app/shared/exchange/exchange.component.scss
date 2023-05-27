@@ -72,11 +72,13 @@
                         right: 0;
                     }
                     span{
-                        font-weight: bold;
-                        margin-left: 10px;
+                        font-weight: 500;
                         height: 30px;
                         display: flex;
                         align-items: center;
+                    }
+                    .money{
+                        margin-left: 10px;
                     }
                 }
 
@@ -95,6 +97,7 @@
                         border-radius: 5px;
                         padding: 0px 10px;
                         padding-bottom: 10px;
+                        height: 100%;
 
                         &::-webkit-scrollbar {
                             width: 5px;
