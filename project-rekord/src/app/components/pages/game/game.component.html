@@ -106,15 +106,15 @@
             <mat-form-field>
                 <mat-label>Card Color</mat-label>
                 <div class="colorContainer" fxLayoutAlign="start center">
-                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor()">
-                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor()">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor('card', gameService.sessionTheme.cardColor)">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor('card', gameService.sessionTheme.cardColor)">
                 </div>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Card Border</mat-label>
                 <div class="colorContainer" fxLayoutAlign="start center" fxLayoutAlign="start center">
-                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor()">
-                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor()">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor('border', gameService.sessionTheme.cardBorder)">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor('border', gameService.sessionTheme.cardBorder)">
                 </div>
             </mat-form-field>
         </div>
@@ -158,6 +158,10 @@
                 <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.z">
             </mat-form-field>
 
+            <mat-form-field>
+                <mat-label>Target Z</mat-label>
+                <input matInput type="text" [(ngModel)]="gameService.cameraControls._objRef.target.z">
+            </mat-form-field>
         </div>
 
     </div>

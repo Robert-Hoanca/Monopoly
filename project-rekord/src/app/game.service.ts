@@ -98,6 +98,9 @@ export class GameService {
   amountRent:number=0;
   amountDebt:number=0;
   setDebt:boolean = false;
+  
+  cardColorMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff})
+  cardBorderMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff , side : THREE.BackSide})
 
   debtWithWho:string='';
   diceRes:Array<number> = [];
@@ -126,6 +129,7 @@ export class GameService {
   debugMode:boolean = false;
   godMode:boolean = false;
   enableCursor:boolean = false;
+
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
 
   async retrieveDBData(){
@@ -187,6 +191,8 @@ export class GameService {
   chooseSessionColor(){
     this.sessionTheme = this.themes[Math.floor(Math.random() * this.themes.length)];
     this.sessionColor = this.sessionTheme.background;
+    this.changeCardColor('card', this.sessionTheme.cardColor)
+    this.changeCardColor('border', this.sessionTheme.cardBorder)
   }
   LightenDarkenColor(col:string,amt:number) {
     //Return a lighten / darken color based on the given color
@@ -336,24 +342,12 @@ export class GameService {
     this.getCardPosition$.next(cardIndex);
   }
 
-  changeCardColor(){
-    this.gameScene.children.forEach((child:any) => {
-      if( child.name.includes('cardNumber')){
-        child.traverse((child:any) => {
-          if(child.isMesh ){
-            const material = new THREE.MeshBasicMaterial({color: this.sessionTheme.cardColor});
-            child.material = material
-          }
-        })
-      }else if( child.name.includes('cardOutline')){
-        child.traverse((child:any) => {
-          if(child.isMesh ){
-           const material = new THREE.MeshBasicMaterial({color: this.sessionTheme.cardBorder, side: THREE.BackSide});
-            child.material = material
-          }
-        })
-      }
-    });
+  changeCardColor(type:string, color:string){
+    if(type === 'card'){
+      this.cardColorMaterial = new THREE.MeshBasicMaterial({color :  color})
+    }else if(type === 'border'){
+      this.cardBorderMaterial = new THREE.MeshBasicMaterial({color : color , side : THREE.BackSide})
+    }
   }
 
   resizeCanvas(event:any, camera:any){
@@ -885,6 +879,7 @@ export class GameService {
 
     this.textDialog(this.randomChance,'chance');
   }
+
 
   //Database Management
 

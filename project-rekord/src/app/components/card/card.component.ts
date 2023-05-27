@@ -21,12 +21,13 @@ export class CardComponent implements OnInit {
   @ViewChild('cardRef', { static: true }) cardRef: any;
   @ViewChild('cardOutlineRef', { static: true }) cardOutlineRef: any;
   @ViewChild('carpetRef', { static: true }) carpetRef: any;
+  bakcSideOption = THREE.BackSide;
   constructor(
     public gameService: GameService,
     private service: GLTFLoaderService
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     this.url =
       (this.cardIndex / 10) % 1 == 0
         ? '/assets/blenderModels/card/definitiveCard/card2.gltf'
@@ -68,23 +69,25 @@ export class CardComponent implements OnInit {
 
   ngAfterViewInit() {}
   setCardPosition() {
+
+    const yPosition = -0.2;
     if (this.cardIndex == 11 || this.cardIndex == 21 || this.cardIndex == 31) {
       this.gameService.cardsPositionCounter = 0;
       this.gameService.cardsPositionCounter += 2.2;
     }
 
     if (this.cardIndex <= 10) {
-      this.position = [this.gameService.cardsPositionCounter, 0, 0];
+      this.position = [this.gameService.cardsPositionCounter, yPosition, 0];
       if (this.cardIndex == 0) {
-        this.position = [0, 0, 0];
+        this.position = [0,  yPosition, 0];
       }
     } else if (10 < this.cardIndex && this.cardIndex <= 20) {
-      this.position = [22, 0, this.gameService.cardsPositionCounter];
+      this.position = [22,  yPosition, this.gameService.cardsPositionCounter];
       this.rotation = [0, Math.PI / 2, 0];
     } else if (20 < this.cardIndex && this.cardIndex <= 30) {
-      this.position = [22 - this.gameService.cardsPositionCounter, 0, 22];
+      this.position = [22 - this.gameService.cardsPositionCounter,  yPosition, 22];
     } else if (30 < this.cardIndex && this.cardIndex <= 40) {
-      this.position = [0, 0, 22 - this.gameService.cardsPositionCounter];
+      this.position = [0,  yPosition, 22 - this.gameService.cardsPositionCounter];
       this.rotation = [0, Math.PI / 2, 0];
     }
     this.gameService.cardsPositionCounter += 2.2;
@@ -102,7 +105,7 @@ export class CardComponent implements OnInit {
     } else if (30 < this.cardIndex && this.cardIndex <= 40) {
       this.carpetPosistion[0] += 0.8;
     }
-    this.carpetPosistion[1] += 0.05;
+    this.carpetPosistion[1] += 0.25;
   }
 
   returnSpecialCardUrl(cardType: string) {
