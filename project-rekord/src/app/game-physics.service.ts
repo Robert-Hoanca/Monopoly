@@ -24,7 +24,7 @@ export class GamePhysicsService {
   constructor(public gameService: GameService, private dialog: MatDialog) {}
 
   initWorld() {
-    this.world.gravity.set(0, -20, 0); // -9.82 m/s²
+    this.world.gravity.set(0, -40, 0); // -9.82 m/s² 
     this.world.defaultContactMaterial.restitution = 0.3;
     this.createDiceCase();
     if (this.diceArray.length) {
