@@ -37,6 +37,9 @@
                 width: 100%;
             }
             &.bankrupt{
+                &:not(.show){
+                    opacity: 0;
+                }
                 background: #c73b2f;
                 opacity: 0.7;
                 pointer-events: none!important;

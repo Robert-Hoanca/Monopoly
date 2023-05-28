@@ -33,7 +33,7 @@
     <app-decoration-item [whereAmI]="'outsideCanvas'"></app-decoration-item>
       
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around start">
-        <mat-card *ngFor="let player of gameService.players; let i = index" [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt' , player.name + i]" fxLayout="row" fxLayoutAlign="start center">
+        <mat-card *ngFor="let player of gameService.players; let i = index" [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="row" fxLayoutAlign="start center" [attr.player-id]="player.name + i">
            <div class="infoContaner" fxLayoutAlign="space-between start">
                 <span class="name">{{player.name}}</span>
                 <span class="money" *ngIf="!player.bankrupt">{{player.money}} €</span>

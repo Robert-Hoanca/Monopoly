@@ -310,6 +310,14 @@ export class GameService {
 
   setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number){
     //Camera
+          // const cards = document.querySelectorAll('#playersContainer .playerCard.show')
+      // if(cards.length){
+      //   cards.forEach(cardInfo => {
+      //     const playerIndex:any = cardInfo.getAttribute('player-id')?.replace(/\D+/g, '')
+      //     this.gameService.showHidePlayerInfo$.next({type : 'hide', playerId : this.gameService.players[playerIndex].id, playerMoving:true})
+      //   });
+      // }
+
     if(this.userDevice.includes('phone')){
       if(cameraPosition){
         gsap.fromTo(this.camera._objRef.position, {x: this.camera._objRef.position.x}, {x: cameraPosition[0], duration: duration/1000});
