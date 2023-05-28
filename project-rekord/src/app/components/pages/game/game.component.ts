@@ -119,6 +119,10 @@ export class GameComponent implements OnInit {
         let evt =  new WheelEvent("wheel", {deltaY:10});
         document.querySelector("canvas")?.dispatchEvent(evt);
         this.gameService.enableMapControls = false;
+
+        this.gameService.players.filter((player:any) => player.bankrupt).forEach(player => {
+          this.gameService.showHidePlayerInfo$.next({type : 'show', playerId: player.id})
+        });
       }
     })
     this.gameService.setCameraOnPlayer(1500);

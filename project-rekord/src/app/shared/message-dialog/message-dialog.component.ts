@@ -209,5 +209,9 @@ export class MessageDialogComponent implements OnInit {
   getPlayerWhoWin(){
     return this.gameService.players.find(player => player.id == this.gameService.playerWhoWonId)
   }
+
+  getActualPlayerProps(){
+    return this.gameService.gameTable.cards.filter((card:any) => card.owner === this.data.textData.playerId).length
+  }
 }
 

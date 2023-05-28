@@ -6,20 +6,14 @@
 
     </div>
 
-    <div *ngIf="data.eventType === 'goBankRupt' || data.eventType === 'payMoney' || data.eventType === 'exitFromPrison' || data.eventType === 'changeTurn'" fxLayoutAlign="space-between center" class="messageTitle">
+    <div *ngIf="data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest'" fxLayoutAlign="space-between center" class="messageTitle">
         <h1>Message</h1>
     </div>
-    <hr class="messageDivider" *ngIf="data.eventType === 'showPlayerProps' || data.eventType === 'goBankRupt' || data.eventType === 'payMoney' || data.eventType === 'exitFromPrison' || data.eventType === 'changeTurn'">
+    <hr class="messageDivider" *ngIf="data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest'">
 
     <div *ngIf="data.eventType != 'showDiceResult' && data.eventType != 'chance' && data.eventType != 'communityChest'" class="messageDialogTextContainer">
         <h1 *ngIf="this.data.eventType !== 'changeTurn' && !data.textData.showPlayerProps" class="messageText">{{data.textData.text ?? data.textData.title}}</h1>
-        <div *ngIf="gameService.playerWhoWonId != '' && this.data.eventType !== 'changeTurn'" class="winScreen">
-            <div>Player money: {{getPlayerWhoWin().money}} €</div>
-            <div>Time to finish the game:</div>
-            <div class="time">{{gameService.gameAmountTime}}</div>
-        </div>
-    
-        <div class="playerInfos" *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps )">
+        <div class="playerInfos" *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps ) && this.getActualPlayerProps()">
             <mat-icon class="material-symbols-outlined icon">
                 person
             </mat-icon>
@@ -30,8 +24,12 @@
                 {{gameService.players[gameService.turn].money}}$
             </span>
         </div>
+        <div *ngIf="gameService.playerWhoWonId != '' && this.data.eventType !== 'changeTurn'" class="winScreen">
+            <div>Time to finish the game:</div>
+            <div class="time">{{gameService.gameAmountTime}}</div>
+        </div>
 
-        <div *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps )" class="playerProps">
+        <div *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps ) && getActualPlayerProps()" class="playerProps">
             <app-player-properties [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
         </div>
         <div *ngIf="data.eventType !== 'changeTurn' && !data.textData.showPlayerProps" class="finishWarning" fxLayoutAlign="space-evenly center">

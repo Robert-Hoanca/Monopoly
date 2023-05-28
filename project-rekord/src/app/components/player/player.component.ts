@@ -4,6 +4,7 @@ import { GameService } from 'src/app/game.service';
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import gsap from 'gsap';
+import { info } from 'console';
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
@@ -66,6 +67,12 @@ export class PlayerComponent implements OnInit {
         }
       })
     );
+    this.subscriptions$.push(
+      this.gameService.showHidePlayerInfo$.subscribe((data:any) => {
+        if(this.player.id === data.playerId)
+        this.showPlayerInfo(data.type)
+      })
+    )
   }
   ngAfterViewInit() {
   }
@@ -1211,6 +1218,43 @@ export class PlayerComponent implements OnInit {
           { z: 0, duration: duration / 1000 }
         );
       }, duration);
+    }
+  }
+
+  showPlayerInfo(type:string){
+    if(type === 'show' && !this.gameService.playerShowingInfo.includes(this.player.id)){
+      this.gameService.playerShowingInfo.push(this.player.id);
+      this.setPlayerCardPosition()
+    }
+    else if(type === 'hide' && this.gameService.playerShowingInfo.includes(this.player.id)){
+      const idIndex = this.gameService.playerShowingInfo.findIndex(playerId => playerId === this.player.id);
+      this.gameService.playerShowingInfo.splice(idIndex,1)
+      this.setPlayerCardPosition()
+    }
+  }
+
+  setPlayerCardPosition(){
+    const playerIndex = this.gameService.players.findIndex(player => player.id === this.player.id)
+    const infoEl = document.querySelectorAll<HTMLElement>('.' + this.player.name + playerIndex)[0];
+    const position = this.gameService.getObjectScreenPosition(this.playerRef);
+    //Aggiungere sistema che controlla se due o piu' info si sovrappongono
+      if(infoEl){
+        if((position[0] - ((infoEl.clientHeight + 20))) > 0){
+          infoEl.style.top = (position[0] - ((infoEl.clientHeight + 20))) + 'px';
+        }else{
+          infoEl.style.top = position[0] + 'px';
+        }
+
+        infoEl.style.left = (position[1] - (infoEl.clientWidth / 2)) + 'px' ;
+      }
+    if(this.gameService.playerShowingInfo.includes(this.player.id)){
+      // infoEl.style.opacity = '1';
+      // infoEl.style.pointerEvents = 'all';
+      infoEl.classList.add('show');
+    } else if(!this.gameService.playerShowingInfo.includes(this.player.id)){
+      // infoEl.style.opacity = '0';
+      // infoEl.style.pointerEvents = 'none';
+      infoEl.classList.remove('show');
     }
   }
 

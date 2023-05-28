@@ -99,8 +99,9 @@ export class GameService {
   amountDebt:number=0;
   setDebt:boolean = false;
   
-  cardColorMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff})
-  cardBorderMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff , side : THREE.BackSide})
+  cardColorMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff});
+  cardBorderMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff , side : THREE.BackSide});
+  playerShowingInfo:Array<string> = [];
 
   debtWithWho:string='';
   diceRes:Array<number> = [];
@@ -120,6 +121,7 @@ export class GameService {
   shouldRemovePlayerCage$ = new Subject();
   changeCardBorderColor$ = new Subject();
   screenLoaded$ = new Subject();
+  showHidePlayerInfo$ = new Subject();
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
@@ -196,30 +198,41 @@ export class GameService {
   }
   LightenDarkenColor(col:string,amt:number) {
     //Return a lighten / darken color based on the given color
-    var usePound = false;
-    if ( col[0] == "#" ) {
-        col = col.slice(1);
-        usePound = true;
+    let amount = amt;
+    let finalHex = '';
+
+    while(finalHex.length < 7){
+      var usePound = false;
+      if ( col[0] == "#" ) {
+          col = col.slice(1);
+          usePound = true;
+      }
+  
+      var num = parseInt(col,16);
+  
+      var r = (num >> 16) + amt;
+  
+      if ( r > 255 ) r = 255;
+      else if  (r < 0) r = 0;
+  
+      var b = ((num >> 8) & 0x00FF) + amt;
+  
+      if ( b > 255 ) b = 255;
+      else if  (b < 0) b = 0;
+  
+      var g = (num & 0x0000FF) + amt;
+  
+      if ( g > 255 ) g = 255;
+      else if  ( g < 0 ) g = 0;
+      finalHex = (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+
+      if(finalHex.length < 7){
+        amount--;
+      }
     }
 
-    var num = parseInt(col,16);
 
-    var r = (num >> 16) + amt;
-
-    if ( r > 255 ) r = 255;
-    else if  (r < 0) r = 0;
-
-    var b = ((num >> 8) & 0x00FF) + amt;
-
-    if ( b > 255 ) b = 255;
-    else if  (b < 0) b = 0;
-
-    var g = (num & 0x0000FF) + amt;
-
-    if ( g > 255 ) g = 255;
-    else if  ( g < 0 ) g = 0;
-
-    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+    return finalHex;
   }
 
   returnInclude(element:any, string:string){
@@ -391,7 +404,7 @@ export class GameService {
       this.localSaveName = this.localSaves.localId;
       if(this.localSaves.playerWhoWonId){
         this.playerWhoWonId = this.localSaves.playerWhoWonId;
-        this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!'}, 'finishGame')
+        this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
       }
     }
     this.switchRouter('game');
@@ -516,6 +529,7 @@ export class GameService {
 
   addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
 
+    player ? this.showHidePlayerInfo$.next({type:'show', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'show', playerId: this.players[this.turn].id});
     new Observable((subscriber) => {
       this.playerMoneyChangeValue = amount;
       if(type=='add'){
@@ -535,6 +549,7 @@ export class GameService {
         }else if(type=='remove'){
           player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
         }
+        player ? this.showHidePlayerInfo$.next({type:'hide', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'hide', playerId: this.players[this.turn].id});
       }
     })
 
@@ -556,7 +571,7 @@ export class GameService {
 
   //MANAGE PROPERTIES
   showPlayerProps(){
-    this.textDialog({text: this.players[this.turn].name, showPlayerProps:true}, 'showPlayerProps')
+    this.textDialog({text: this.players[this.turn].name, showPlayerProps:true, playerId: this.players[this.turn].id}, 'showPlayerProps')
   }
 
   buyProperty(property:any){
@@ -785,6 +800,7 @@ export class GameService {
 
   goBankRupt(){
     this.players[this.turn].bankrupt = true;
+    this.showHidePlayerInfo$.next({type: 'show', playerId : JSON.parse(JSON.stringify(this.players[this.turn].id))})
     this.checkIfSomeoneWon();
   }
 
@@ -794,7 +810,7 @@ export class GameService {
       this.endTime = Date.now();
       this.playerWhoWonId = this.players.find(player => !player.bankrupt).id;
       this.calculateGameTime()
-      this.textDialog({text: this.players.find(player => !player.bankrupt).name + ' has won the game!', playerWhoWonId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
+      this.textDialog({text: this.players.find(player => !player.bankrupt).name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
     }else{
       await this.gameTable.cards.filter((card:any) => card.owner == this.players[this.turn].id).forEach((foundCard:any) => {
         foundCard.owner = '';
@@ -817,7 +833,7 @@ export class GameService {
     seconds = seconds % 3600;
     var minutes = Math.round(( seconds / 60 )); // 60 seconds in 1 minute
     seconds = Math.round(seconds % 60);
-    this.gameAmountTime = hours + ' : ' + minutes + ' : ' + seconds;
+    this.gameAmountTime = hours + 'h : ' + minutes + 'm : ' + seconds + 's';
   }
 
   //Calculate the amount of debt that a player have to pay to continue playing
@@ -862,10 +878,20 @@ export class GameService {
   }
 
   getObjectScreenPosition(object:any){
+    const objectPosition = new THREE.Vector3();
+    objectPosition.setFromMatrixPosition(object._objRef.matrixWorld);
+    objectPosition.project(this.camera._objRef)
 
-   
+    let canvasElement = document.getElementById('rendererCanvas0');
 
+    if(canvasElement){
 
+      const left = (objectPosition.x + 1) * canvasElement.offsetWidth / 2;
+      const top = (-objectPosition.y + 1) * canvasElement.offsetHeight / 2;
+      
+      return [ top , left]
+    }
+    return [];
   }
 
   test(){

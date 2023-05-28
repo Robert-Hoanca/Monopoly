@@ -33,10 +33,12 @@
     <app-decoration-item [whereAmI]="'outsideCanvas'"></app-decoration-item>
       
     <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around start">
-        <mat-card *ngFor="let player of gameService.players" [@mmAnimationScale] [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="column" fxLayoutAlign="center start">
-            <span class="name">{{player.name}}</span>
-            <span class="money">{{player.money}} €</span>
-            <mat-icon *ngIf="gameService.players[gameService.turn].id === player.id" class="material-symbols-outlined actualTurnPlayer" [@mmAnimationScale]>person</mat-icon>
+        <mat-card *ngFor="let player of gameService.players; let i = index" [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt' , player.name + i]" fxLayout="row" fxLayoutAlign="start center">
+           <div class="infoContaner" fxLayoutAlign="space-between start">
+                <span class="name">{{player.name}}</span>
+                <span class="money" *ngIf="!player.bankrupt">{{player.money}} €</span>
+           </div>
+            <mat-icon *ngIf="gameService.players[gameService.turn].id === player.id" class="material-symbols-outlined actualTurnPlayer">person</mat-icon>
             <div id="passedStart" *ngIf="(player.addingMoney || player.removingMoney) && !player.bankrupt" [@passedStartMoney]>
                 <span [ngStyle]="{'color': player.addingMoney ? 'green' : 'red'}"> <span [innerHTML]="player.addingMoney ? '+' : '-'"></span> {{gameService.playerMoneyChangeValue}}</span>
             </div>
@@ -158,10 +160,6 @@
                 <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.z">
             </mat-form-field>
 
-            <mat-form-field>
-                <mat-label>Target Z</mat-label>
-                <input matInput type="text" [(ngModel)]="gameService.cameraControls._objRef.target.z">
-            </mat-form-field>
         </div>
 
     </div>
