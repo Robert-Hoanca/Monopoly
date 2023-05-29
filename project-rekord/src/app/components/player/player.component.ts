@@ -298,7 +298,9 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z - 1,
             ],
-            1000
+            1000, 
+            (xIndex == 1 ? true : false),
+            (xIndex === counterOfCards ? true : false)
           );
         } else {
           this.gameService.setCameraPosition(
@@ -312,7 +314,9 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z + 1,
             ],
-            1000
+            1000,
+            (xIndex == -1 ? true : false),
+            (xIndex === counterOfCards ? true : false)
           );
         }
 
@@ -469,7 +473,9 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z + 1,
             ],
-            1000
+            1000,
+            (zIndex == 1 ? true : false),
+            (zIndex === counterOfCards ? true : false)
           );
         } else {
           this.gameService.setCameraPosition(
@@ -483,7 +489,9 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z - 1,
             ],
-            1000
+            1000,
+            (zIndex == -1 ? true : false),
+            (zIndex === counterOfCards ? true : false)
           );
         }
 

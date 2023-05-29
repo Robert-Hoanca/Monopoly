@@ -173,7 +173,7 @@ export class GameComponent implements OnInit {
 
   rollTheDice(){
     const time = this.gameService.userDevice.includes('phone') ? 1000 : 100;
-    this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000)
+    this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000, true , true)
 
     timer(100).pipe(take(1)).subscribe({
       complete: ()=> {
