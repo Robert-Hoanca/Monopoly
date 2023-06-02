@@ -126,7 +126,7 @@ export class GameComponent implements OnInit {
       }
     })
     this.gameService.setCameraOnPlayer(1500);
-    this.activateLocalSave();
+    //this.activateLocalSave();
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
     

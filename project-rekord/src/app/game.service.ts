@@ -308,31 +308,13 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number, isStart:boolean , isEnd:boolean){
+  setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number){
     //Camera
 
     if(this.userDevice.includes('phone')){
       if(cameraPosition){
-        //const cards = document.querySelectorAll('#playersContainer .playerCard.show');
-        const bankRuptedPlayer = this.players.filter(player => player.bankrupt)
-        //this.movingCamera = true;
-        gsap.fromTo(this.camera._objRef.position, {x: this.camera._objRef.position.x}, {x: cameraPosition[0], duration: duration/1000, onStart : () =>{
-          //Tranform this code into a function and use it also on page rezise 
-          if(bankRuptedPlayer.length){
-            this.playerShowingInfo.forEach(playerId => {
-              this.showHidePlayerInfo$.next({type : 'hide', playerId : playerId});
-            });
-            
-          }
-        },
-        onComplete : () => {
-          if(bankRuptedPlayer.length && isEnd){
-            this.players.filter(player => player.bankrupt).forEach(player => {
-
-              if(!this.playerShowingInfo.includes(player.id))
-              this.showHidePlayerInfo$.next({type : 'show', playerId : player.id});
-            });
-          } 
+        gsap.fromTo(this.camera._objRef.position, {x: this.camera._objRef.position.x}, {x: cameraPosition[0], duration: duration/1000, onUpdate : () =>{
+          this.handlePlayerCardWhenSceneMoving();
         }});
         gsap.fromTo(this.camera._objRef.position, {y: this.camera._objRef.position.y}, {y: cameraPosition[1], duration: duration/1000});
         gsap.fromTo(this.camera._objRef.position, {z: this.camera._objRef.position.z}, {z: cameraPosition[2], duration: duration/1000});
@@ -365,7 +347,7 @@ export class GameService {
 
       timer(timeOutTimer).pipe(take(1)).subscribe({
         complete: () => {
-          this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000, true, true)
+          this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000)
         }
       })
     }
@@ -393,6 +375,7 @@ export class GameService {
       document.querySelector("canvas")?.dispatchEvent(evt);
     }
     this.aspect = event.width / event.height;
+    this.handlePlayerCardWhenSceneMoving();
   }
 
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
@@ -913,6 +896,14 @@ export class GameService {
       return [ top , left]
     }
     return [];
+  }
+
+  handlePlayerCardWhenSceneMoving(){
+    if(!this.loading){
+      this.playerShowingInfo.forEach(playerId => {
+        this.showHidePlayerInfo$.next({type : 'onlySetPosition', playerId : playerId});
+      });
+    }
   }
 
   test(){

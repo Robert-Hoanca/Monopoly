@@ -1,4 +1,4 @@
-<div id="messageContainer" [ngStyle]="{background : data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest' ? '#fff' : ''}">
+<div id="messageContainer" [ngClass]="data.eventType === 'chance' && data.eventType === 'communityChest' ? 'card' : ''" [ngStyle]="{background : data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest' ? '#fff' : ''}">
 
     <div *ngIf="data.eventType === 'showPlayerProps'" class="messageTitle" fxLayoutAlign="space-between center">
         <h1>Player Info</h1>

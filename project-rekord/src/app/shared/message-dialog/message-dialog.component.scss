@@ -1,6 +1,8 @@
 #messageContainer{
     overflow: hidden;
-    padding: 20px;
+    &:not(.card){
+        padding: 20px;
+    }
     .messageTitle{
         width: 100%;
         height: 50px;

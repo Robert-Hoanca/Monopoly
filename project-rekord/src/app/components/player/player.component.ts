@@ -298,9 +298,7 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z - 1,
             ],
-            1000, 
-            (xIndex == 1 ? true : false),
-            (xIndex === counterOfCards ? true : false)
+            1000
           );
         } else {
           this.gameService.setCameraPosition(
@@ -314,9 +312,7 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z + 1,
             ],
-            1000,
-            (xIndex == -1 ? true : false),
-            (xIndex === counterOfCards ? true : false)
+            1000
           );
         }
 
@@ -473,9 +469,7 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z + 1,
             ],
-            1000,
-            (zIndex == 1 ? true : false),
-            (zIndex === counterOfCards ? true : false)
+            1000
           );
         } else {
           this.gameService.setCameraPosition(
@@ -489,9 +483,7 @@ export class PlayerComponent implements OnInit {
               0,
               this.gameService.cameraControls._objRef.target.z - 1,
             ],
-            1000,
-            (zIndex == -1 ? true : false),
-            (zIndex === counterOfCards ? true : false)
+            1000
           );
         }
 
@@ -1229,17 +1221,19 @@ export class PlayerComponent implements OnInit {
   }
 
   showPlayerInfo(type:string){
-    if(type === 'show' && !this.gameService.playerShowingInfo.includes(this.player.id)){
-      this.gameService.playerShowingInfo.push(this.player.id);
-      this.setPlayerCardPosition()
-    }
-    else if(type === 'hide' && this.gameService.playerShowingInfo.includes(this.player.id)){
-      const idIndex = this.gameService.playerShowingInfo.findIndex(playerId => playerId === this.player.id);
-      this.gameService.playerShowingInfo.splice(idIndex,1)
-      this.setPlayerCardPosition()
-    }
-    else if(type === 'onlySetPosition'){
-      this.setPlayerCardPosition()
+    if(this.playerRef._objRef){
+      if(type === 'show' && !this.gameService.playerShowingInfo.includes(this.player.id)){
+        this.gameService.playerShowingInfo.push(this.player.id);
+        this.setPlayerCardPosition()
+      }
+      else if(type === 'hide' && this.gameService.playerShowingInfo.includes(this.player.id)){
+        const idIndex = this.gameService.playerShowingInfo.findIndex(playerId => playerId === this.player.id);
+        this.gameService.playerShowingInfo.splice(idIndex,1)
+        this.setPlayerCardPosition()
+      }
+      else if(type === 'onlySetPosition'){
+        this.setPlayerCardPosition()
+      }
     }
   }
 
