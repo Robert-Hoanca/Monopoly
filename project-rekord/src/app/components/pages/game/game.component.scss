@@ -92,6 +92,25 @@
             &[disabled="true"] mat-icon.info{
                 background:unset;
             }
+
+
+            &#bankRupt{
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:after{
+                    content: '';
+                    background: #fff;
+                    position: absolute;
+                    transform: rotate(-45deg);
+                }
+                &[disabled="true"]{
+                    &:after{
+                        opacity: 0.5;
+                    }
+                }
+            }
         }
     }
     #pauseBtn{
@@ -156,17 +175,9 @@
             }
 
             &#bankRupt{
-                position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: center;
                 &:after{
-                    content: '';
                     width: 2px;
-                    background: #fff;
                     height: 65%;
-                    position: absolute;
-                    transform: rotate(-45deg);
                 }
             }
         }
@@ -210,17 +221,9 @@
             }
 
             &#bankRupt{
-                position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: center;
                 &:after{
-                    content: '';
                     width: 2px;
-                    background: #fff;
                     height: 50%;
-                    position: absolute;
-                    transform: rotate(-45deg);
                 }
             }
 

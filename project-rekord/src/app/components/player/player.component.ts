@@ -27,7 +27,6 @@ export class PlayerComponent implements OnInit {
   constructor(public gameService: GameService) {}
 
   async ngOnInit() {
-    this.setPlayerPosition(this.player.pawn.position, true);
     this.subscriptions$.push(
       this.gameService.setPlayerPosition$.subscribe((data: any) => {
         if (this.playerArrived) {
@@ -75,6 +74,7 @@ export class PlayerComponent implements OnInit {
     )
   }
   ngAfterViewInit() {
+    this.setPlayerPosition(this.player.pawn.position, true);
   }
 
   async setPlayerPosition(

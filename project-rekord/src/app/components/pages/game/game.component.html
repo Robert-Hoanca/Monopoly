@@ -61,7 +61,7 @@
     <ng-template #showDiceResultDialog>
 
         <div class="doubleDiceTitle" *ngIf="gameService.players[gameService.turn].prison.doubleDiceCounter">
-            <h1>DOUBLE!! </h1> <span>x{{gameService.players[gameService.turn].prison.doubleDiceCounter}}</span>
+            <span>x{{gameService.players[gameService.turn].prison.doubleDiceCounter}}</span>
         </div>
         <div *ngFor="let res of gamePhysicsService.diceRes" [ngClass]="['dice', getDiceResClass(res)]" [@showDice]>       
             <div class="dotsContainer">
