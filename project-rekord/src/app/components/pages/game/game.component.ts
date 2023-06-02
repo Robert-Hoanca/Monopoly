@@ -126,7 +126,7 @@ export class GameComponent implements OnInit {
       }
     })
     this.gameService.setCameraOnPlayer(1500);
-    //this.activateLocalSave();
+    this.activateLocalSave();
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
     
@@ -173,7 +173,7 @@ export class GameComponent implements OnInit {
 
   rollTheDice(){
     const time = this.gameService.userDevice.includes('phone') ? 1000 : 100;
-    this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000, true , true)
+    this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000)
 
     timer(100).pipe(take(1)).subscribe({
       complete: ()=> {
