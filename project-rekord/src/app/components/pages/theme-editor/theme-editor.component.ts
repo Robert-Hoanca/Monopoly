@@ -43,14 +43,6 @@ export class ThemeEditorComponent implements OnInit {
     this.closeDialog();
   }
 
-  addNewTheme(){
-    this.gameService.themes.push({
-      background : '#fdfd96',
-      cardColor : '#fff',
-      cardBorder : '#000',
-    })
-  }
-
   openSaveDialog(){
 
     this.dialog.open(this.saveThemesRef, {

@@ -190,12 +190,21 @@ export class GameService {
     });
   }
 
-  chooseSessionColor(){
-    this.sessionTheme = this.themes[Math.floor(Math.random() * this.themes.length)];
+  chooseSessionColor(index?:number){
+    this.sessionTheme = index !== undefined ? this.themes[index] : this.themes[Math.floor(Math.random() * this.themes.length)];
     this.sessionColor = this.sessionTheme.background;
     this.changeCardColor('card', this.sessionTheme.cardColor)
     this.changeCardColor('border', this.sessionTheme.cardBorder)
   }
+
+  addNewTheme(){
+    this.themes.push({
+      background : '#fdfd96',
+      cardColor : '#fff',
+      cardBorder : '#000',
+    })
+  }
+
   LightenDarkenColor(col:string,amt:number) {
     //Return a lighten / darken color based on the given color
     let amount = amt;
