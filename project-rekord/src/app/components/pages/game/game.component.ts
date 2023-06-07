@@ -172,22 +172,19 @@ export class GameComponent implements OnInit {
   }
 
   rollTheDice(){
+    this.gamePhysicsService.dicesRolling = true;
     const time = this.gameService.userDevice.includes('phone') ? 1000 : 100;
     this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000)
 
-    timer(100).pipe(take(1)).subscribe({
-      complete: ()=> {
+    if(this.gameService.startToDice){
+      this.gameService.startToDice = false;
+    }
 
-        if(this.gameService.startToDice){
-          this.gameService.startToDice = false;
-        }
+    timer(time).pipe(take(1)).subscribe({
+      complete: ()=> {
 
         if(!this.gameService.players[this.gameService.turn].prison.inPrison){
           this.gameService.startToDice = true;
-          let index = 0;
-          this.gamePhysicsService.diceArray.forEach(dice => {
-            this.gamePhysicsService.diceRoll(dice);
-          });
         }else{
          this.whatToDoInPrison('prisonRoll')
         }
@@ -203,9 +200,6 @@ export class GameComponent implements OnInit {
       this.gameService.exitFromPrison(false, false);
     }else if(action == 'prisonRoll'){
       this.gameService.startToDice = true;
-      this.gamePhysicsService.diceArray.forEach(dice => {
-        this.gamePhysicsService.diceRoll(dice);
-      });
     }
   }
 

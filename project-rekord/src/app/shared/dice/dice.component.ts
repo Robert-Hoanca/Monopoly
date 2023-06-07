@@ -17,11 +17,20 @@ export class DiceComponent implements OnInit {
     sleepTimeLimit: 0.1 ,
   })
 
+  positionX = 0;
+  positionY = 0;
+  positionZ = 0;
 
   constructor(public gamePhysicsService : GamePhysicsService) { }
 
   ngOnInit(): void {
-    this.setDicePhysics()
+    this.positionX = Math.round(Math.random() * 9 + 7);
+    this.positionY = Math.round(Math.random() * 15 + 10);
+    this.positionZ = Math.round(Math.random() * 10 + 7);
+
+    this.diceBody.position.x = this.positionX;
+    this.diceBody.position.z = this.positionZ;
+    this.diceBody.position.y = this.positionY;
   }
 
   ngAfterViewInit(){
@@ -34,6 +43,7 @@ export class DiceComponent implements OnInit {
       body: this.diceBody
     })
 
+
     this.gamePhysicsService.createDice({
       mesh: this.diceMesh,
       body: this.diceBody
@@ -41,22 +51,27 @@ export class DiceComponent implements OnInit {
   }
 
   diceScaleAnimation(){
+
     if(this.diceRef){
+
       gsap.fromTo(
         this.diceRef._objRef.scale,
         { x: this.diceRef._objRef.scale.x },
-        { x: 0.5, duration: 0.25}
+        { x: 0.5, duration: 0.20, onComplete: () =>{
+          this.setDicePhysics()
+        }}
       );
       gsap.fromTo(
         this.diceRef._objRef.scale, 
         { y: this.diceRef._objRef.scale.y },
-        { y: 0.5, duration: 0.25 }
+        { y: 0.5, duration: 0.20 }
       );
       gsap.fromTo(
         this.diceRef._objRef.scale,
         { z: this.diceRef._objRef.scale.z },
-        { z: 0.5, duration: 0.25 }
+        { z: 0.5, duration: 0.20 }
       );
+
     }
   }
 
@@ -64,5 +79,4 @@ export class DiceComponent implements OnInit {
   ngOnDestroy(){
     this.gamePhysicsService.diceArray.pop()
   }
-
 }

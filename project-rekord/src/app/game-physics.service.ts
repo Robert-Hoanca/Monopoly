@@ -27,12 +27,12 @@ export class GamePhysicsService {
     this.world.gravity.set(0, -40, 0); // -9.82 m/s² 
     this.world.defaultContactMaterial.restitution = 0.3;
     this.createDiceCase();
-    if (this.diceArray.length) {
-      this.diceArray.forEach((dice) => {
-        this.createDice(dice.body);
-        this.addDiceEvents(dice);
-      });
-    }
+    // if (this.diceArray.length) {
+    //   // this.diceArray.forEach((dice) => {
+    //   //   this.createDice(dice.body);
+    //   //   //this.addDiceEvents(dice);
+    //   // });
+    // }
   }
 
   createDiceCase() {
@@ -154,11 +154,6 @@ export class GamePhysicsService {
   }
 
   diceRoll(dice: any) {
-    this.dicesRolling = true;
-    dice.body.position.x = Math.round(Math.random() * 9 + 7);
-    dice.body.position.z = Math.round(Math.random() * 10 + 7);
-    dice.body.position.y = Math.round(Math.random() * 9 + 7);
-
     dice.body.velocity.setZero();
     dice.body.angularVelocity.setZero();
 

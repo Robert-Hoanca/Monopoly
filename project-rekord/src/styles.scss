@@ -39,6 +39,7 @@ body{
     padding: 0;
     width: 100vw;
     height: 100vh;
+    height: -webkit-fill-available;
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -1,6 +1,7 @@
 .home{
     width: 100vw;
     height: 100vh;
+    height: -webkit-fill-available;
     font-family: mova;
     overflow: hidden;
     &__ui-container{
@@ -10,6 +11,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
+        height: -webkit-fill-available;
 
         &__title{
             width: 100%;
@@ -68,6 +70,7 @@
 .about-page{
     width: 100vw;
     height: 100vh;
+    height: -webkit-fill-available;
     position: absolute;
     top: 0;
     left: 0;
