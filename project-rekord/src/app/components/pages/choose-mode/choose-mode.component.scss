@@ -14,7 +14,6 @@
     }
     #localSaves{
         height: 100vh;
-        height: -webkit-fill-available;
         width: 100vw;
         display: flex;
         align-items: center;
@@ -194,7 +193,7 @@
     }
     #localSaves{
         flex-direction: column;
-        //padding: 50px 0px;
+        height: -webkit-fill-available;
     }
     #startGame{
         padding: 20px 0px;

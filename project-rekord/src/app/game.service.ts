@@ -895,7 +895,7 @@ export class GameService {
     objectPosition.setFromMatrixPosition(object._objRef.matrixWorld);
     objectPosition.project(this.camera._objRef)
 
-    let canvasElement = document.getElementById('rendererCanvas0');
+    let canvasElement:any = document.querySelector('canvas[id*="rendererCanvas"]');
 
     if(canvasElement){
 

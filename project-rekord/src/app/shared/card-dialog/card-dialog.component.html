@@ -2,10 +2,9 @@
     
    
     <div class="externalBtns" fxLayoutAlign="space-between center">
-        <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
         <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.distrainProperty(data.card);close()" [matTooltipPosition]="'above'" matTooltip="Mortgage" [disabled]="data.card.housesCounter>0"><mat-icon>credit_card</mat-icon></button>
-
         <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.cancelDistrainedFromProperty(data.card)" [disabled]="gameService.players[gameService.turn].money<data.card.distrainedCost" [matTooltipPosition]="'above'" matTooltip="Remove mortgage"><mat-icon>credit_card_off</mat-icon></button>
+        <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
     </div>
 
     <mat-card [ngClass]="['cardForm', data.card.owner == gameService.players[gameService.turn].id ? 'owned' : '']">

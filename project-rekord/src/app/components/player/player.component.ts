@@ -74,7 +74,6 @@ export class PlayerComponent implements OnInit {
     )
   }
   ngAfterViewInit() {
-    this.setPlayerPosition(this.player.pawn.position, true);
   }
 
   async setPlayerPosition(
@@ -1169,17 +1168,17 @@ export class PlayerComponent implements OnInit {
       gsap.fromTo(
         elementRef.scale,
         { x: elementRef.scale.x },
-        { x: 1, duration: duration / 1000 }
+        { x: 1.2, duration: duration / 1000 }
       );
       gsap.fromTo(
         elementRef.scale,
         { y: elementRef.scale.y },
-        { y: 1, duration: duration / 1000 }
+        { y: 1.2, duration: duration / 1000 }
       );
       gsap.fromTo(
         elementRef.scale,
         { z: elementRef.scale.z },
-        { z: 1, duration: duration / 1000 }
+        { z: 1.2, duration: duration / 1000 }
       );
 
       setTimeout(() => {
@@ -1239,7 +1238,6 @@ export class PlayerComponent implements OnInit {
 
   setPlayerCardPosition(){
     const playerIndex = this.gameService.players.findIndex(player => player.id === this.player.id)
-    //const infoEl = document.querySelectorAll<HTMLElement>('.' + this.player.name + playerIndex)[0];
     const infoEl = document.querySelectorAll<HTMLElement>('.playerCard[player-id="' + this.player.name + playerIndex + '"]')[0];
     const position = this.gameService.getObjectScreenPosition(this.playerRef);
     //Aggiungere sistema che controlla se due o piu' info si sovrappongono

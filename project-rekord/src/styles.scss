@@ -39,7 +39,6 @@ body{
     padding: 0;
     width: 100vw;
     height: 100vh;
-    height: -webkit-fill-available;
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
@@ -383,6 +382,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 //On Mobile
 @media screen and (max-width: 600px) {
+  body{
+    height: -webkit-fill-available;
+  }
   .propertyInfo{
     .mat-dialog-container{
       justify-content: center;

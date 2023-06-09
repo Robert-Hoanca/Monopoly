@@ -173,14 +173,15 @@ export class GameComponent implements OnInit {
 
   rollTheDice(){
     this.gamePhysicsService.dicesRolling = true;
-    const time = this.gameService.userDevice.includes('phone') ? 1000 : 100;
-    this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000)
+    const player = this.gameService.players[this.gameService.turn]
+    const time = this.gameService.userDevice.includes('phone') && player.actualCard !== 0 ? 1000 : 100;
+    this.gameService.setCameraPosition([-10,10,-10], [8,0,8], time)
 
     if(this.gameService.startToDice){
       this.gameService.startToDice = false;
     }
 
-    timer(time).pipe(take(1)).subscribe({
+    timer(time).subscribe({
       complete: ()=> {
 
         if(!this.gameService.players[this.gameService.turn].prison.inPrison){

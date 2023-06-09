@@ -7,7 +7,6 @@
     &__container{
         width: 100vw;
         height: 100vh;
-        height: -webkit-fill-available;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -45,5 +44,14 @@
     }
     to {
         transform:rotate(360deg);
+    }
+}
+
+//On Mobile
+@media screen and (max-width: 600px) {
+    .loading{
+        &__container{
+            height: -webkit-fill-available;
+        }    
     }
 }
