@@ -3,10 +3,13 @@
     src: url(../assets/fonts/ailerons-regular-webfont.woff);
 }
 @font-face {
-    font-family: 'mova';
+    font-family: mova;
     src: url(../assets/fonts/Mova/Mova.ttf);
 }
-
+@font-face {
+    font-family: bebasNeue;
+    src: url(../assets/fonts/BebasNeue-Regular/BebasNeue-Regular.ttf);
+}
 #routerContainer{
     width: 100%;
     height: 100%;

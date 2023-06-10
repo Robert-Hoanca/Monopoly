@@ -53,6 +53,7 @@ export class GameService {
   sessionTheme:any;
   players: Array<any> = [];
   themes: any;
+  debugSelectedTheme:string = '';
 
   choosenMode:string = '';
   db = getFirestore();

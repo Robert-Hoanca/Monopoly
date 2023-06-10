@@ -144,7 +144,4 @@ export class HomeComponent implements OnInit {
     event.renderer.setSize( window.innerWidth, window.innerHeight );
   }
 
-  openInfoPopup(){
-    //this.gameService.switchRouter('about')
-  }
 }

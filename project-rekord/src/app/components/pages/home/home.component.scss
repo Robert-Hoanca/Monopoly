@@ -1,7 +1,7 @@
 .home{
     width: 100vw;
     height: 100vh;
-    font-family: mova;
+    font-family: 'bebasNeue';
     overflow: hidden;
     &__ui-container{
         position: absolute;
@@ -110,7 +110,6 @@
             width: 180px;
             height: 65px;
             font-size: 24px;
-            font-family: 'mova';
             ::ng-deep .mat-button-wrapper{
                 width: 100%;
                 height: 100%;
@@ -165,7 +164,6 @@
             width: 110px;
             height: 50px;
             font-size: 18px;
-            font-family: 'mova';
             ::ng-deep .mat-button-wrapper{
                 width: 100%;
                 height: 100%;

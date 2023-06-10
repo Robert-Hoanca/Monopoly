@@ -101,8 +101,8 @@
 
             <mat-form-field>
                 <mat-label>Themes</mat-label>
-                <mat-select>
-                    <mat-option *ngFor="let theme of gameService.themes; let i = index" (click)="gameService.chooseSessionColor(i)"> Theme_{{ i }}</mat-option>
+                <mat-select [(ngModel)]="gameService.debugSelectedTheme">
+                    <mat-option *ngFor="let theme of gameService.themes; let i = index" (click)="gameService.chooseSessionColor(i)" [value]="'Theme_' + i"> Theme_{{ i }}</mat-option>
                 </mat-select>
             </mat-form-field>
 
