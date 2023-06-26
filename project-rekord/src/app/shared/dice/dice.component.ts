@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import * as CANNON from 'cannon-es'
 import { GamePhysicsService } from 'src/app/game-physics.service';
 import gsap from 'gsap';
@@ -9,10 +9,11 @@ import gsap from 'gsap';
 })
 export class DiceComponent implements OnInit {
   @ViewChild('diceRef', { static: true }) diceRef:any;
+  @Input() diceIndex!: any;
 
   diceMesh:any;
   diceBody = new CANNON.Body({
-    mass: 10,
+    mass: 1,
     shape: new CANNON.Box(new CANNON.Vec3(0.5,0.5,0.5)),
     sleepTimeLimit: 0.1 ,
   })
@@ -26,7 +27,7 @@ export class DiceComponent implements OnInit {
   ngOnInit(): void {
     this.positionX = Math.round(Math.random() * 9 + 7);
     this.positionY = Math.round(Math.random() * 15 + 10);
-    this.positionZ = Math.round(Math.random() * 10 + 7);
+    this.positionZ = Math.round(Math.random() * 9 + 7);
 
     this.diceBody.position.x = this.positionX;
     this.diceBody.position.z = this.positionZ;
@@ -46,7 +47,8 @@ export class DiceComponent implements OnInit {
 
     this.gamePhysicsService.createDice({
       mesh: this.diceMesh,
-      body: this.diceBody
+      body: this.diceBody,
+      diceindex: this.diceIndex
     })
   }
 

@@ -1,7 +1,7 @@
 <div class="home"  (click)="goToChooseModeView()" [ngStyle]="{'background-color': returnSessionBg(), 'color' : returnSessionColor()}" fxLayout="column" fxLayoutAlign="center center"> <!--(click)="goToChooseModeView()"-->
     
     <div class="home__ui-container" fxLayout="column" fxLayoutAlign="center center">
-        <h1 class="home__ui-container__title" (click)="$event.stopPropagation()" fxLayoutAlign="center center" fxLayout="column">
+        <h1 class="home__ui-container__title" (click)="$event.stopPropagation()" fxLayoutAlign="center center" fxLayout="column" [ngStyle]="{'color' : gameService.sessionTheme.cardColor}">
             Monopoly  
             <!-- <span>Js Edition</span> -->
         </h1>
@@ -13,7 +13,7 @@
         </div>
 
     
-        <span class="playText" *ngIf="!choosingMode">PLAY</span>
+        <span class="playText" *ngIf="!choosingMode" [ngStyle]="{'color' : gameService.sessionTheme.cardColor}">PLAY</span>
 
         <span class="rightsSection" [ngStyle]="{'color': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" (click)="$event.stopPropagation()">@Hoanca Robert 2022 All Rights Reserved</span>
 

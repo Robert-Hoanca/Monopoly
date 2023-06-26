@@ -1,15 +1,15 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '', gameService.enableCursor ? 'hoveringCard' : '']">
 
     <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event); gamePhysicsService.renderPhysicsWorld()">
-        <th-scene [autoUpdate]="true" #scene>
+        <th-scene [thStats]="true" [autoUpdate]="true" #scene>
             
             <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
             <th-hemisphereLight [castShadow]="false"></th-hemisphereLight>
             <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
 
-            <app-dice *ngIf="gameService.startToDice"></app-dice>
-            <app-dice *ngIf="gameService.startToDice"></app-dice>
+            <app-dice *ngIf="gameService.startToDice" [diceIndex]="0"></app-dice>
+            <app-dice *ngIf="gameService.startToDice" [diceIndex]="1"></app-dice>
 
             <th-orthographicCamera
                 [left]="-gameService.distance * this.gameService.aspect"
@@ -47,13 +47,13 @@
     </div>
 
     <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
-        <button mat-raised-button id="bankRupt" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.askIfShouldGoBankrupt()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" color="warn" [matTooltipPosition]="'above'" matTooltip="Go Bankrupt"><mat-icon class="material-symbols-outlined">home</mat-icon></button>
-        <button mat-raised-button id="seeProperties" *ngIf="!gameService.players[gameService.turn].canDice" [disabled]="!getActualPlayerProps().length && !gameService.players[gameService.turn].prison.getOutCards || gameService.playerWhoWonId != '' || gameService.movingCamera" (click)="gameService.showPlayerProps()" [matTooltipPosition]="'above'" matTooltip="See Player Info"><span class="title">Player Info</span><mat-icon class="material-symbols-outlined">person</mat-icon> <mat-icon class="material-symbols-outlined info">info</mat-icon> </button>
-        <button mat-raised-button id="openExchange" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="Start an Exchange"><span class="title">Exchange</span><mat-icon class="material-symbols-outlined">currency_exchange</mat-icon></button>
-        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.players[gameService.turn].canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera" [matTooltipPosition]="'above'" matTooltip="End Your Turn"><span class="title">End Turn</span><mat-icon class="material-symbols-outlined">logout</mat-icon></button>
-        <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="rollTheDice()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" [matTooltipPosition]="'above'" matTooltip="Throw The Dice"><span class="title">Dice Roll</span><mat-icon class="material-symbols-outlined">casino</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" (click)="whatToDoInPrison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay And Exit"><span class="title">Pay</span><mat-icon class="material-symbols-outlined">payments</mat-icon></button>
-        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling" [matTooltipPosition]="'above'" matTooltip="Use Free Card And Exit"><span class="title">Exit Free</span><mat-icon class="material-symbols-outlined">exit_to_app</mat-icon></button>  
+        <button mat-raised-button id="bankRupt" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.askIfShouldGoBankrupt()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gameService.addingPlayerMoney" color="warn" [matTooltipPosition]="'above'" matTooltip="Go Bankrupt"><mat-icon class="material-symbols-outlined">home</mat-icon></button>
+        <button mat-raised-button id="seeProperties" *ngIf="!gameService.players[gameService.turn].canDice" [disabled]="!getActualPlayerProps().length && !gameService.players[gameService.turn].prison.getOutCards || gameService.playerWhoWonId != '' || gameService.movingCamera || gameService.addingPlayerMoney" (click)="gameService.showPlayerProps()" [matTooltipPosition]="'above'" matTooltip="See Player Info"><span class="title">Player Info</span><mat-icon class="material-symbols-outlined">person</mat-icon> <mat-icon class="material-symbols-outlined info">info</mat-icon> </button>
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Start an Exchange"><span class="title">Exchange</span><mat-icon class="material-symbols-outlined">currency_exchange</mat-icon></button>
+        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.players[gameService.turn].canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="End Your Turn"><span class="title">End Turn</span><mat-icon class="material-symbols-outlined">logout</mat-icon></button>
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="rollTheDice()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Throw The Dice"><span class="title">Dice Roll</span><mat-icon class="material-symbols-outlined">casino</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" (click)="whatToDoInPrison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay And Exit"><span class="title">Pay</span><mat-icon class="material-symbols-outlined">payments</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingCamera || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Use Free Card And Exit"><span class="title">Exit Free</span><mat-icon class="material-symbols-outlined">exit_to_app</mat-icon></button>  
     </div>
 
     <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon class="material-symbols-outlined">pause</mat-icon></button>
@@ -180,9 +180,27 @@
 </div>
 
 <div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
-    <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
-    <button mat-raised-button disabled="true">Options</button>
-    <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
+    
+    <ng-container *ngIf="!pauseOptions">
+        <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
+        <button mat-raised-button (click)="pauseOptions = true">Options</button>
+        <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
+        <button mat-raised-button *ngIf="gameService.godMode" id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button>
+    </ng-container>
 
-    <button mat-raised-button *ngIf="gameService.godMode" id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button>
+    <div class="pausedGame__options" *ngIf="pauseOptions">
+        <div fxLayout="column">
+
+            <mat-checkbox [(ngModel)]="soundService.enableMusic" (click)="soundService.handleMusic()">Music</mat-checkbox>
+
+            <mat-slider [min]="0" [max]="0.1" step="0.001" [(ngModel)]="soundService.musicVolume" (ngModelChange)="soundService.changeMusicVolume()"></mat-slider>
+
+            <mat-checkbox [(ngModel)]="soundService.enableSoundsEffects">Sound Effects</mat-checkbox>
+
+            <!-- <mat-slider [min]="0" [max]="0.1" step="0.001" [(ngModel)]="soundService.soundVolume"></mat-slider> -->
+
+            <button mat-raised-button (click)="pauseOptions = false">Done</button>
+        </div>
+    </div>
+
 </div>

@@ -1,11 +1,10 @@
-import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription, take, timer } from 'rxjs';
 import { GamePhysicsService } from 'src/app/game-physics.service';
 import { GameService } from 'src/app/game.service';
-import * as THREE from 'three'
-import gsap from 'gsap'
+import { SoundService } from 'src/app/sound.service';
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
@@ -90,7 +89,9 @@ export class GameComponent implements OnInit {
 
   subscriptions:Array<Subscription> = [];
 
-  constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService) { }
+  pauseOptions:boolean = false;
+
+  constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService, public soundService : SoundService) { }
 
   ngOnInit(): void {
     this.gameService.addingRemovingMoneyProps();

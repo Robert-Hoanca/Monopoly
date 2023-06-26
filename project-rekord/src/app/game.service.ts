@@ -12,6 +12,7 @@ import gsap from 'gsap'
 import { Vector3 } from 'three';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
 import * as THREE from 'three';
+import { SoundService } from './sound.service';
 
 @Injectable({
   providedIn: 'root'
@@ -133,7 +134,7 @@ export class GameService {
   godMode:boolean = false;
   enableCursor:boolean = false;
 
-  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
+  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog, public soundService : SoundService) { }
 
   async retrieveDBData(){
     //const storage = getStorage();
@@ -397,6 +398,7 @@ export class GameService {
 
   async startGame(){
     this.loading = true;
+    this.soundService.playAmbientMusic()
     if(this.localSaves == 'new'){
       this.beginTime = Date.now();
       const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
@@ -542,9 +544,9 @@ export class GameService {
   }
 
   addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
-
     player ? this.showHidePlayerInfo$.next({type:'show', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'show', playerId: this.players[this.turn].id});
     new Observable((subscriber) => {
+      this.addingPlayerMoney = true;
       this.playerMoneyChangeValue = amount;
       if(type=='add'){
         player? player.addingMoney = true : this.players[this.turn].addingMoney = true;
@@ -564,6 +566,7 @@ export class GameService {
           player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
         }
         player ? this.showHidePlayerInfo$.next({type:'hide', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'hide', playerId: this.players[this.turn].id});
+        this.addingPlayerMoney = false;
       }
     })
 

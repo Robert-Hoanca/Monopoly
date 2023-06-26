@@ -21,6 +21,9 @@
 
         &-section{
             font-size: 35px;
+            &-title{
+                font-weight: bold;
+            }
             &-description{
                 margin-left: 20px;
                 &-normal{
@@ -30,7 +33,7 @@
                 font-size: 25px;
                 &-bold{
                     text-indent: 10px;
-                    -webkit-text-stroke-width: 0px!important;
+                    font-weight: bold;
                 }
             }
         }

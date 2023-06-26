@@ -68,6 +68,7 @@ export class CardComponent implements OnInit {
   }
 
   ngAfterViewInit() {}
+  
   setCardPosition() {
 
     const yPosition = -0.2;

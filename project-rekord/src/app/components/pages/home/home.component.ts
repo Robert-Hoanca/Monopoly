@@ -5,6 +5,7 @@ import { GameService } from 'src/app/game.service';
 import {  doc, getDoc } from '@angular/fire/firestore';
 import { switchMap, take, tap, timer } from 'rxjs';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-home',
@@ -54,7 +55,7 @@ export class HomeComponent implements OnInit {
   choosingMode:boolean = false;
 
 
-  constructor(public router: Router, public gameService: GameService, private dialog: MatDialog) { }
+  constructor(public router: Router, public gameService: GameService, private dialog: MatDialog, public soundService : SoundService) { }
 
   async ngOnInit(): Promise<void> {
     this.gameService.retrieveSavesFromLocal()
@@ -65,6 +66,8 @@ export class HomeComponent implements OnInit {
     }else if(window.navigator.userAgent.includes('iPhone')){
       this.gameService.userDevice = 'phone_ios'
     }
+    this.soundService.initializeAudioContext()
+
     // this.homeCameraDistance = this.gameService.userDevice.includes('phone') ? 50 : 30;
 
     // const gameTableRef = doc(this.gameService.db, "gameTables", 'monopolyMap');
@@ -78,6 +81,9 @@ export class HomeComponent implements OnInit {
       this.gameService.userDevice = 'computer_windows'
     }
     */
+  }
+
+  ngAfterViewInit(){
   }
 
   goToChooseModeView(){

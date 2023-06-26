@@ -3,7 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import { GameService } from './game.service';
-import { EMPTY, Observable, fromEvent, switchMap, take, tap, timer } from 'rxjs';
+import { EMPTY, Observable, debounceTime, delay, fromEvent, interval, map, pipe, switchMap, take, tap, timeout, timer } from 'rxjs';
+import { SoundService } from './sound.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,18 +22,12 @@ export class GamePhysicsService {
   dicesRolling: boolean = false;
   showDiceResultDialogRef: TemplateRef<any> | any;
 
-  constructor(public gameService: GameService, private dialog: MatDialog) {}
+  constructor(public gameService: GameService, private dialog: MatDialog, public soundService : SoundService) {}
 
   initWorld() {
-    this.world.gravity.set(0, -40, 0); // -9.82 m/s² 
+    this.world.gravity.set(0, -50, 0); // -9.82 m/s² 
     this.world.defaultContactMaterial.restitution = 0.3;
     this.createDiceCase();
-    // if (this.diceArray.length) {
-    //   // this.diceArray.forEach((dice) => {
-    //   //   this.createDice(dice.body);
-    //   //   //this.addDiceEvents(dice);
-    //   // });
-    // }
   }
 
   createDiceCase() {
@@ -104,6 +99,16 @@ export class GamePhysicsService {
   }
 
   addDiceEvents(dice: any) {
+
+    fromEvent(dice.body, 'collide').pipe(debounceTime(50)).subscribe({
+      next: (data) => {
+        if (dice.body.velocity.length() > 0) {
+          this.soundService.playDiceSound(dice);
+        }
+      }
+    })
+
+
     fromEvent(dice.body, 'sleep')
       .pipe()
       .subscribe({

@@ -29,6 +29,7 @@
     "firebase": "^9.9.3",
     "firebase-admin": "^11.0.1",
     "gsap": "^3.11.3",
+    "howler": "^2.2.3",
     "ngx-three": "^0.20.0",
     "require": "^2.4.20",
     "require-node": "^2.0.8",
