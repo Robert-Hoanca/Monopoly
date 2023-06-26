@@ -113,7 +113,7 @@ export class GameComponent implements OnInit {
     this.height = window.innerHeight;
     this.gameService.camera = this.camera;
     this.gameService.cameraControls = this.cameraControls;
-    this.gameService.enableMapControls = true;
+  this.gameService.enableMapControls = true;
 
     timer(500).pipe(take(1)).subscribe({
       complete : () =>{
@@ -127,7 +127,7 @@ export class GameComponent implements OnInit {
       }
     })
     this.gameService.setCameraOnPlayer(1500);
-    this.activateLocalSave();
+    //this.activateLocalSave();
     this.gamePhysicsService.initWorld();
     this.gamePhysicsService.showDiceResultDialogRef = this.showDiceResultDialogRef;
     

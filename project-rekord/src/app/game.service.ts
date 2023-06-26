@@ -555,6 +555,7 @@ export class GameService {
         player? player.removingMoney = true : this.players[this.turn].removingMoney = true;
         player != undefined? player.money -= amount : this.players[this.turn].money -= amount;
       }
+      this.soundService.playSound('money')
       subscriber.next(duration)
     }).pipe(switchMap((data:any):any => {
       return timer(data)

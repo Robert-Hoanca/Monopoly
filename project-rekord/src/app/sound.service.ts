@@ -13,13 +13,17 @@ export class SoundService {
 
   
   diceSounds = [
-    new Audio('../assets/sound/dice/1.wav'),
-    new Audio('../assets/sound/dice/2.wav'),
-    new Audio('../assets/sound/dice/3.wav'),
-    new Audio('../assets/sound/dice/4.wav'),
-    new Audio('../assets/sound/dice/5.wav'),
-    new Audio('../assets/sound/dice/6.wav'),
-    new Audio('../assets/sound/dice/7.wav'),
+    new Audio('../assets/sound/dice/1.mp3'),
+    new Audio('../assets/sound/dice/2.mp3'),
+    new Audio('../assets/sound/dice/3.mp3'),
+    new Audio('../assets/sound/dice/4.mp3'),
+    new Audio('../assets/sound/dice/5.mp3'),
+    new Audio('../assets/sound/dice/6.mp3'),
+    new Audio('../assets/sound/dice/7.mp3'),
+    new Audio('../assets/sound/dice/8.mp3'),
+    new Audio('../assets/sound/dice/9.mp3'),
+    new Audio('../assets/sound/dice/10.mp3'),
+    new Audio('../assets/sound/dice/11.mp3'),
   ];
 
   currentMusic:HTMLAudioElement | undefined;
@@ -109,6 +113,18 @@ export class SoundService {
       }
       }
 
+  }
+
+  playSound(sound:string){
+    switch (sound) {
+      case 'money':
+        const audio = new Audio('../assets/sound/cash/cash.mp3');
+        audio.play()
+        break;
+    
+      default:
+        break;
+    }
   }
 
   chooseRandomAudio(min:number , max:number){
