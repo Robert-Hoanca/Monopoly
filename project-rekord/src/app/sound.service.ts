@@ -11,20 +11,52 @@ export class SoundService {
   musicVolume:number = 0.1;
   soundVolume:number = 0.2;
 
-  
   diceSounds = [
-    new Audio('../assets/sound/dice/1.mp3'),
-    new Audio('../assets/sound/dice/2.mp3'),
-    new Audio('../assets/sound/dice/3.mp3'),
-    new Audio('../assets/sound/dice/4.mp3'),
-    new Audio('../assets/sound/dice/5.mp3'),
-    new Audio('../assets/sound/dice/6.mp3'),
-    new Audio('../assets/sound/dice/7.mp3'),
-    new Audio('../assets/sound/dice/8.mp3'),
-    new Audio('../assets/sound/dice/9.mp3'),
-    new Audio('../assets/sound/dice/10.mp3'),
-    new Audio('../assets/sound/dice/11.mp3'),
+    new Audio('../assets/sound/dice/dice_1.mp3'),
+    new Audio('../assets/sound/dice/dice_2.mp3'),
+    new Audio('../assets/sound/dice/dice_3.mp3'),
+    new Audio('../assets/sound/dice/dice_4.mp3'),
+    new Audio('../assets/sound/dice/dice_5.mp3'),
+    new Audio('../assets/sound/dice/dice_6.mp3'),
+    new Audio('../assets/sound/dice/dice_7.mp3'),
+    new Audio('../assets/sound/dice/dice_8.mp3'),
+    new Audio('../assets/sound/dice/dice_9.mp3'),
+    new Audio('../assets/sound/dice/dice_10.mp3'),
+    new Audio('../assets/sound/dice/dice_11.mp3'),
   ];
+
+  pawnSounds = [
+    new Audio('../assets/sound/pawn/pawn_1.mp3'),
+    new Audio('../assets/sound/pawn/pawn_2.mp3'),
+    new Audio('../assets/sound/pawn/pawn_3.mp3'),
+    new Audio('../assets/sound/pawn/pawn_4.mp3'),
+    new Audio('../assets/sound/pawn/pawn_5.mp3'),
+  ];
+
+  cardSounds = [
+    new Audio('../assets/sound/card/card_1.mp3'),
+    new Audio('../assets/sound/card/card_2.mp3'),
+    new Audio('../assets/sound/card/card_3.mp3'),
+    new Audio('../assets/sound/card/card_4.mp3'),
+    new Audio('../assets/sound/card/card_5.mp3'),
+    new Audio('../assets/sound/card/card_6.mp3'),
+  ];
+
+
+  dialogSounds = [
+    new Audio('../assets/sound/dialog/dialog_1.mp3'),
+    new Audio('../assets/sound/dialog/dialog_2.mp3'),
+    new Audio('../assets/sound/dialog/dialog_3.mp3'),
+    new Audio('../assets/sound/dialog/dialog_4.mp3'),
+    new Audio('../assets/sound/dialog/dialog_5.mp3'),
+  ];
+
+  cashSounds = [
+    new Audio('../assets/sound/cash/cash_1.mp3'),
+    new Audio('../assets/sound/cash/cash_2.mp3'),
+    new Audio('../assets/sound/cash/cash_3.mp3'),
+  ];
+
 
   currentMusic:HTMLAudioElement | undefined;
   playingDiceSoundIndex:Array<number>= [];
@@ -75,6 +107,22 @@ export class SoundService {
     this.diceSounds.forEach(sound => {
       sound.load();
     });
+
+    this.pawnSounds.forEach(sound => {
+      sound.load();
+    });
+
+    this.dialogSounds.forEach(sound => {
+      sound.load();
+    });
+
+    this.cardSounds.forEach(sound => {
+      sound.load();
+    });
+
+    this.cashSounds.forEach(sound => {
+      sound.load();
+    });
   }
 
   playDiceSound(dice:any){
@@ -119,19 +167,20 @@ export class SoundService {
     let audio;
     switch (sound) {
       case 'money':
-        audio = new Audio('../assets/sound/cash/cash.mp3')
+        const cashI = this.chooseRandomAudio(1,this.cashSounds.length - 1)
+        audio = this.cashSounds[cashI];
         break;
       case 'open-dialog':
-        const dialogI = this.chooseRandomAudio(1,5)
-        audio = new Audio('../assets/sound/dialog/'+ dialogI +'.mp3')
+        const dialogI = this.chooseRandomAudio(1,this.dialogSounds.length - 1)
+        audio = this.dialogSounds[dialogI];
         break;
       case 'open-card':
-        const cardI = this.chooseRandomAudio(1,6)
-        audio = new Audio('../assets/sound/card-opening/'+ cardI +'.mp3')
+        const cardI = this.chooseRandomAudio(1,this.cardSounds.length - 1)
+        audio = this.cardSounds[cardI];
         break;
       case 'pawn-move':
-        const pawnI = this.chooseRandomAudio(1,5)
-        audio = new Audio('../assets/sound/pawn/'+ pawnI +'.mp3')
+        const pawnI = this.chooseRandomAudio(1,this.pawnSounds.length - 1)
+        audio = this.pawnSounds[pawnI];
         break;
     
       default:
