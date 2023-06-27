@@ -46,12 +46,3 @@
         transform:rotate(360deg);
     }
 }
-
-//On Mobile
-@media screen and (max-width: 600px) {
-    .loading{
-        &__container{
-            //height: -webkit-fill-available;
-        }    
-    }
-}

@@ -31,12 +31,12 @@ export class LoadingScreenComponent implements OnInit {
 
   ngOnInit(): void {
 
-    // timer(1500).pipe(take(1)).subscribe({
-    //   complete: () => {
-    //     this.gameService.loading = false;
-    //     this.gameService.screenLoaded$.next(false)
-    //   }
-    // })
+    timer(1500).pipe(take(1)).subscribe({
+      complete: () => {
+        this.gameService.loading = false;
+        this.gameService.screenLoaded$.next(false)
+      }
+    })
     
   }
 }
