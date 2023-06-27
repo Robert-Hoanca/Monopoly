@@ -100,7 +100,7 @@ export class GamePhysicsService {
 
   addDiceEvents(dice: any) {
 
-    fromEvent(dice.body, 'collide').pipe(debounceTime(50)).subscribe({
+    fromEvent(dice.body, 'collide').pipe(debounceTime(65)).subscribe({
       next: (data) => {
         if (dice.body.velocity.length() > 0) {
           this.soundService.playDiceSound(dice);

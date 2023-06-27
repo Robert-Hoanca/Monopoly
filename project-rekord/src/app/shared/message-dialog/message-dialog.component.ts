@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subject, take, timer } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 import { CardDialogComponent } from '../card-dialog/card-dialog.component';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-message-dialog',
@@ -14,7 +15,7 @@ export class MessageDialogComponent implements OnInit {
   getCardPosition$ = new Subject();
   movedNearest:boolean=false;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
     if(this.data.eventType === 'changeTurn'){
@@ -24,6 +25,7 @@ export class MessageDialogComponent implements OnInit {
         } 
       })
     }
+    this.soundService.playSound('open-dialog')
   }
 
   ngAfterViewInit(){
@@ -212,6 +214,10 @@ export class MessageDialogComponent implements OnInit {
 
   getActualPlayerProps(){
     return this.gameService.gameTable.cards.filter((card:any) => card.owner === this.data.textData.playerId).length
+  }
+
+  ngOnDestroy(){
+    this.soundService.playSound('open-dialog');
   }
 }
 

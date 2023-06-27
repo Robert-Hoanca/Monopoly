@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { Vector3 } from 'three';
 import gsap from 'gsap';
 import { info } from 'console';
+import { SoundService } from 'src/app/sound.service';
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
@@ -24,7 +25,7 @@ export class PlayerComponent implements OnInit {
   cagePosition: [x: number, y: number, z: number] = [0, 0, 0];
   subscriptions$: Array<any> = [];
 
-  constructor(public gameService: GameService) {}
+  constructor(public gameService: GameService, public soundService : SoundService) {}
 
   async ngOnInit() {
     this.subscriptions$.push(
@@ -719,6 +720,11 @@ export class PlayerComponent implements OnInit {
           this.playerRefOutline._objRef.position.y =
             this.playerRef._objRef.position.y;
         },
+        onComplete : () =>{
+          if(!shouldJump){
+            this.soundService.playSound('pawn-move');
+          }
+        }
       }
     );
   }

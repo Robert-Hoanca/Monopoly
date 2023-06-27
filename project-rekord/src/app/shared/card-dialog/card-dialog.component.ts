@@ -2,6 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GameService } from 'src/app/game.service';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-card-dialog',
@@ -32,9 +33,10 @@ export class CardDialogComponent implements OnInit {
   completedSeriesCards:Array<any> = [];
   ownerName:string = '';
 
-  constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
+  constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
+    this.soundService.playSound('open-dialog');
   }
   ngAfterViewInit(){
     if(this.data.completedSeries){
@@ -104,5 +106,9 @@ export class CardDialogComponent implements OnInit {
     if(this.completedSeriesCards[0]){
       return this.gameService.players.find(player => player.id === this.completedSeriesCards[0].owner).name;
     }
+  }
+
+  ngOnDestroy(){
+    this.soundService.playSound('open-dialog');
   }
 }

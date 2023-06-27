@@ -9,7 +9,7 @@ export class SoundService {
   enableSoundsEffects:boolean = true;
 
   musicVolume:number = 0.1;
-  soundVolume:number = 1;
+  soundVolume:number = 0.2;
 
   
   diceSounds = [
@@ -116,18 +116,31 @@ export class SoundService {
   }
 
   playSound(sound:string){
+    let audio;
     switch (sound) {
       case 'money':
-        const audio = new Audio('../assets/sound/cash/cash.mp3');
-        audio.play()
+        audio = new Audio('../assets/sound/cash/cash.mp3')
+        break;
+      case 'open-dialog':
+        const dialogI = this.chooseRandomAudio(1,5)
+        audio = new Audio('../assets/sound/dialog/'+ dialogI +'.mp3')
+        break;
+      case 'pawn-move':
+        const pawnI = this.chooseRandomAudio(1,5)
+        audio = new Audio('../assets/sound/pawn/'+ pawnI +'.mp3')
         break;
     
       default:
         break;
     }
+
+    if(audio){
+      audio.volume = this.soundVolume;
+      audio.play()
+    }
   }
 
   chooseRandomAudio(min:number , max:number){
-    return Math.round((Math.random() * max - min) + min);
+    return Math.floor(Math.random() * (max - min + 1)) + min;;
   }
 }
