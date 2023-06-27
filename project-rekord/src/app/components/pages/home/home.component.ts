@@ -66,7 +66,6 @@ export class HomeComponent implements OnInit {
     }else if(window.navigator.userAgent.includes('iPhone')){
       this.gameService.userDevice = 'phone_ios'
     }
-    this.soundService.initializeAudioContext()
 
     // this.homeCameraDistance = this.gameService.userDevice.includes('phone') ? 50 : 30;
 
@@ -87,10 +86,7 @@ export class HomeComponent implements OnInit {
   }
 
   goToChooseModeView(){
-    // this.gameService.cardsPositionCounter = 0;
-    // this.homeGameTable = {};
-    // this.gameService.switchRouter('mode')
-
+    this.soundService.initializeAudioContext()
     this.choosingMode = true;
   }
 

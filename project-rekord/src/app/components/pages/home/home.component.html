@@ -1,4 +1,4 @@
-<div class="home"  (click)="goToChooseModeView()" [ngStyle]="{'background-color': returnSessionBg(), 'color' : returnSessionColor()}" fxLayout="column" fxLayoutAlign="center center"> <!--(click)="goToChooseModeView()"-->
+<div class="home" (click)="goToChooseModeView()" [ngStyle]="{'background-color': returnSessionBg(), 'color' : returnSessionColor()}" fxLayout="column" fxLayoutAlign="center center"> <!--(click)="goToChooseModeView()"-->
     
     <div class="home__ui-container" fxLayout="column" fxLayoutAlign="center center">
         <h1 class="home__ui-container__title" (click)="$event.stopPropagation()" fxLayoutAlign="center center" fxLayout="column" [ngStyle]="{'color' : gameService.sessionTheme.cardColor}">
