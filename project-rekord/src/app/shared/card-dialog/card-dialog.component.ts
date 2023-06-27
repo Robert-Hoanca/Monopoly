@@ -36,7 +36,7 @@ export class CardDialogComponent implements OnInit {
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
-    this.soundService.playSound('open-dialog');
+    this.soundService.playSound('open-card');
   }
   ngAfterViewInit(){
     if(this.data.completedSeries){
@@ -109,6 +109,6 @@ export class CardDialogComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.soundService.playSound('open-dialog');
+    this.soundService.playSound('open-card');
   }
 }

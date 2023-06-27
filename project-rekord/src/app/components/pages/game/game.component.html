@@ -108,7 +108,7 @@
 
             <div fxLayoutAlign="space-between center">
                 <button mat-raised-button (click)="gameService.addNewTheme()"> <mat-icon>add</mat-icon> Add Theme</button> 
-                <button mat-raised-button (click)="gameService.setThemesDb(this.gameService.themes)"> <mat-icon>save</mat-icon> Save Themes</button>
+                <button mat-raised-button (click)="gameService.setThemesDb(this.gameService.themes)" [disabled]="canSaveThemes()"> <mat-icon>save</mat-icon> Save Themes</button>
             </div>
             <br><br>
 

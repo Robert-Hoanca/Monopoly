@@ -25,7 +25,12 @@ export class MessageDialogComponent implements OnInit {
         } 
       })
     }
-    this.soundService.playSound('open-dialog')
+
+    if(this.data.eventType === 'chance' || this.data.eventType === 'communityChest'){
+      this.soundService.playSound('open-card')
+    }else{
+      this.soundService.playSound('open-dialog')
+    }
   }
 
   ngAfterViewInit(){

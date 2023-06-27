@@ -3,6 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/game.service';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-exchange',
@@ -35,10 +36,11 @@ export class ExchangeComponent implements OnInit {
   startExchange:boolean=false;
   actualExpanded:string = '';
 
-  constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<ExchangeComponent>, public gameService: GameService) { }
+  constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<ExchangeComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
     this.resetSelectedProps();
+    this.soundService.playSound('open-dialog')
   }
   ngAfterViewInit(){
   }
@@ -118,9 +120,6 @@ export class ExchangeComponent implements OnInit {
   changeActualExpanded(playerId:string){
     this.actualExpanded = this.actualExpanded == playerId ? '' : playerId;
   }
-  ngOnDestroy(){
-   this.resetSelectedProps();
-  }
 
   resetSelectedProps(){
     this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerToExchangeWith.id)).forEach(property => {
@@ -145,5 +144,10 @@ export class ExchangeComponent implements OnInit {
     }else{
       return true;
     }
+  }
+
+  ngOnDestroy(){
+    this.resetSelectedProps();
+    this.soundService.playSound('open-dialog')
   }
 }

@@ -204,7 +204,10 @@ export class GameService {
       background : '#fdfd96',
       cardColor : '#fff',
       cardBorder : '#000',
-    })
+      new : true,
+    });
+    this.sessionTheme = this.themes[this.themes.length - 1];
+    this.debugSelectedTheme = 'Theme_' + (this.themes.length - 1);
   }
 
   LightenDarkenColor(col:string,amt:number) {
@@ -942,6 +945,9 @@ export class GameService {
   //Database Management
 
   async setThemesDb(themes:any){
+    this.themes.filter((theme:any) => theme.new).forEach((theme:any) => {
+      delete theme.new
+    });
     setDoc(doc(this.db, "colors", "themes"), {themes});
   }
 

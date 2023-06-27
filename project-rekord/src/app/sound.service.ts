@@ -125,6 +125,10 @@ export class SoundService {
         const dialogI = this.chooseRandomAudio(1,5)
         audio = new Audio('../assets/sound/dialog/'+ dialogI +'.mp3')
         break;
+      case 'open-card':
+        const cardI = this.chooseRandomAudio(1,6)
+        audio = new Audio('../assets/sound/card-opening/'+ cardI +'.mp3')
+        break;
       case 'pawn-move':
         const pawnI = this.chooseRandomAudio(1,5)
         audio = new Audio('../assets/sound/pawn/'+ pawnI +'.mp3')
@@ -135,6 +139,8 @@ export class SoundService {
     }
 
     if(audio){
+      audio.pause()
+      audio.currentTime = 0;
       audio.volume = this.soundVolume;
       audio.play()
     }

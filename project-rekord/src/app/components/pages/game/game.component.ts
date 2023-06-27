@@ -248,6 +248,10 @@ export class GameComponent implements OnInit {
     event.renderer.setPixelRatio(window.devicePixelRatio);
   }
 
+  canSaveThemes(){
+    return this.gameService.themes.find((theme:any) => theme.new) ? false : true;
+  }
+
   ngOnDestroy(){
     this.subscriptions.forEach(sub => {
       sub.unsubscribe();
