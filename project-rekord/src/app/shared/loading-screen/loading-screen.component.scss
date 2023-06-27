@@ -6,6 +6,7 @@
 
     &__container{
         width: 100vw;
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -50,16 +51,7 @@
 @media screen and (max-width: 600px) {
     .loading{
         &__container{
-            height: -webkit-fill-available;
-        }    
-    }
-}
-
-//On PC
-@media screen and (min-width: 601px) {
-    .loading{
-        &__container{
-            height: 100vh;
+            //height: -webkit-fill-available;
         }    
     }
 }
