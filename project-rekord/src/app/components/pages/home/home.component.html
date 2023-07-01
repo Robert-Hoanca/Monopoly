@@ -70,18 +70,19 @@
 
 <ng-template #godModeDialogRef>
 
-    <div class="god-container" fxLayoutAlign="center center" fxLayout="column">
+        <settings [whereAmI]="'home'"></settings>
 
-        <span [ngClass]="['god-container__title', errorGodMode ? 'error' : '']"> {{ errorGodMode ? ' Wrong Password, retry :D ' : 'Insert the Password' }}</span>
+        <div class="god-container" fxLayoutAlign="center start" fxLayout="column">
 
-        <mat-form-field *ngIf="!errorGodMode">
-            <mat-label>Password</mat-label>
-            <input matInput type="text" [(ngModel)]="godPassword">
-        </mat-form-field>
+                <span [ngClass]="['god-container__title', errorGodMode ? 'error' : '']"> {{ errorGodMode ? ' Wrong Password, retry :D ' : 'Insert the Password' }}</span>
 
-        <button *ngIf="!errorGodMode" mat-raised-button (click)="tryToGoGodMode()"> Enable God Mode </button>
+                <mat-form-field *ngIf="!errorGodMode">
+                <mat-label>Password</mat-label>
+                <input matInput type="text" [(ngModel)]="godPassword">
+                </mat-form-field>
 
-    </div>
+                <button *ngIf="!errorGodMode" mat-raised-button (click)="tryToGoGodMode()"> Enable God Mode </button>
+        </div>
 
 
 </ng-template>

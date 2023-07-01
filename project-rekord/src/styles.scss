@@ -356,13 +356,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   .god-container{
     width: 300px;
     padding: 20px;
-
+    font-size: 12px;
     &__title{
-      font-size: 18px;
+      font-size: 14px;
       font-weight: bold;
       &.error{
         color: red;
       }
+    }
+    button{
+      font-size: 12px;
     }
   }
 }

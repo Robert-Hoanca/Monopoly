@@ -1,0 +1,15 @@
+.settings{
+    background: #fff;
+    padding: 20px;
+    min-width: 200px;
+    font-size: 12px;
+    h1{
+        font-size: 14px;
+    }
+    &-container{
+        &-save-btn{
+            margin-top: 20px;
+            font-size: 12px;
+        }
+    }
+}

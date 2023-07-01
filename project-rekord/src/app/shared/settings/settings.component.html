@@ -1,0 +1,15 @@
+<div fxLayout="column" class="settings">
+
+    <h1>Settings</h1>
+
+    <div class="settings-container" fxLayout="column"> 
+        <mat-checkbox [(ngModel)]="settingsService.settings.sound.enabledMusic" (ngModelChange)="settingsService.updateSoundService();soundService.handleMusic(settingsService.settings.sound.enabledMusic)">Music</mat-checkbox>
+
+        <mat-slider [min]="0" [max]="0.1" step="0.001" [(ngModel)]="settingsService.settings.sound.musicVolume" (ngModelChange)="settingsService.updateSoundService();soundService.changeMusicVolume()"></mat-slider>
+
+        <mat-checkbox [(ngModel)]="settingsService.settings.sound.enabledSfx" (ngModelChange)="settingsService.updateSoundService()">Sound Effects</mat-checkbox>
+
+        <button mat-raised-button class="settings-container-save-btn" (click)="saveSettings()" *ngIf="whereAmI !== 'home'">Done</button>
+    </div>
+
+</div>

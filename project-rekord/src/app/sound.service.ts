@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { interval } from 'rxjs';
+import { SettingsService } from './settings.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -9,7 +10,7 @@ export class SoundService {
   enableSoundsEffects:boolean = true;
 
   musicVolume:number = 0.1;
-  soundVolume:number = 0.2;
+  sfxVolume:number = 0.2;
 
   diceSounds = [
     new Audio('../assets/sound/dice/dice_1.mp3'),
@@ -63,7 +64,7 @@ export class SoundService {
 
   audioContext!: AudioContext;
 
-  constructor() { }
+  constructor(public settingsService : SettingsService) { }
 
   initializeAudioContext(){
     this.audioContext = new AudioContext();
@@ -71,26 +72,26 @@ export class SoundService {
   }
 
   playAmbientMusic(){
-
+    this.enableMusic = this.settingsService.settings.sound.enabledMusic;
+    this.currentMusic = new Audio('../assets/music/'+ this.chooseRandomAudio(1,6) +'.mp3');
+    this.currentMusic.volume = this.settingsService.settings.sound.musicVolume;
     if(this.enableMusic){
-      this.currentMusic = new Audio('../assets/music/'+ this.chooseRandomAudio(1,6) +'.mp3');
-      this.currentMusic.volume = this.musicVolume;
       this.currentMusic.play();
+    }
   
       interval((190000)).subscribe({
         next: (data) => {
           this.currentMusic = new Audio('../assets/music/'+ this.chooseRandomAudio(1,6) +'.mp3');
-          this.currentMusic.volume = this.musicVolume;
+          this.currentMusic.volume = this.settingsService.settings.sound.musicVolume;
           if(this.enableMusic){
             this.currentMusic.play();
           }
         }
       })
-    }
   }
 
-  handleMusic(){
-    if(this.enableMusic){
+  handleMusic(enabled:boolean){
+    if(!enabled){
       this.currentMusic?.pause();
     } else{
       this.currentMusic?.play();
@@ -99,7 +100,7 @@ export class SoundService {
 
   changeMusicVolume(){
     if(this.currentMusic){
-      this.currentMusic.volume = this.musicVolume;
+      this.currentMusic.volume = this.settingsService.settings.sound.musicVolume;
     }
   }
 
@@ -127,7 +128,7 @@ export class SoundService {
 
   playDiceSound(dice:any){
 
-    if(this.enableSoundsEffects){
+    if(this.settingsService.settings.sound.enabledSfx){
       
       if(this.playingDiceSoundIndex[dice.diceIndex] >= 0 && !this.diceSounds[this.playingDiceSoundIndex[dice.diceIndex]].ended){
         try{
@@ -159,39 +160,41 @@ export class SoundService {
         }catch{}
 
       }
-      }
+      
+    }
 
   }
 
   playSound(sound:string){
-    let audio;
-    switch (sound) {
-      case 'money':
-        const cashI = this.chooseRandomAudio(1,this.cashSounds.length - 1)
-        audio = this.cashSounds[cashI];
-        break;
-      case 'open-dialog':
-        const dialogI = this.chooseRandomAudio(1,this.dialogSounds.length - 1)
-        audio = this.dialogSounds[dialogI];
-        break;
-      case 'open-card':
-        const cardI = this.chooseRandomAudio(1,this.cardSounds.length - 1)
-        audio = this.cardSounds[cardI];
-        break;
-      case 'pawn-move':
-        const pawnI = this.chooseRandomAudio(1,this.pawnSounds.length - 1)
-        audio = this.pawnSounds[pawnI];
-        break;
-    
-      default:
-        break;
-    }
-
-    if(audio){
-      audio.pause()
-      audio.currentTime = 0;
-      audio.volume = this.soundVolume;
-      audio.play()
+    if(this.settingsService.settings.sound.enabledSfx){
+      let audio;
+      switch (sound) {
+        case 'money':
+          const cashI = this.chooseRandomAudio(1,this.cashSounds.length - 1)
+          audio = this.cashSounds[cashI];
+          break;
+        case 'open-dialog':
+          const dialogI = this.chooseRandomAudio(1,this.dialogSounds.length - 1)
+          audio = this.dialogSounds[dialogI];
+          break;
+        case 'open-card':
+          const cardI = this.chooseRandomAudio(1,this.cardSounds.length - 1)
+          audio = this.cardSounds[cardI];
+          break;
+        case 'pawn-move':
+          const pawnI = this.chooseRandomAudio(1,this.pawnSounds.length - 1)
+          audio = this.pawnSounds[pawnI];
+          break;
+        default:
+          break;
+      }
+  
+      if(audio){
+        audio.pause()
+        audio.currentTime = 0;
+        audio.volume = this.settingsService.settings.sound.sfxVolume;
+        audio.play()
+      }
     }
   }
 

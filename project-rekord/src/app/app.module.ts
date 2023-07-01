@@ -54,6 +54,7 @@ import { GameTableEditorComponent } from './components/pages/game-table-editor/g
 import { GrassItemComponent } from './shared/decorations/grass-item/grass-item.component';
 import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rain-drops-item.component';
 import { AboutComponent } from './components/pages/about/about.component';
+import { SettingsComponent } from './shared/settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -81,6 +82,7 @@ import { AboutComponent } from './components/pages/about/about.component';
     GrassItemComponent,
     RainDropsItemComponent,
     AboutComponent,
+    SettingsComponent,
   ],
   imports: [
     BrowserModule,

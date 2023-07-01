@@ -189,18 +189,7 @@
     </ng-container>
 
     <div class="pausedGame__options" *ngIf="pauseOptions">
-        <div fxLayout="column">
-
-            <mat-checkbox [(ngModel)]="soundService.enableMusic" (click)="soundService.handleMusic()">Music</mat-checkbox>
-
-            <mat-slider [min]="0" [max]="0.1" step="0.001" [(ngModel)]="soundService.musicVolume" (ngModelChange)="soundService.changeMusicVolume()"></mat-slider>
-
-            <mat-checkbox [(ngModel)]="soundService.enableSoundsEffects">Sound Effects</mat-checkbox>
-
-            <!-- <mat-slider [min]="0" [max]="0.1" step="0.001" [(ngModel)]="soundService.soundVolume"></mat-slider> -->
-
-            <button mat-raised-button (click)="pauseOptions = false">Done</button>
-        </div>
+       <settings (close)="pauseOptions = false"></settings>
     </div>
 
 </div>

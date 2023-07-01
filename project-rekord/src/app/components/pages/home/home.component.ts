@@ -6,6 +6,7 @@ import {  doc, getDoc } from '@angular/fire/firestore';
 import { switchMap, take, tap, timer } from 'rxjs';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { SoundService } from 'src/app/sound.service';
+import { SettingsService } from 'src/app/settings.service';
 
 @Component({
   selector: 'app-home',
@@ -55,16 +56,21 @@ export class HomeComponent implements OnInit {
   choosingMode:boolean = false;
 
 
-  constructor(public router: Router, public gameService: GameService, private dialog: MatDialog, public soundService : SoundService) { }
+  constructor(public router: Router, public gameService: GameService, private dialog: MatDialog, public soundService : SoundService, private settingsService : SettingsService) { }
 
   async ngOnInit(): Promise<void> {
-    this.gameService.retrieveSavesFromLocal()
+    this.settingsService.retrieveSettings()
+    this.gameService.retrieveSavesFromLocal();
     if(window.navigator.userAgent.includes('Android')){
       this.gameService.userDevice = 'phone_android'
     }else if(window.navigator.userAgent.includes('Windows')){
       this.gameService.userDevice = 'computer_windows'
     }else if(window.navigator.userAgent.includes('iPhone')){
       this.gameService.userDevice = 'phone_ios'
+    }
+
+    if(this.gameService.userDevice.includes('computer')){
+      this.soundService.initializeAudioContext()
     }
 
     // this.homeCameraDistance = this.gameService.userDevice.includes('phone') ? 50 : 30;
@@ -86,7 +92,9 @@ export class HomeComponent implements OnInit {
   }
 
   goToChooseModeView(){
-    this.soundService.initializeAudioContext()
+    if(this.gameService.userDevice.includes('phone')){
+      this.soundService.initializeAudioContext()
+    }
     this.choosingMode = true;
   }
 
