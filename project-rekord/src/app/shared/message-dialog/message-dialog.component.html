@@ -6,7 +6,7 @@
 
     </div>
 
-    <div *ngIf="data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest'" fxLayoutAlign="space-between center" class="messageTitle">
+    <div *ngIf="data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest' && data.eventType !== 'showPlayerProps'" fxLayoutAlign="space-between center" class="messageTitle">
         <h1>Message</h1>
     </div>
     <hr class="messageDivider" *ngIf="data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest'">
