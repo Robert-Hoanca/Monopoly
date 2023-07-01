@@ -5,8 +5,8 @@
   [receiveShadow]="false"
   [castShadow]="false"
   [name]="'cardNumber'+ cardIndex"
-  (onMouseEnter)="(this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant') && !gameService.movingPlayer ? changeCardBorderColor('#ffffff') : ''; enableCursorOnHover(true)"
-  (onMouseExit)="(this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant') && !gameService.movingPlayer ? changeCardBorderColor(this.gameService.sessionTheme.cardBorder) : ''; enableCursorOnHover(false)"
+  (onMouseEnter)="(this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant') && (!gameService.movingPlayer || (!gameService.movingPlayer && gameService.disabledUserHoveringCard)) ? changeCardBorderColor('#ffffff') : ''; enableCursorOnHover(true)"
+  (onMouseExit)="(this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant') && !gameService.movingPlayer && !gameService.disabledUserHoveringCard? changeCardBorderColor(this.gameService.sessionTheme.cardBorder) : ''; enableCursorOnHover(false)"
   [material]="gameService.cardColorMaterial"
   #cardRef
 >

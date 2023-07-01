@@ -779,6 +779,7 @@ export class PlayerComponent implements OnInit {
     if (index === counterOfCards && passedCards === this.player.actualCard) {
       this.gameService.movingPlayer = false;
       this.gameService.movingCamera = false;
+      this.gameService.disabledUserHoveringCard = false;
       this.playerArrived = true;
       this.gameService.changeCardBorderColor$.next({type: 'playerArrivedReturnToNormal', color: this.gameService.sessionTheme.cardBorder});
       this.playerIsGoingBack = false;

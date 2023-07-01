@@ -133,6 +133,7 @@ export class GameService {
   debugMode:boolean = false;
   godMode:boolean = false;
   enableCursor:boolean = false;
+  disabledUserHoveringCard:boolean = false;
 
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog, public soundService : SoundService) { }
 
@@ -369,6 +370,7 @@ export class GameService {
   }
 
   getCardPosition(cardIndex:any){
+    this.disabledUserHoveringCard = true;
     this.getCardPosition$.next(cardIndex);
   }
 
@@ -709,6 +711,7 @@ export class GameService {
 
   //EVENTS
   goToPrison(){
+    this.disabledUserHoveringCard = true;
     this.players[this.turn].prison.inPrison = true;
     const prisonIndex = this.gameTable.cards.findIndex((card: { cardType: string; }) => card.cardType === 'prison');
     this.players[this.turn].prison.doubleDiceCounter = 0;
