@@ -35,6 +35,7 @@ export class PlayerPropertiesComponent implements OnInit {
     districts.forEach(district => {
       this.dividedPlayerProps.push(this.playerProps.filter(card => card.district === district))
     });
+    this.getPlayerGetOutCards();
   }
 
   getPlayerGetOutCards(){

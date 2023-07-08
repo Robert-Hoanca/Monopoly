@@ -20,17 +20,22 @@
         }
     }
     .getOutCard{
-        width: 42px;
-        height: 47px;
+        width: 37px;
+        height: 42px;
         position: relative;
         margin-top: 10px;
-        padding: 0;
+        cursor: pointer;
         mat-icon{
             margin-top: -10px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .counter{
             position: absolute;
             bottom: 0;
+            font-size: 12px;
         }
     }
     .chosenProperty{

@@ -1,10 +1,8 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 import gsap from 'gsap';
-import { info } from 'console';
 import { SoundService } from 'src/app/sound.service';
 @Component({
   selector: 'app-player',
@@ -16,9 +14,14 @@ export class PlayerComponent implements OnInit {
   @ViewChild('playerRef', { static: true }) public playerRef: any;
   @ViewChild('playerRefOutline', { static: true }) playerRefOutline: any;
   @ViewChild('cageRef', { static: true }) cageRef: any;
-  playerPosition: Vector3 | any;
-  playerHasRotate: boolean = false;
-  playerIsGoingBack: boolean = false;
+  finalPosition:Array<number> = [0,0,0];
+  inCardPositionIndex:number = 0;
+  inCardPosition:Array<number> = [0,0,0]
+  finalRotation:Array<number> = [0,0,0];
+  movingPlayerCell:number= 0;
+  oldInCardIndex:number= 0;
+  rotatedBack:boolean = false;
+  playergoBack:boolean = false;
   playerArrived: boolean = false;
   gameTableSides: Array<string> = ['x', 'z', 'x', 'z'];
   playerInCage: boolean = false;
@@ -29,30 +32,22 @@ export class PlayerComponent implements OnInit {
 
   async ngOnInit() {
     this.subscriptions$.push(
-      this.gameService.setPlayerPosition$.subscribe((data: any) => {
+      this.gameService.setPlayerPosition$.subscribe(async (data: any) => {
         if (this.playerArrived) {
           this.playerArrived = false;
         }
-        if (
-          this.player.id == this.gameService.players[this.gameService.turn].id
-        ) {
+        if (this.player.id == this.gameService.players[this.gameService.turn].id) {
+          this.calculateFinalPosition(data.cardPosition);
           if (
             this.gameService.randomChance &&
-            this.gameService.randomChance.count != undefined
+            this.gameService.randomChance.count != undefined &&
+            this.gameService.randomChance.count < 0
           ) {
             //Only a chance can make the player go back
-            this.setPlayerPosition(
-              data.cardPosition,
-              false,
-              data.oldCardPosition,
-              true
-            );
+            this.playergoBack = true;
+            this.setPlayerPosition(data.cardPosition,false,data.oldCardPosition,true);
           } else {
-            this.setPlayerPosition(
-              data.cardPosition,
-              false,
-              data.oldCardPosition
-            );
+            this.setPlayerPosition(data.cardPosition,false,data.oldCardPosition);
           }
         }
       })
@@ -74,19 +69,104 @@ export class PlayerComponent implements OnInit {
       })
     )
   }
-  ngAfterViewInit() {
+
+  //Calculate player's final position and save it without modifying the player's actual position.
+  calculateFinalPosition(toGoPosition:Array<number>){
+
+    //Calculate player final rotation when arriving.
+    const side = this.whichSideAmI(this.player.actualCard);
+    this.finalRotation = [0,this.calcPlayerRotation(side),0];
+    
+    //Calculate player position in the new card.
+    const playerInTheSameCard = this.gameService.players.filter(player => player.id !== this.player.id && player.actualCard === this.player.actualCard).length;
+    this.oldInCardIndex = this.player.pawn.cardSection;
+    this.inCardPositionIndex = playerInTheSameCard > 0 ? playerInTheSameCard : 0;
+
+    //Calculate player final position
+    this.finalPosition = JSON.parse(JSON.stringify(toGoPosition)); //Position to save in the storage
+    this.calcPlayerPosInCard(this.inCardPositionIndex) //Position to use in game
+
+
+    this.player.pawn.position = this.finalPosition;
+    this.player.pawn.cardSection = this.inCardPositionIndex;
+    this.player.pawn.rotation = this.finalRotation;
   }
 
-  async setPlayerPosition(
-    position: any,
-    noAnimation?: boolean,
-    oldCardPosition?: number,
-    goBack?: boolean
-  ) {
+  //Calculate in which side of the card the player should go based on its "cardSection" and in which side of the map it is.
+  calcPlayerPosInCard(cardSection:number){
+    const side = this.whichSideAmI(this.player.actualCard);
+    const positionInCard = [0,0,0];
+    switch (cardSection) {
+      case 0:
+        positionInCard[0] += (side === 'x+' || side === 'z-' ? 0.5 : -0.5);
+        positionInCard[2] += (side === 'x+' || side === 'z+' ? 0.5 : -0.5);
+        break;
+      case 1:
+        positionInCard[0] += (side === 'x+' || side === 'z+' ? 0.5 : -0.5);
+        positionInCard[2] += (side === 'x-' || side === 'z+' ? 0.5 : -0.5);
+        break;
+      case 2:
+        positionInCard[0] += (side === 'x-' || side === 'z+' ? 0.5 : -0.5);
+        positionInCard[2] += (side === 'x-' || side === 'z-' ? 0.5 : -0.5);
+        break;
+      case 3:
+        positionInCard[0] += (side === 'x-' || side === 'z-' ? 0.5 : -0.5);
+        positionInCard[2] += (side === 'x+' || side === 'z-' ? 0.5 : -0.5);
+        break;
+    
+      default:
+        break;
+    }
+    this.inCardPosition = positionInCard;
+  }
+
+  //Calculate player's final rotation and save it without modifying the player's actual position.
+  calcPlayerRotation(side:string){
+    let rotation = 0;
+    switch (side) {
+      case 'x+':
+        rotation = 0;
+        break;
+      case 'z+':
+        rotation = -1.57;
+        break;
+      case 'x-':
+        rotation = -3.14;
+        break;
+      case 'z-':
+        rotation = -4.71;
+        break;
+    
+      default:
+        break;
+    }
+    return rotation;
+  }
+
+  //Return in which side the player is based on it's cell index.
+  whichSideAmI(cardNumber:number){
+    if(cardNumber >= 0 && cardNumber < 10){
+      return 'x+';
+    } else if(cardNumber >= 10 && cardNumber < 20){
+      return 'z+';
+    } else if(cardNumber >= 20 && cardNumber < 30){
+      return 'x-';
+    } else if(cardNumber >= 30 && cardNumber <= 39){
+      return 'z-';
+    }
+    return '';
+  }
+
+  //Find if the player is on one of the four corner of the map based in it's actual cell.
+  isPlayerOnCorner(position:number){
+    return position === 0 || position === 10 || position === 20 || position === 30 ? true : false;
+  }
+
+  //Calculate player position based on where it has to go ( In which cell of the map has to move).
+  async setPlayerPosition(position: any , noAnimation?: boolean , oldCardPosition?: number , goBack?: boolean ) {
     position = JSON.parse(JSON.stringify(position));
-    let actualCardPosition = JSON.parse(
-      JSON.stringify(this.gameService.players[this.gameService.turn].actualCard)
-    );
+    let actualCardPosition = JSON.parse(JSON.stringify(this.gameService.players[this.gameService.turn].actualCard));
+
     if (noAnimation) {
       this.playerRef._objRef.position.x = position[0];
       this.playerRefOutline._objRef.position.x = position[0];
@@ -95,55 +175,69 @@ export class PlayerComponent implements OnInit {
       this.ShouldSpawnPrison(true);
     } else {
       if (oldCardPosition != undefined) {
+        this.movingPlayerCell = oldCardPosition;
         let actualSide = 0;
         let toGoSide = 0;
 
-        if (actualCardPosition >= 30 && actualCardPosition <= 39) {
-          toGoSide = 3;
-        } else if (actualCardPosition >= 20 && actualCardPosition <= 30) {
-          toGoSide = 2;
-        } else if (actualCardPosition > 10 && actualCardPosition < 30) {
-          toGoSide = 1;
-        } else if (actualCardPosition >= 0 && actualCardPosition <= 10) {
-          toGoSide = 0;
+        const newSide = this.whichSideAmI(actualCardPosition); //The side on which the player has to go.
+        const oldSide = this.whichSideAmI(oldCardPosition); //The side on which the player is now.
+
+        //Calculate both sides
+        switch (newSide) {
+          case 'x+':
+            toGoSide = 0
+            break;
+          case 'z+':
+            toGoSide = 1
+            break;
+          case 'x-':
+            toGoSide = 2
+            break;
+          case 'z-':
+            toGoSide = 3
+            break;
+        
+          default:
+            break;
+        }
+        switch (oldSide) {
+          case 'x+':
+            actualSide = 0
+            break;
+          case 'z+':
+            actualSide = 1
+            break;
+          case 'x-':
+            actualSide = 2
+            break;
+          case 'z-':
+            actualSide = 3
+            break;
+        
+          default:
+            break;
         }
 
-        if (oldCardPosition >= 30 && oldCardPosition <= 39) {
-          actualSide = 3;
-        } else if (oldCardPosition >= 20 && oldCardPosition <= 30) {
-          actualSide = 2;
-        } else if (oldCardPosition >= 10 && oldCardPosition <= 20) {
-          actualSide = 1;
-        } else if (oldCardPosition >= 0 && oldCardPosition <= 10) {
-          actualSide = 0;
-        }
-
+        //Player should go forward
         if (!goBack) {
+          //Player should go on the same side as the starting side
           if (actualSide === toGoSide) {
+             //Player should go on a cell after the actual position
             if (oldCardPosition < actualCardPosition) {
-              await this.movePlayerGsap(position, actualSide, oldCardPosition);
-            } else {
+              await this.movePlayer(position, actualSide, oldCardPosition);
+            } else { //Player should go on a cell before actual position
               if (actualSide === 3) {
-                await this.movePlayerGsap([0, 0, 0], 3, oldCardPosition);
+                //If the player is on the last side has to go to the start
+                await this.movePlayer([0, 0, 0], 3, oldCardPosition);
               } else {
-                await this.cycleMap(
-                  actualSide,
-                  oldCardPosition,
-                  3,
-                  3,
-                  [0, 0, 0]
-                );
+                //Player is not on the last side just cycle the map to know where to go
+                await this.cycleMap(actualSide, oldCardPosition, 3, 3, [0, 0, 0]);
               }
               actualSide = 0;
-              await this.cycleMap(
-                actualSide,
-                oldCardPosition,
-                toGoSide,
-                toGoSide,
-                position
-              );
+              //cycle the rest of the map to know where to go
+              await this.cycleMap(actualSide,oldCardPosition,toGoSide,toGoSide,position);
             }
-          } else if (actualSide < toGoSide) {
+          } else if (actualSide < toGoSide) { //Player should go on a forward side, cycle the map to know where to go
             await this.cycleMap(
               actualSide,
               oldCardPosition,
@@ -151,13 +245,16 @@ export class PlayerComponent implements OnInit {
               toGoSide,
               position
             );
-          } else if (actualSide > toGoSide) {
+          } else if (actualSide > toGoSide) { //Player should go on a side before the its current side ( Ex. from 2 to 0 )
+            //If the player is on the last side has to go to the start
             if (actualSide === 3) {
-              await this.movePlayerGsap([0, 0, 0], 3, oldCardPosition);
+              await this.movePlayer([0, 0, 0], 3, oldCardPosition);
             } else {
+               //Player is not on the last side just cycle the map to know where to go
               await this.cycleMap(actualSide, oldCardPosition, 3, 3, [0, 0, 0]);
             }
             actualSide = 0;
+            //cycle the rest of the map to know where to go
             await this.cycleMap(
               actualSide,
               oldCardPosition,
@@ -166,483 +263,266 @@ export class PlayerComponent implements OnInit {
               position
             );
           }
-        } else if (goBack) {
-          if (
-            (actualSide === toGoSide && oldCardPosition > actualCardPosition) ||
-            actualSide > toGoSide
-          ) {
-            await this.cycleMap(
-              actualSide,
-              oldCardPosition,
-              toGoSide,
-              toGoSide,
-              position,
-              true
-            );
-          } else if (
-            actualSide < toGoSide ||
-            (actualSide === toGoSide && oldCardPosition < actualCardPosition)
-          ) {
-            //Dalla posizione in cui mi trovo fino a 0
-            await this.cycleMap(
-              actualSide,
-              oldCardPosition,
-              0,
-              0,
-              [0, 0, 0],
-              true
-            );
+        } else if (goBack) { //PLayer has to go back throught the cells
+          if ((actualSide === toGoSide && oldCardPosition > actualCardPosition) || actualSide > toGoSide ) {//Player needs to go back and not pass throught the start
+            await this.cycleMap(actualSide,oldCardPosition,toGoSide,toGoSide,position,true);
+          } else if (actualSide < toGoSide ||(actualSide === toGoSide && oldCardPosition < actualCardPosition) ) { //Player needs to go back and passes from the start cell
+            //Go from where am i to the start side.
+            await this.cycleMap( actualSide, oldCardPosition, 0, 0,[0, 0, 0],true);
             //Set actualcard a 0
             actualSide = 3;
             //Dalla posizione 3 alla posizione in cui devo andare
-            await this.cycleMap(
-              actualSide,
-              oldCardPosition,
-              toGoSide,
-              toGoSide,
-              position,
-              true
-            );
+            await this.cycleMap(actualSide,oldCardPosition,toGoSide, toGoSide,position,true );
           }
         }
-        this.gameService.whichPropertyAmI(
-          this.gameService.gameTable.cards[
-            this.gameService.players[this.gameService.turn].actualCard
-          ]
-        );
+        //When arrived on destination ask what to do in that cell.
+        this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[this.gameService.players[this.gameService.turn].actualCard]);
       }
     }
   }
-  async movePlayerGsap(position: any, index: number, oldCardPosition: number) {
-    this.gameService.movingCamera = true;
-    //Based on given axis, move the player animating it using gsap library
-    let shouldGoBack =
-      (this.gameService.randomChance &&
-        this.gameService.randomChance.count !== undefined) ||
-      (this.gameService.randomChest &&
-        this.gameService.randomChest.count !== undefined)
-        ? true
-        : false;
-    if (shouldGoBack && !this.playerIsGoingBack) {
-      this.playerIsGoingBack = true;
-      await this.choosePlayerRotation(true, false);
-      this.playerHasRotate = false;
+
+  //cycle the sides of the map in which the player has to pass to go from position A to position B. The make the player move throught every cell.
+  async cycleMap( actualSide: number,oldCardPosition: number,indexCheckNum: number,indexMinusNum: number,finalPosition: Array<number>, goBack?: boolean) {
+    if (!goBack) {
+      for (let index = actualSide; index <= indexMinusNum; index++) {
+        if (index < indexCheckNum) {
+          await this.movePlayer([index == 0 || index == 1 ? 22 : 0,0,index == 1 || index == 2 ? 22 : 0,],index,oldCardPosition);
+        } else {
+          await this.movePlayer(finalPosition, index, oldCardPosition);
+        }
+      }
+    } else if (goBack) {
+      for (let index = actualSide; index >= indexMinusNum; index--) {
+        if (index > indexCheckNum) {
+          await this.movePlayer([index == 2 || index == 1 ? 22 : 0, 0,index == 2 || index == 3 ? 22 : 0,],index,oldCardPosition
+          );
+        } else {
+          await this.movePlayer(finalPosition, index, oldCardPosition);
+        }
+      }
     }
-    if (this.gameTableSides[index] == 'x' && !this.playerArrived) {
-      //Save player position
-      let playerPos = parseFloat(
-        JSON.parse(JSON.stringify(this.playerRef._objRef.position.x)).toFixed(1)
-      );
-      //If player wasn't moving when this function is called, then take the player to the center of the card and prepare it to move
-      let confrontatePosition: boolean = false;
-      if (oldCardPosition < 20 && !shouldGoBack) {
-        confrontatePosition =
-          Math.round(
-            JSON.parse(JSON.stringify(this.playerRef._objRef.position.x))
-          ) < Math.round(position[0]);
-      } else {
-        if (
-          Math.round(
-            JSON.parse(JSON.stringify(this.playerRef._objRef.position.x))
-          ) > Math.round(position[0])
-        ) {
-          confrontatePosition =
-            Math.round(
-              JSON.parse(JSON.stringify(this.playerRef._objRef.position.x))
-            ) > Math.round(position[0]);
-        } else if (
-          Math.round(
-            JSON.parse(JSON.stringify(this.playerRef._objRef.position.x))
-          ) < Math.round(position[0])
-        ) {
-          confrontatePosition =
-            Math.round(
-              JSON.parse(JSON.stringify(this.playerRef._objRef.position.x))
-            ) < Math.round(position[0]);
-        }
+  }
+
+  //Based on the initial axis (x or y) cycle the cell where the player has to go and foreach cell play the animation. The player in the middle cold jump, rotate
+  async movePlayer(position: any, index: number, oldCardPosition: number){
+
+    let currentAxis = this.gameTableSides[index];
+
+    //Player actual position
+    let playerPos = parseFloat( JSON.parse(JSON.stringify(this.playerRef._objRef.position[currentAxis])).toFixed(1));
+    
+    //Calculate the amount of cards that the player should pass in
+    let totOfCells = Math.round(Math.round(position[currentAxis === "x" ? 0 : 2]) != 22? (parseFloat(position[currentAxis === "x" ? 0 : 2].toFixed(1)) / 2.2) - (playerPos / 2.2) :( 22 / 2.2) - (playerPos / 2.2) );
+
+    const goingBack = this.playergoBack; 
+    let cellCounter = 0;
+
+    //If player is going back, rotate the player by 180deg accordingly to his actual side.
+    if(goingBack && !this.rotatedBack){
+      let side = this.whichSideAmI(oldCardPosition);
+      switch (side) {
+        case 'x+':
+          this.rotatePlayer(oldCardPosition === 0 ? -1.57 : -3.14, true);
+          break;
+        case 'z+':
+          this.rotatePlayer(-4.71, true);
+            break;
+        case 'x-':
+          this.rotatePlayer(0, true);
+          break;
+        case 'z-':
+          this.rotatePlayer(-1.57, true);
+          break;
+        default:
+          break;
       }
-      if (!this.gameService.movingPlayer && confrontatePosition) {
-        let amountOfDistance = await this.setPlayerPositionToCenter(
-          'x',
-          oldCardPosition < 20 ? true : false
-        );
-        playerPos += amountOfDistance;
-        this.gameService.movingPlayer = true;
+      this.rotatedBack = true;
+    }
+
+    //Set player position to center
+    if(this.movingPlayerCell !== this.player.actualCard && !this.gameService.movingPlayer){
+      //Calculating and updating "playerPos" to match the center
+      let isPositive = oldCardPosition < 20 ? true : false //Rappresent if the current axis ( x || z) is positive or negative ( x+ / x- || z+ / z-)
+      let amountOfDistance = this.movePlayerToCenter(currentAxis, isPositive);
+      playerPos += amountOfDistance;
+
+      if(totOfCells === 0){
+        this.playerMovingAnimation(currentAxis, playerPos, true) //Needed to fix position on start when turning back
       }
+      this.gameService.movingPlayer = true;
+    }
 
-      //Calculate the amount of cards that the player should pass in
-      let counterOfCards = Math.round(
-        Math.round(position[0]) != 22
-          ? parseFloat(position[0].toFixed(1)) / 2.2 - playerPos / 2.2
-          : 22 / 2.2 - playerPos / 2.2
-      );
-
-      let xIndex = 0;
-
-      for (
-        counterOfCards > 0 ? (xIndex = 1) : (xIndex = -1);
-        counterOfCards > 0
-          ? xIndex <= Math.round(counterOfCards)
-          : xIndex >= Math.round(counterOfCards);
-        counterOfCards > 0 ? xIndex++ : xIndex--
-      ) {
-        if (counterOfCards > 0) {
-          this.gameService.setCameraPosition(
-            [
-              this.gameService.camera._objRef.position.x + 1,
-              10,
-              this.gameService.camera._objRef.position.z - 1,
-            ],
-            [
-              this.gameService.cameraControls._objRef.target.x + 1,
-              0,
-              this.gameService.cameraControls._objRef.target.z - 1,
-            ],
-            1000
-          );
-        } else {
-          this.gameService.setCameraPosition(
-            [
-              this.gameService.camera._objRef.position.x - 1,
-              10,
-              this.gameService.camera._objRef.position.z + 1,
-            ],
-            [
-              this.gameService.cameraControls._objRef.target.x - 1,
-              0,
-              this.gameService.cameraControls._objRef.target.z + 1,
-            ],
-            1000
-          );
-        }
-
-        let shouldJump: boolean = false;
-        let anotherPlayerOffset: number = 0;
-        if (
-          xIndex === Math.round(counterOfCards) ||
-          xIndex === 1 ||
-          xIndex === -1
-        ) {
-          anotherPlayerOffset = this.movePlayerFromBeingOverAnother(
-            'x',
-            playerPos,
-            xIndex,
-            counterOfCards,
-            position
-          );
-        }
-        this.player.pawn.position[0] =
-          playerPos +
-          parseFloat((xIndex * 2.2).toFixed(1)) +
-          anotherPlayerOffset;
-        await gsap.fromTo(
-          this.playerRef._objRef.position,
-          { x: this.playerRef._objRef.position.x },
-          {
-            x:
-              playerPos +
-              parseFloat((xIndex * 2.2).toFixed(1)) +
-              anotherPlayerOffset,
-            duration: 0.8,
-            ease: 'ease-out',
-            onUpdate: (currentValue) => {
-              //Check if player has reached the start cell and call the function.
-
-              this.playerRefOutline._objRef.position.x =
-                this.playerRef._objRef.position.x;
-              if (
-                this.playerRef._objRef.position.x < 1 &&
-                this.playerRef._objRef.position.x > -1 &&
-                this.playerRef._objRef.position.z < 1 &&
-                this.playerRef._objRef.position.z > -1 &&
-                oldCardPosition != 0 &&
-                !this.gameService.players[this.gameService.turn].addingMoney &&
-                !this.gameService.players[this.gameService.turn].removingMoney
-              ) {
-                this.gameService.playerPassedStart();
-              }
-              //Check if player has reached one angle of the gameTable, if so rotate the player.
-              this.choosePlayerRotation(false, false);
-              //Check if the player is in a range in which should jump, if so do it otherwise fall down.
-              if (
-                (counterOfCards > 0 &&
-                  this.playerRef._objRef.position.x >=
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) - 2 &&
-                  this.playerRef._objRef.position.x <=
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) - 1.1 &&
-                  !shouldJump) ||
-                (counterOfCards < 0 &&
-                  this.playerRef._objRef.position.x >
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) + 1.1 &&
-                  this.playerRef._objRef.position.x <
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) + 2 &&
-                  !shouldJump)
-              ) {
-                shouldJump = true;
-                this.playerJump(true);
-              } else if (
-                (counterOfCards > 0 &&
-                  this.playerRef._objRef.position.x >
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) - 1.1 &&
-                  this.playerRef._objRef.position.x <
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) &&
-                  shouldJump) ||
-                (counterOfCards < 0 &&
-                  this.playerRef._objRef.position.x >
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) &&
-                  this.playerRef._objRef.position.x <
-                    playerPos + parseFloat((xIndex * 2.2).toFixed(1)) + 1.1 &&
-                  shouldJump)
-              ) {
-                shouldJump = false;
-                this.playerJump(false);
-              }
-            },
+    for (totOfCells > 0 ? (cellCounter = 1) : (cellCounter = -1);totOfCells > 0? cellCounter <= Math.round(totOfCells) : cellCounter >= Math.round(totOfCells);totOfCells > 0 ? cellCounter++ : cellCounter--) {
+      //Making the camera follow the player with an offset
+      let totOfCellsPositive = totOfCells > 0;
+      if(currentAxis === 'x'){
+        this.gameService.setCameraPosition(
+          [this.gameService.camera._objRef.position.x + (totOfCellsPositive ? 1 : -1) , 10, this.gameService.camera._objRef.position.z + (totOfCellsPositive ? -1 : 1)],
+          [this.gameService.cameraControls._objRef.target.x + (totOfCellsPositive ? 1 : -1),0,this.gameService.cameraControls._objRef.target.z + (totOfCellsPositive ? -1 : 1)],
+          500)
+      } else if(currentAxis === 'z'){
+        this.gameService.setCameraPosition(
+          [this.gameService.camera._objRef.position.x + (totOfCellsPositive ? -1 : 1) , 10, this.gameService.camera._objRef.position.z + (totOfCellsPositive ? 1 : -1)],
+          [this.gameService.cameraControls._objRef.target.x + (totOfCellsPositive ? -1 : 1),0,this.gameService.cameraControls._objRef.target.z + (totOfCellsPositive ? 1 : -1)],
+          500)
+      }
+      
+      await gsap.fromTo(this.playerRef._objRef.position,{ [currentAxis]: this.playerRef._objRef.position[currentAxis] }, {[currentAxis]: playerPos + parseFloat((cellCounter * 2.2).toFixed(1)) ,duration: 0.5,ease: 'ease-out', 
+        onStart : () =>{
+          //Jump up
+          this.playerJump(true);
+          //Return down
+          setTimeout(() => {
+            this.playerJump(false);
+          }, 200);
+        },
+        
+        onComplete: () => {
+          //Update cell counter
+          if(this.movingPlayerCell === 39 && !goingBack){
+            this.movingPlayerCell = 0
+          }else if(this.movingPlayerCell === 0 && goingBack){
+            this.movingPlayerCell = 39;
+          }else if(!goingBack){
+            this.movingPlayerCell++;
+          } else {
+            this.movingPlayerCell--;
           }
-        );
 
-        this.playerHasRotate = false;
-      }
-      this.ShouldSpawnPrison(false);
-    } else if (this.gameTableSides[index] == 'z' && !this.playerArrived) {
-      let playerPos = parseFloat(
-        JSON.parse(JSON.stringify(this.playerRef._objRef.position.z)).toFixed(1)
-      );
-      let confrontatePosition: boolean = false;
-      if (oldCardPosition < 20 && !shouldGoBack) {
-        confrontatePosition =
-          Math.round(
-            JSON.parse(JSON.stringify(this.playerRef._objRef.position.z))
-          ) < Math.round(position[2]);
-      } else {
-        if (
-          Math.round(
-            JSON.parse(JSON.stringify(this.playerRef._objRef.position.z))
-          ) > Math.round(position[2])
-        ) {
-          confrontatePosition =
-            Math.round(
-              JSON.parse(JSON.stringify(this.playerRef._objRef.position.z))
-            ) > Math.round(position[2]);
-        } else if (
-          Math.round(
-            JSON.parse(JSON.stringify(this.playerRef._objRef.position.z))
-          ) < Math.round(position[2])
-        ) {
-          confrontatePosition =
-            Math.round(
-              JSON.parse(JSON.stringify(this.playerRef._objRef.position.z))
-            ) < Math.round(position[2]);
-        }
-      }
-      if (!this.gameService.movingPlayer && confrontatePosition) {
-        let amountOfDistance = await this.setPlayerPositionToCenter(
-          'z',
-          oldCardPosition < 20 ? true : false
-        );
-        playerPos += amountOfDistance;
-        this.gameService.movingPlayer = true;
-      }
-
-      let counterOfCards = Math.round(
-        Math.round(position[2]) != 22
-          ? parseFloat(position[2].toFixed(1)) / 2.2 - playerPos / 2.2
-          : 22 / 2.2 - playerPos / 2.2
-      );
-      let zIndex = 0;
-      for (
-        counterOfCards > 0 ? (zIndex = 1) : (zIndex = -1);
-        counterOfCards > 0
-          ? zIndex <= Math.round(counterOfCards)
-          : zIndex >= Math.round(counterOfCards);
-        counterOfCards > 0 ? zIndex++ : zIndex--
-      ) {
-        if (counterOfCards > 0) {
-          this.gameService.setCameraPosition(
-            [
-              this.gameService.camera._objRef.position.x - 1,
-              10,
-              this.gameService.camera._objRef.position.z + 1,
-            ],
-            [
-              this.gameService.cameraControls._objRef.target.x - 1,
-              0,
-              this.gameService.cameraControls._objRef.target.z + 1,
-            ],
-            1000
-          );
-        } else {
-          this.gameService.setCameraPosition(
-            [
-              this.gameService.camera._objRef.position.x + 1,
-              10,
-              this.gameService.camera._objRef.position.z - 1,
-            ],
-            [
-              this.gameService.cameraControls._objRef.target.x + 1,
-              0,
-              this.gameService.cameraControls._objRef.target.z - 1,
-            ],
-            1000
-          );
-        }
-
-        let shouldJump: boolean = false;
-        let anotherPlayerOffset: number = 0;
-        if (
-          zIndex === Math.round(counterOfCards) ||
-          zIndex === 1 ||
-          zIndex === -1
-        ) {
-          anotherPlayerOffset = this.movePlayerFromBeingOverAnother(
-            'z',
-            playerPos,
-            zIndex,
-            counterOfCards,
-            position
-          );
-        }
-        this.player.pawn.position[2] =
-          playerPos +
-          parseFloat((zIndex * 2.2).toFixed(1)) +
-          anotherPlayerOffset;
-        await gsap.fromTo(
-          this.playerRef._objRef.position,
-          { z: this.playerRef._objRef.position.z },
-          {
-            z:
-              playerPos +
-              parseFloat((zIndex * 2.2).toFixed(1)) +
-              anotherPlayerOffset,
-            duration: 0.8,
-            ease: 'ease-out',
-            onUpdate: (currentValue) => {
-              this.playerRefOutline._objRef.position.z =
-                this.playerRef._objRef.position.z;
-              if (
-                this.playerRef._objRef.position.x < 1 &&
-                this.playerRef._objRef.position.x > -1 &&
-                this.playerRef._objRef.position.z < 1 &&
-                this.playerRef._objRef.position.z > -1 &&
-                oldCardPosition != 0 &&
-                !this.gameService.players[this.gameService.turn].addingMoney &&
-                !this.gameService.players[this.gameService.turn].removingMoney
-              ) {
-                this.gameService.playerPassedStart();
-              }
-              this.choosePlayerRotation(false, false);
-              if (
-                (counterOfCards > 0 &&
-                  this.playerRef._objRef.position.z >=
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) - 2 &&
-                  this.playerRef._objRef.position.z <=
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) - 1.1 &&
-                  !shouldJump) ||
-                (counterOfCards < 0 &&
-                  this.playerRef._objRef.position.z >
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) + 1.1 &&
-                  this.playerRef._objRef.position.z <
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) + 2 &&
-                  !shouldJump)
-              ) {
-                shouldJump = true;
-                this.playerJump(true);
-              } else if (
-                (counterOfCards > 0 &&
-                  this.playerRef._objRef.position.z >
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) - 1.1 &&
-                  this.playerRef._objRef.position.z <
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) &&
-                  shouldJump) ||
-                (counterOfCards < 0 &&
-                  this.playerRef._objRef.position.z >
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) &&
-                  this.playerRef._objRef.position.z <
-                    playerPos + parseFloat((zIndex * 2.2).toFixed(1)) + 1.1 &&
-                  shouldJump)
-              ) {
-                shouldJump = false;
-                this.playerJump(false);
-              }
-            },
+          //Check if player has reached one angle of the gameTable, if so rotate the player accordingly.
+          if(this.isPlayerOnCorner(this.movingPlayerCell)){
+            switch (this.movingPlayerCell) {
+              case 0:
+                this.rotatePlayer(goingBack ? -1.57 : 0, true);
+                break;
+              case 10:
+                this.rotatePlayer(goingBack ? -3.14 : -1.57, true);
+                break;
+              case 20:
+                this.rotatePlayer(goingBack ? -4.71 : -3.14, true);
+                  break;
+              case 30:
+                this.rotatePlayer(goingBack ? 0 : -4.71, true);
+                break;
+              default:
+                break;
+            }
           }
-        );
-        this.playerHasRotate = false;
+
+          //Player has arrived to it's destination.
+          if(this.movingPlayerCell === this.player.actualCard){
+            //If the player was walking back, set its rotation to normal when arriving.
+            if(goingBack && this.rotatedBack){
+              let side = this.whichSideAmI(this.movingPlayerCell);
+              switch (side) {
+                case 'x+':
+                  this.rotatePlayer(0, true);
+                  break;
+                case 'z+':
+                  this.rotatePlayer(-1.57, true);
+                    break;
+                case 'x-':
+                  this.rotatePlayer(-3.14, true);
+                  break;
+                case 'z-':
+                  this.rotatePlayer(-4.71, true);
+                  break;
+                default:
+                  break;
+              }
+              this.rotatedBack = false;
+            }
+            this.gameService.movingPlayer = false;
+            this.gameService.disabledUserHoveringCard = false;
+            this.playergoBack = false;
+            this.gameService.resetChestChance();
+            //Move player on it's side of the card when arriving.
+            this.playerMovingAnimation('x', this.player.pawn.position[0] + this.inCardPosition[0], false);
+            this.playerMovingAnimation('z', this.player.pawn.position[2] + this.inCardPosition[2], false);
+            //Change card border color to normal when player arrived.
+            this.gameService.changeCardBorderColor$.next({type: 'playerArrivedReturnToNormal', color: this.gameService.sessionTheme.cardBorder});
+          }
+
+          //Check if player is in the "start" cell, if so add money.
+          if(this.movingPlayerCell === 0){
+            this.gameService.playerPassedStart();
+          }
+        },
+        onUpdate: () => {
+          //Update player outline position
+          this.playerRefOutline._objRef.position[currentAxis] =this.playerRef._objRef.position[currentAxis];
+        }  
+        }
+      );
+    }
+
+
+  }
+
+  //Move the player from being on one side of a cell to the center of it.
+  movePlayerToCenter(axis:string, isPositive:boolean){
+    if (axis === 'x') {
+      switch (this.oldInCardIndex) {
+        case 0:
+          this.playerMovingAnimation('z', isPositive ? this.playerRef._objRef.position.z - 0.5 : this.playerRef._objRef.position.z + 0.5, false);
+          return isPositive ? -0.5 : 0.5;
+        case 1:
+          this.playerMovingAnimation('z', isPositive ? this.playerRef._objRef.position.z + 0.5 : this.playerRef._objRef.position.z - 0.5, false);
+          return isPositive ? -0.5 : 0.5;
+        case 2:
+          this.playerMovingAnimation('z', isPositive ? this.playerRef._objRef.position.z + 0.5 : this.playerRef._objRef.position.z - 0.5, false);
+          return isPositive ? 0.5 : -0.5;
+        case 3:
+          this.playerMovingAnimation('z', isPositive ? this.playerRef._objRef.position.z - 0.5 : this.playerRef._objRef.position.z + 0.5, false);
+          return isPositive ? 0.5 : -0.5;
+        default:
+          return 0;
       }
-      this.ShouldSpawnPrison(false);
+    } else if (axis === 'z') {
+      switch (this.oldInCardIndex) {
+        case 0:
+          this.playerMovingAnimation('x', isPositive ? this.playerRef._objRef.position.x + 0.5 : this.playerRef._objRef.position.x - 0.5, false);
+          return isPositive ? -0.5 : 0.5;
+        case 1:
+          this.playerMovingAnimation('x', isPositive ? this.playerRef._objRef.position.x - 0.5 : this.playerRef._objRef.position.x + 0.5, false);
+          return isPositive ? -0.5 : 0.5;
+        case 2:
+          this.playerMovingAnimation('x', isPositive ? this.playerRef._objRef.position.x - 0.5 : this.playerRef._objRef.position.x + 0.5, false);
+          return isPositive ? 0.5 : -0.5;
+        case 3:
+          this.playerMovingAnimation('x', isPositive ? this.playerRef._objRef.position.x + 0.5 : this.playerRef._objRef.position.x - 0.5, false);
+          return isPositive ? 0.5 : -0.5;
+        default:
+          return 0;
+      }
     } else {
-      this.gameService.movingCamera = false;
+      return 0;
     }
   }
 
-  async choosePlayerRotation(rotateBack: boolean, rotateforward: boolean) {
-    if (!this.playerHasRotate) {
-      let rotationValue = 0;
-      if (rotateBack || rotateforward) {
-        rotationValue =
-          JSON.parse(JSON.stringify(this.playerRef._objRef.rotation.y)) +
-          (rotateBack ? 3.14 : -3.14);
-        this.playerHasRotate = true;
-      } else if (
-        this.playerRef._objRef.position.x >= -1 &&
-        this.playerRef._objRef.position.x < 1 &&
-        this.playerRef._objRef.position.z >= -1 &&
-        this.playerRef._objRef.position.z < 1 &&
-        ((this.player.pawn.rotationSide === 3 && !this.playerIsGoingBack) ||
-          (this.player.pawn.rotationSide === 0 && this.playerIsGoingBack))
-      ) { 
-        this.playerHasRotate = true;
-        this.player.pawn.rotationSide = this.playerIsGoingBack ? 3 : 0;
-        rotationValue =
-          this.playerRef._objRef.rotation.y +
-          (this.playerIsGoingBack ? 1.57 : -1.57);
-      } else if (
-        this.playerRef._objRef.position.x > 21 &&
-        this.playerRef._objRef.position.x < 23 &&
-        this.playerRef._objRef.position.z > -1 &&
-        this.playerRef._objRef.position.z < 1 &&
-        ((this.player.pawn.rotationSide === 0 && !this.playerIsGoingBack) ||
-          (this.player.pawn.rotationSide === 1 && this.playerIsGoingBack))
-      ) {
-        this.playerHasRotate = true;
-        this.player.pawn.rotationSide = this.playerIsGoingBack ? 0 : 1;
-        rotationValue =
-          this.playerRef._objRef.rotation.y +
-          (this.playerIsGoingBack ? 1.57 : -1.57);
-      } else if (
-        this.playerRef._objRef.position.x >= 21 &&
-        this.playerRef._objRef.position.x <= 23 &&
-        this.playerRef._objRef.position.z >= 21 &&
-        this.playerRef._objRef.position.z <= 23 &&
-        ((this.player.pawn.rotationSide === 1 && !this.playerIsGoingBack) ||
-          (this.player.pawn.rotationSide === 2 && this.playerIsGoingBack))
-      ) {
-        this.playerHasRotate = true;
-        this.player.pawn.rotationSide = this.playerIsGoingBack ? 1 : 2;
-        rotationValue =
-          this.playerRef._objRef.rotation.y +
-          (this.playerIsGoingBack ? 1.57 : -1.57);
-      } else if (
-        this.playerRef._objRef.position.x >= -1 &&
-        this.playerRef._objRef.position.x < 1 &&
-        this.playerRef._objRef.position.z > 21 &&
-        this.playerRef._objRef.position.z < 23 &&
-        ((this.player.pawn.rotationSide === 2 && !this.playerIsGoingBack) ||
-          (this.player.pawn.rotationSide === 3 && this.playerIsGoingBack))
-      ) {
-        this.playerHasRotate = true;
-        this.player.pawn.rotationSide = this.playerIsGoingBack ? 2 : 3;
-        rotationValue =
-          this.playerRef._objRef.rotation.y +
-          (this.playerIsGoingBack ? 1.57 : -1.57);
-      }
-      if (
-        this.playerRef._objRef.rotation.y != rotationValue &&
-        this.playerHasRotate
-      ) {
-        this.player.pawn.rotation = [0, rotationValue, 0];
-        await this.rotatePlayer(rotationValue, true);
-      }
+  //Play the moving animation for the player.
+  async playerMovingAnimation(side:string, value:number, wait:boolean){
+    //Side can be x || z.
+    if(wait){
+      await gsap.fromTo(
+        this.playerRef._objRef.position,
+        { [side] : this.playerRef._objRef.position[side] },
+        { [side] : value ,ease: 'ease-out', duration : 0.5,
+          onUpdate: () => {
+            this.playerRefOutline._objRef.position[side] = this.playerRef._objRef.position[side];
+          },
+        }
+      );
+    } else{
+      gsap.fromTo(
+        this.playerRef._objRef.position,
+        { [side] : this.playerRef._objRef.position[side] },
+        { [side] : value, ease: 'ease-out', duration : 0.5,
+          onUpdate: () => {
+            this.playerRefOutline._objRef.position[side] = this.playerRef._objRef.position[side];
+          },
+        }
+      );
     }
   }
 
@@ -653,10 +533,9 @@ export class PlayerComponent implements OnInit {
         { y: this.playerRef._objRef.rotation.y },
         {
           y: value,
-          duration: 0.5,
+          duration: 0.3,
           onUpdate: () => {
-            this.playerRefOutline._objRef.rotation.y =
-              this.playerRef._objRef.rotation.y;
+            this.playerRefOutline._objRef.rotation.y = this.playerRef._objRef.rotation.y;
           },
         }
       );
@@ -666,59 +545,16 @@ export class PlayerComponent implements OnInit {
     }
   }
 
-  async cycleMap(
-    actualSide: number,
-    oldCardPosition: number,
-    indexCheckNum: number,
-    indexMinusNum: number,
-    finalPosition: Array<number>,
-    goBack?: boolean
-  ) {
-    if (!goBack) {
-      for (let index = actualSide; index <= indexMinusNum; index++) {
-        if (index < indexCheckNum) {
-          await this.movePlayerGsap(
-            [
-              index == 0 || index == 1 ? 22 : 0,
-              0,
-              index == 1 || index == 2 ? 22 : 0,
-            ],
-            index,
-            oldCardPosition
-          );
-        } else {
-          await this.movePlayerGsap(finalPosition, index, oldCardPosition);
-        }
-      }
-    } else if (goBack) {
-      for (let index = actualSide; index >= indexMinusNum; index--) {
-        if (index > indexCheckNum) {
-          await this.movePlayerGsap(
-            [
-              index == 2 || index == 1 ? 22 : 0,
-              0,
-              index == 2 || index == 3 ? 22 : 0,
-            ],
-            index,
-            oldCardPosition
-          );
-        } else {
-          await this.movePlayerGsap(finalPosition, index, oldCardPosition);
-        }
-      }
-    }
-  }
-
   playerJump(shouldJump: boolean) {
     gsap.fromTo(
       this.playerRef._objRef.position,
       { y: this.playerRef._objRef.position.y },
       {
-        y: shouldJump ? 1 : 0,
+        y: shouldJump ? 0.5 : 0,
         ease: 'ease-out',
+        duration: 0.20,
         onUpdate: () => {
-          this.playerRefOutline._objRef.position.y =
-            this.playerRef._objRef.position.y;
+          this.playerRefOutline._objRef.position.y = this.playerRef._objRef.position.y;
         },
         onComplete : () =>{
           if(!shouldJump){
@@ -729,391 +565,7 @@ export class PlayerComponent implements OnInit {
     );
   }
 
-  calculatePassedCards(position: Array<number>) {
-    let passedCards = 0;
-    position = JSON.parse(JSON.stringify(position));
-    if (
-      Math.round(position[0] / 2.2) <= 10 &&
-      Math.round(position[2] / 2.2) == 0
-    ) {
-      passedCards = 0 + Math.round(position[0] / 2.2);
-    } else if (
-      Math.round(position[0] / 2.2) === 10 &&
-      Math.round(position[2] / 2.2) > 0
-    ) {
-      passedCards = 10 + Math.round(position[2] / 2.2);
-    } else if (
-      Math.round(position[2] / 2.2) === 10 &&
-      Math.round(position[0] / 2.2) > 0
-    ) {
-      passedCards = 20 + Math.round((22 - position[0]) / 2.2);
-    } else if (
-      Math.round(position[0] / 2.2) === 0 &&
-      Math.round(position[2] / 2.2) > 0
-    ) {
-      passedCards = 30 + Math.round((22 - position[2]) / 2.2);
-    }
-    return passedCards;
-  }
-
-  movePlayerFromBeingOverAnother(
-    axis: string,
-    playerPos: number,
-    index: number,
-    counterOfCards: number,
-    position: Array<number>
-  ) {
-    //Calculate in which cell should the player go at the end of this function
-    position = JSON.parse(JSON.stringify(position));
-    let passedCards = this.calculatePassedCards(position);
-    let playerFinalPosIsPositive = this.player.actualCard >= 20 ? false : true;
-    let goingBack =
-      (this.gameService.randomChance &&
-        this.gameService.randomChance.count !== undefined) ||
-      (this.gameService.randomChest &&
-        this.gameService.randomChest.count !== undefined)
-        ? true
-        : false;
-
-    //If the player has arrived at the destination then place it in one of the four sections of a card
-    if (index === counterOfCards && passedCards === this.player.actualCard) {
-      this.gameService.movingPlayer = false;
-      this.gameService.movingCamera = false;
-      this.gameService.disabledUserHoveringCard = false;
-      this.playerArrived = true;
-      this.gameService.changeCardBorderColor$.next({type: 'playerArrivedReturnToNormal', color: this.gameService.sessionTheme.cardBorder});
-      this.playerIsGoingBack = false;
-
-      if(this.gameService.randomChance || this.gameService.randomChest){
-        this.gameService.randomChance = undefined;
-        this.gameService.randomChance = undefined;
-      }
-
-      let finalZNum = 0;
-      let finalXNum = 0;
-      if (axis === 'x') {
-        //          ^                 //          ^
-        //  |0|3|   |                 //  |2|1|   |
-        //  |1|2|   | z               //  |3|0|   | z
-        //  <-- x                     // - x -- >
-        if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 0 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 10) {
-            //Final cardPosition === 10
-            finalZNum = this.playerRef._objRef.position.z + 0.5;
-            finalXNum = -0.5;
-          } else if (passedCards === 30) {
-            //Final cardPosition === 30
-            finalZNum = this.playerRef._objRef.position.z + -0.5;
-            finalXNum = 0.5;
-          } else {
-            finalZNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.z + 0.5
-              : this.playerRef._objRef.position.z + -0.5;
-            finalXNum = playerFinalPosIsPositive ? 0.5 : -0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 0;
-        } else if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 1 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 10) {
-            //Final cardPosition === 10
-            finalZNum = this.playerRef._objRef.position.z + 0.5;
-            finalXNum = 0.5;
-          } else {
-            finalZNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.z + -0.5
-              : this.playerRef._objRef.position.z + 0.5;
-            finalXNum = playerFinalPosIsPositive ? 0.5 : -0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 1;
-        } else if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 2 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 10) {
-            //Final cardPosition === 10
-            finalZNum = this.playerRef._objRef.position.z + -0.5;
-            finalXNum = 0.5;
-          } else {
-            finalZNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.z + -0.5
-              : this.playerRef._objRef.position.z + 0.5;
-            finalXNum = playerFinalPosIsPositive ? -0.5 : 0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 2;
-        } else if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 3 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 10) {
-            //Final cardPosition === 10
-            finalZNum = this.playerRef._objRef.position.z + -0.5;
-            finalXNum = -0.5;
-          } else {
-            finalZNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.z + 0.5
-              : this.playerRef._objRef.position.z + -0.5;
-            finalXNum = playerFinalPosIsPositive ? -0.5 : 0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 3;
-        }
-        this.player.pawn.position[2] = finalZNum;
-        this.movePlayerGsapNormal('z', finalZNum);
-        if (goingBack) {
-          this.choosePlayerRotation(false, true);
-        }
-        return finalXNum;
-      } else if (axis === 'z') {
-        //          ^                 //          |
-        //  |1|0|   |                 //  |3|2|   |
-        //  |2|3|   | z               //  |0|1|   v -z
-        //  <-- x                     // - x -- >
-        if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 0 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 20) {
-            //Final cardPosition === 20
-            finalXNum = this.playerRef._objRef.position.x + -0.5;
-            finalZNum = -0.5;
-          } else if (passedCards === 0) {
-            //Final cardPosition === 0
-            finalXNum = this.playerRef._objRef.position.x + 0.5;
-            finalZNum = 0.5;
-          } else {
-            finalXNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.x + -0.5
-              : this.playerRef._objRef.position.x + 0.5;
-            finalZNum = playerFinalPosIsPositive ? 0.5 : -0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 0;
-        } else if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 1 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 20) {
-            //Final cardPosition === 20
-            finalXNum = this.playerRef._objRef.position.x + -0.5;
-            finalZNum = 0.5;
-          } else if (passedCards === 0) {
-            //Final cardPosition === 0
-            finalXNum = this.playerRef._objRef.position.x + 0.5;
-            finalZNum = -0.5;
-          } else {
-            finalXNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.x + 0.5
-              : this.playerRef._objRef.position.x + -0.5;
-            finalZNum = playerFinalPosIsPositive ? 0.5 : -0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 1;
-        } else if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 2 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 20) {
-            //Final cardPosition === 20
-            finalXNum = this.playerRef._objRef.position.x + 0.5;
-            finalZNum = 0.5;
-          } else if (passedCards === 0) {
-            //Final cardPosition === 20
-            finalXNum = this.playerRef._objRef.position.x + -0.5;
-            finalZNum = -0.5;
-          } else {
-            finalXNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.x + 0.5
-              : this.playerRef._objRef.position.x + -0.5;
-            finalZNum = playerFinalPosIsPositive ? -0.5 : 0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 2;
-        } else if (
-          this.gameService.players.filter(
-            (player) =>
-              player.id != this.player.id &&
-              player.pawn.cardSection === 3 &&
-              player.actualCard === passedCards
-          ).length === 0
-        ) {
-          if (passedCards === 20) {
-            //Final cardPosition === 20
-            finalXNum = this.playerRef._objRef.position.x + 0.5;
-            finalZNum = -0.5;
-          } else if (passedCards === 0) {
-            //Final cardPosition === 20
-            finalXNum = this.playerRef._objRef.position.x + -0.5;
-            finalZNum = 0.5;
-          } else {
-            finalXNum = playerFinalPosIsPositive
-              ? this.playerRef._objRef.position.x + -0.5
-              : this.playerRef._objRef.position.x + 0.5;
-            finalZNum = playerFinalPosIsPositive ? -0.5 : 0.5;
-          }
-          this.gameService.players[this.gameService.turn].pawn.cardSection = 3;
-        }
-        this.player.pawn.position[0] = finalXNum;
-        this.movePlayerGsapNormal('x', finalXNum);
-        if (goingBack) {
-          this.choosePlayerRotation(false, true);
-        }
-        return finalZNum;
-      }
-
-      return 0;
-    } else if (
-      counterOfCards > 0 ? index < counterOfCards : index > counterOfCards
-    ) {
-      //If the player hasn't arrived yet && if the player is not in the center, center the player position on the card.
-      if (!this.gameService.movingPlayer) {
-        this.setPlayerPositionToCenter(axis, playerFinalPosIsPositive);
-        // return valueToReturn;
-      }
-      return 0;
-    } else {
-      return 0;
-    }
-  }
-
-  async movePlayerGsapNormal(axis: string, value: number) {
-    if (axis === 'x') {
-      await gsap.fromTo(
-        this.playerRef._objRef.position,
-        { x: this.playerRef._objRef.position.x },
-        {
-          x: value,
-          ease: 'ease-out',
-          onUpdate: () => {
-            this.playerRefOutline._objRef.position.x =
-              this.playerRef._objRef.position.x;
-          },
-        }
-      );
-    } else if (axis === 'z') {
-      await gsap.fromTo(
-        this.playerRef._objRef.position,
-        { z: this.playerRef._objRef.position.z },
-        {
-          z: value,
-          ease: 'ease-out',
-          onUpdate: () => {
-            this.playerRefOutline._objRef.position.z =
-              this.playerRef._objRef.position.z;
-          },
-        }
-      );
-    }
-  }
-
-  async setPlayerPositionToCenter(axis: string, isPositive: boolean) {
-    if (axis === 'x') {
-      switch (this.player.pawn.cardSection) {
-        case 0:
-          await this.movePlayerGsapNormal(
-            'z',
-            isPositive
-              ? this.playerRef._objRef.position.z - 0.5
-              : this.playerRef._objRef.position.z + 0.5
-          );
-          return isPositive ? -0.5 : 0.5;
-        case 1:
-          await this.movePlayerGsapNormal(
-            'z',
-            isPositive
-              ? this.playerRef._objRef.position.z + 0.5
-              : this.playerRef._objRef.position.z - 0.5
-          );
-          return isPositive ? -0.5 : 0.5;
-        case 2:
-          await this.movePlayerGsapNormal(
-            'z',
-            isPositive
-              ? this.playerRef._objRef.position.z + 0.5
-              : this.playerRef._objRef.position.z - 0.5
-          );
-          return isPositive ? 0.5 : -0.5;
-        case 3:
-          await this.movePlayerGsapNormal(
-            'z',
-            isPositive
-              ? this.playerRef._objRef.position.z - 0.5
-              : this.playerRef._objRef.position.z + 0.5
-          );
-          return isPositive ? 0.5 : -0.5;
-        default:
-          return 0;
-      }
-    } else if (axis === 'z') {
-      switch (this.player.pawn.cardSection) {
-        case 0:
-          await this.movePlayerGsapNormal(
-            'x',
-            isPositive
-              ? this.playerRef._objRef.position.x + 0.5
-              : this.playerRef._objRef.position.x - 0.5
-          );
-          return isPositive ? -0.5 : 0.5;
-        case 1:
-          await this.movePlayerGsapNormal(
-            'x',
-            isPositive
-              ? this.playerRef._objRef.position.x - 0.5
-              : this.playerRef._objRef.position.x + 0.5
-          );
-          return isPositive ? -0.5 : 0.5;
-        case 2:
-          await this.movePlayerGsapNormal(
-            'x',
-            isPositive
-              ? this.playerRef._objRef.position.x - 0.5
-              : this.playerRef._objRef.position.x + 0.5
-          );
-          return isPositive ? 0.5 : -0.5;
-        case 3:
-          await this.movePlayerGsapNormal(
-            'x',
-            isPositive
-              ? this.playerRef._objRef.position.x + 0.5
-              : this.playerRef._objRef.position.x - 0.5
-          );
-          return isPositive ? 0.5 : -0.5;
-        default:
-          return 0;
-      }
-    } else {
-      return 0;
-    }
-  }
-
+  //Set player outline
   setOutline() {
     this.gameService.gameScene.children
       .filter((child: any) => child.name.includes('player_outline'))

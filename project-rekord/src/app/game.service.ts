@@ -67,7 +67,6 @@ export class GameService {
   distance:number = 15;
   cameraControls:any;
   cameraPosition: Vector3 | any;
-  movingCamera:boolean= false;
   movingPlayer:boolean = false;
   enableMapControls:boolean = false;
   cameraZoom:number = 1.2;
@@ -293,28 +292,8 @@ export class GameService {
     newPlayer.money = 1500;
     newPlayer.pawn.choosenPawnLabel = type == 'normal'? this.pawnTypes[pawnIndex].name : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).name;
     newPlayer.pawn.choosenPawnValue =  type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).value;
-    switch (this.players.filter(player => player.id != newPlayer.id).length) {
-      case 0:
-        newPlayer.pawn.position = [0.5,0,0.5]
-        newPlayer.pawn.cardSection = 0;
-        break;
-      case 1:
-        newPlayer.pawn.position = [0.5,0,-0.5]
-        newPlayer.pawn.cardSection = 1;
-        break;
-      case 2:
-        newPlayer.pawn.position = [-0.5,0,-0.5]
-        newPlayer.pawn.cardSection = 2;
-        break;
-      case 3:
-        newPlayer.pawn.position = [-0.5,0,0.5]
-        newPlayer.pawn.cardSection = 3;
-        break;
-
-      default:
-        newPlayer.pawn.position = [0,0,0]
-        break;
-    }
+    newPlayer.pawn.cardSection = this.players.filter(player => player.id != newPlayer.id).length;
+    newPlayer.pawn.position = [0,0,0]
     newPlayer.pawn.rotationSide = 0;
     newPlayer.canDice = false;
     newPlayer.actualCard = 0;
@@ -455,10 +434,7 @@ export class GameService {
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
 
-    if(this.randomChance || this.randomChest){
-      this.randomChance = undefined;
-      this.randomChance = undefined;
-    }
+    this.resetChestChance();
   }
 
   payTaxes(property:any){
@@ -789,6 +765,13 @@ export class GameService {
     }
   }
 
+  resetChestChance(){
+    if(this.randomChance || this.randomChest){
+      this.randomChance = undefined;
+      this.randomChance = undefined;
+    }
+  }
+
   //BANKRUPT --> Check if player can eventually pay the debt, otherwise the player goes bankrupt
   checkBankrupt(player:any, moneyToSub:number, playerToPay?:number){
     const playerProps= this.gameTable.cards.filter((card: { owner: any; })=>card.owner == player.id);
@@ -927,23 +910,22 @@ export class GameService {
   }
 
   test(){
-    // const numOfCells = 5
-    // this.randomChance = {
-    //   action: "move",
-    //   count: numOfCells,
-    //   title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
-    // };
+    const numOfCells = -10
+    this.randomChance = {
+      action: "move",
+      count: numOfCells,
+      title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
+    };
     //this.randomChance = this.gameTable.chance[8]
 
-    this.randomChance = {
-      action: "jail",
-      subaction: 'goto',
-      title: 'Go To Prison '
-    };
+    // this.randomChance = {
+    //   action: "jail",
+    //   subaction: 'goto',
+    //   title: 'Go To Prison '
+    // };
 
     this.textDialog(this.randomChance,'chance');
   }
-
 
   //Database Management
 
@@ -961,5 +943,4 @@ export class GameService {
   async deleteMapFromDb(mapName:string){
     deleteDoc(doc(this.db, "gameTables", mapName));
   }
-
 }

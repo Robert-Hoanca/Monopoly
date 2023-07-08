@@ -102,7 +102,7 @@ export class GamePhysicsService {
 
     fromEvent(dice.body, 'collide').pipe(debounceTime(65)).subscribe({
       next: (data) => {
-        if (dice.body.velocity.length() > 0) {
+        if (dice.body.velocity.length() > 2) {
           this.soundService.playDiceSound(dice);
         }
       }
