@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription, take, timer } from 'rxjs';
 import { GamePhysicsService } from 'src/app/game-physics.service';
@@ -75,8 +75,12 @@ export class GameComponent implements OnInit {
 
   @ViewChild('showDiceResultDialog', { static: true }) showDiceResultDialogRef!: TemplateRef<any>;
 
-
   @ViewChild('physicsGround', { static: true }) physicsGround:any;
+
+  @HostListener('window:beforeunload')
+  confirmLeavingPageBeforeSaving(): boolean {
+    return this.gameService.godMode ? true : false; 
+  }
 
   actualPlayerProps:Array<any> = [];
 
@@ -91,7 +95,7 @@ export class GameComponent implements OnInit {
 
   pauseOptions:boolean = false;
 
-  constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService, public soundService : SoundService) { }
+  constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService, public soundService : SoundService) {  }
 
   ngOnInit(): void {
     this.gameService.addingRemovingMoneyProps();
