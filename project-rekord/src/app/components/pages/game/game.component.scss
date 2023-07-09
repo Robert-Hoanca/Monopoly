@@ -113,11 +113,36 @@
             }
         }
     }
-    #pauseBtn{
+
+    .left-side-btns{
+        display: flex;
+        flex-direction: column;
         position: absolute;
         top: 10px;
         right: 10px;
-        z-index: 1;
+        #pauseBtn{
+            z-index: 1;
+        }
+        &-isometric{
+            svg{
+                height: 30px;
+                width: 30px;
+            }
+            #icon{
+                transform: scale(0.3);
+            }
+        }
+    
+        &-top-down{
+            svg{
+                height: 30px;
+                width: 30px;
+                transform: rotate(45deg);
+            }
+            #icon{
+                transform: scale(0.3);
+            }
+        }
     }
 }
 
@@ -287,7 +312,6 @@
         }
     }
 }
-
 
 @keyframes scaleAnim {
     0%{

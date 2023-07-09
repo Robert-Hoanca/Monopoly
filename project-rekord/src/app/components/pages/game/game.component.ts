@@ -1,6 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { gsap } from 'gsap';
 import { Subscription, take, timer } from 'rxjs';
 import { GamePhysicsService } from 'src/app/game-physics.service';
 import { GameService } from 'src/app/game.service';
@@ -94,6 +95,7 @@ export class GameComponent implements OnInit {
   subscriptions:Array<Subscription> = [];
 
   pauseOptions:boolean = false;
+  actualView:string = 'isometric';
 
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService, public soundService : SoundService) {  }
 
@@ -121,10 +123,7 @@ export class GameComponent implements OnInit {
 
     timer(500).pipe(take(1)).subscribe({
       complete : () =>{
-        let evt =  new WheelEvent("wheel", {deltaY:10});
-        document.querySelector("canvas")?.dispatchEvent(evt);
-        this.gameService.enableMapControls = false;
-
+        this.gameService.setCameraZoom();
         this.gameService.players.filter((player:any) => player.bankrupt).forEach(player => {
           this.gameService.showHidePlayerInfo$.next({type : 'show', playerId: player.id})
         });
@@ -254,6 +253,24 @@ export class GameComponent implements OnInit {
 
   canSaveThemes(){
     return this.gameService.themes.find((theme:any) => theme.new) ? false : true;
+  }
+
+  changeView(type:string){
+    switch (type) {
+      case 'isometric':
+        this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000, true);
+        this.gameService.cameraZoom = 1.2;
+        break;
+      case 'top-down':
+        this.gameService.setCameraPosition([11,50,7], [11,1,9], 1000, true)
+        this.gameService.cameraZoom = this.gameService.userDevice.includes('phone')? 0.5 : 0.8;
+        break;
+    
+      default:
+        break;
+    }
+
+    
   }
 
   ngOnDestroy(){

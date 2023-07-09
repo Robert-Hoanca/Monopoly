@@ -302,10 +302,10 @@ export class GameService {
     this.specialPawn= '';
   }
 
-  setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number){
+  setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number, force?:boolean){
     //Camera
 
-    if(this.userDevice.includes('phone')){
+    if(this.userDevice.includes('phone') || force){
       if(cameraPosition){
         gsap.fromTo(this.camera._objRef.position, {x: this.camera._objRef.position.x}, {x: cameraPosition[0], duration: duration/1000, onUpdate : () =>{
           this.handlePlayerCardWhenSceneMoving();
@@ -348,6 +348,16 @@ export class GameService {
 
   }
 
+  setCameraZoom(value?:number){
+    gsap.to( this.camera._objRef, {
+      duration: 1,
+      zoom: value ?? this.cameraZoom,
+      onUpdate: () => {
+        this.camera._objRef.updateProjectionMatrix();
+      }
+    } );
+  }
+
   getCardPosition(cardIndex:any){
     this.disabledUserHoveringCard = true;
     this.getCardPosition$.next(cardIndex);
@@ -362,12 +372,8 @@ export class GameService {
   }
 
   resizeCanvas(event:any, camera:any){
-
-    if(camera._objRef != undefined && camera._objRef.zoom != this.cameraZoom){
-      camera._objRef.zoom = this.cameraZoom;
-
-      let evt =  new WheelEvent("wheel", {deltaY : this.cameraZoom})
-      document.querySelector("canvas")?.dispatchEvent(evt);
+    if(camera._objRef != undefined){
+     this.setCameraZoom();
     }
     this.aspect = event.width / event.height;
     this.handlePlayerCardWhenSceneMoving();

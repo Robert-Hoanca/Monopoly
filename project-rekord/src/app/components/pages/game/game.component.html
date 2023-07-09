@@ -1,7 +1,7 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '', gameService.enableCursor ? 'hoveringCard' : '']">
 
     <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event); gamePhysicsService.renderPhysicsWorld()">
-        <th-scene [thStats]="true" [autoUpdate]="true" #scene>
+        <th-scene [autoUpdate]="true" #scene>
             
             <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
             <th-hemisphereLight [castShadow]="false"></th-hemisphereLight>
@@ -56,7 +56,27 @@
         <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Use Free Card And Exit"><span class="title">Exit Free</span><mat-icon class="material-symbols-outlined">exit_to_app</mat-icon></button>
     </div>
 
-    <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon class="material-symbols-outlined">pause</mat-icon></button>
+    <div class="left-side-btns">
+        <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon class="material-symbols-outlined">pause</mat-icon></button>
+        <button class="left-side-btns-isometric" *ngIf="actualView === 'top-down'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Isometric View" (click)="actualView = 'isometric';changeView('isometric')"> 
+            <svg>
+                <g id="icon">
+                    <g fill="#232323">
+                        <path d="M81.89 48.59L51.41 18.11a2 2 0 0 0-2.82 0L18.11 48.59a2 2 0 0 0 0 2.82l30.48 30.48a2 2 0 0 0 2.82 0l30.48-30.48a2 2 0 0 0 0-2.82zm-27.47 15.8l4.42 4.42-3.71 3.71-4.42-4.42zm.7-.71l3.93-3.92 4.42 4.42-3.93 3.92zm4.64-4.63l3.93-3.93 4.41 4.42-3.92 3.93zm4.63-4.63l3.71-3.71 4.42 4.42-3.71 3.71zM50 67.39L32.61 50 50 32.61 67.39 50zM36.32 55.12l3.92 3.93-4.42 4.42-3.92-3.93zm-5.13 3.72l-3.71-3.71 4.42-4.42 3.71 3.71zm9.76.92l3.93 3.93-4.42 4.41-3.93-3.92zm4.63 4.63l3.71 3.71-4.42 4.42-3.71-3.71zm0-28.78l-4.42-4.42 3.71-3.71 4.42 4.42zm-.7.7L41 40.24l-4.42-4.42 3.93-3.92zM40.24 41l-3.92 3.93-4.42-4.47 3.92-3.93zm-4.63 4.63l-3.71 3.66-4.42-4.42 3.71-3.71zM59.76 41l4.42-4.42 3.92 3.93-4.42 4.42zm-.71-.71l-3.93-3.93 4.42-4.41 3.93 3.92zm-4.63-4.63l-3.71-3.76 4.42-4.42 3.71 3.71zm10 10l4.42-4.42 3.71 3.71-4.45 4.34zM50 22.35l4.42 4.42L50 31.19l-4.42-4.42zM26.77 45.58L31.19 50l-4.42 4.42L22.35 50zM50 77.65l-4.42-4.42L50 68.81l4.42 4.42zm23.23-23.23L68.81 50l4.42-4.42L77.65 50z"></path>
+                    </g>
+                </g>
+            </svg>
+        </button>
+        <button class="left-side-btns-top-down" *ngIf="actualView === 'isometric'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Top-down View" (click)="actualView = 'top-down'; ;changeView('top-down')">
+            <svg>
+                <g id="icon">
+                    <g fill="#232323">
+                        <path d="M81.89 48.59L51.41 18.11a2 2 0 0 0-2.82 0L18.11 48.59a2 2 0 0 0 0 2.82l30.48 30.48a2 2 0 0 0 2.82 0l30.48-30.48a2 2 0 0 0 0-2.82zm-27.47 15.8l4.42 4.42-3.71 3.71-4.42-4.42zm.7-.71l3.93-3.92 4.42 4.42-3.93 3.92zm4.64-4.63l3.93-3.93 4.41 4.42-3.92 3.93zm4.63-4.63l3.71-3.71 4.42 4.42-3.71 3.71zM50 67.39L32.61 50 50 32.61 67.39 50zM36.32 55.12l3.92 3.93-4.42 4.42-3.92-3.93zm-5.13 3.72l-3.71-3.71 4.42-4.42 3.71 3.71zm9.76.92l3.93 3.93-4.42 4.41-3.93-3.92zm4.63 4.63l3.71 3.71-4.42 4.42-3.71-3.71zm0-28.78l-4.42-4.42 3.71-3.71 4.42 4.42zm-.7.7L41 40.24l-4.42-4.42 3.93-3.92zM40.24 41l-3.92 3.93-4.42-4.47 3.92-3.93zm-4.63 4.63l-3.71 3.66-4.42-4.42 3.71-3.71zM59.76 41l4.42-4.42 3.92 3.93-4.42 4.42zm-.71-.71l-3.93-3.93 4.42-4.41 3.93 3.92zm-4.63-4.63l-3.71-3.76 4.42-4.42 3.71 3.71zm10 10l4.42-4.42 3.71 3.71-4.45 4.34zM50 22.35l4.42 4.42L50 31.19l-4.42-4.42zM26.77 45.58L31.19 50l-4.42 4.42L22.35 50zM50 77.65l-4.42-4.42L50 68.81l4.42 4.42zm23.23-23.23L68.81 50l4.42-4.42L77.65 50z"></path>
+                    </g>
+                </g>
+            </svg>    
+        </button>
+    </div>
 
     <ng-template #showDiceResultDialog>
 
@@ -137,7 +157,6 @@
 
         <div class="camera" fxLayout="column">
             <span class="title">Camera</span>
-
             <mat-form-field>
                 <mat-label>Position X</mat-label>
                 <input matInput type="number" [(ngModel)]="gameService.camera._objRef.position.x">

@@ -597,9 +597,9 @@ export class PlayerComponent implements OnInit {
     ) {
       this.playerInCage = true;
       this.cagePosition = [
-        this.player.pawn.position[0],
+        this.player.pawn.position[0] + (this.inCardPosition[0]),
         2,
-        this.player.pawn.position[2],
+        this.player.pawn.position[2] + (this.inCardPosition[2]),
       ];
       this.spawnCage(this.cageRef._objRef, 500);
     } else {
