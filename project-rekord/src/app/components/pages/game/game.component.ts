@@ -270,6 +270,7 @@ export class GameComponent implements OnInit {
         break;
     }
 
+    this.gameService.setCameraZoom();
     
   }
 
