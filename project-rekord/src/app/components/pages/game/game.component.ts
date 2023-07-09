@@ -95,7 +95,6 @@ export class GameComponent implements OnInit {
   subscriptions:Array<Subscription> = [];
 
   pauseOptions:boolean = false;
-  actualView:string = 'isometric';
 
   constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService, public soundService : SoundService) {  }
 
@@ -263,15 +262,13 @@ export class GameComponent implements OnInit {
         break;
       case 'top-down':
         this.gameService.setCameraPosition([11,50,7], [11,1,9], 1000, true)
-        this.gameService.cameraZoom = this.gameService.userDevice.includes('phone')? 0.5 : 0.8;
+        this.gameService.cameraZoom = this.gameService.userDevice.includes('phone')? 0.55 : 0.8;
         break;
     
       default:
         break;
     }
-
     this.gameService.setCameraZoom();
-    
   }
 
   ngOnDestroy(){

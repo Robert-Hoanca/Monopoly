@@ -58,7 +58,7 @@
 
     <div class="left-side-btns">
         <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon class="material-symbols-outlined">pause</mat-icon></button>
-        <button class="left-side-btns-isometric" *ngIf="actualView === 'top-down'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Isometric View" (click)="actualView = 'isometric';changeView('isometric')"> 
+        <button class="left-side-btns-isometric" *ngIf="gameService.actualView === 'top-down'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Isometric View" (click)="gameService.actualView = 'isometric';changeView('isometric')" [disabled]="gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney"> 
             <svg>
                 <g id="icon">
                     <g fill="#232323">
@@ -67,7 +67,7 @@
                 </g>
             </svg>
         </button>
-        <button class="left-side-btns-top-down" *ngIf="actualView === 'isometric'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Top-down View" (click)="actualView = 'top-down'; ;changeView('top-down')">
+        <button class="left-side-btns-top-down" *ngIf="gameService.actualView === 'isometric'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Top-down View" (click)="gameService.actualView = 'top-down'; ;changeView('top-down')" [disabled]="gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney">
             <svg>
                 <g id="icon">
                     <g fill="#232323">

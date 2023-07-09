@@ -123,11 +123,18 @@
         #pauseBtn{
             z-index: 1;
         }
-        &-isometric{
+        &-isometric, &-top-down{
             svg{
                 height: 30px;
                 width: 30px;
             }
+            &[disabled]{
+                svg #icon > g{
+                    fill: #00000042;
+                }
+            }
+        }
+        &-isometric{
             #icon{
                 transform: scale(0.3);
             }
@@ -135,8 +142,6 @@
     
         &-top-down{
             svg{
-                height: 30px;
-                width: 30px;
                 transform: rotate(45deg);
             }
             #icon{

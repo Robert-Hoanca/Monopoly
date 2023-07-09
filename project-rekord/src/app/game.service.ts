@@ -70,6 +70,7 @@ export class GameService {
   movingPlayer:boolean = false;
   enableMapControls:boolean = false;
   cameraZoom:number = 1.2;
+  actualView:string = 'isometric';
 
   //Renderer
   rendererOptions:any={
@@ -305,7 +306,7 @@ export class GameService {
   setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number, force?:boolean){
     //Camera
 
-    if(this.userDevice.includes('phone') || force){
+    if((this.userDevice.includes('phone') && this.actualView === 'isometric') || force){
       if(cameraPosition){
         gsap.fromTo(this.camera._objRef.position, {x: this.camera._objRef.position.x}, {x: cameraPosition[0], duration: duration/1000, onUpdate : () =>{
           this.handlePlayerCardWhenSceneMoving();
