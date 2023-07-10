@@ -257,11 +257,15 @@ export class GameComponent implements OnInit {
   changeView(type:string){
     switch (type) {
       case 'isometric':
-        this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000, true);
+        if(this.gameService.userDevice.includes('phone')){
+          this.gameService.setCameraOnPlayer(0); //On phone the camera should follow the player on isometric view
+        }else{
+          this.gameService.setCameraPosition([-10,10,-10], [8,0,8], 1000, true);
+        }
         this.gameService.cameraZoom = 1.2;
         break;
       case 'top-down':
-        this.gameService.setCameraPosition([11,50,7], [11,1,9], 1000, true)
+        this.gameService.setCameraPosition([11,50,7], [11,1,9], 1000, true);
         this.gameService.cameraZoom = this.gameService.userDevice.includes('phone')? 0.55 : 0.8;
         break;
     

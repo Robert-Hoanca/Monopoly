@@ -350,12 +350,19 @@ export class GameService {
   }
 
   setCameraZoom(value?:number){
-    gsap.to( this.camera._objRef, {
-      duration: 1,
-      zoom: value ?? this.cameraZoom,
-      onUpdate: () => {
-        this.camera._objRef.updateProjectionMatrix();
-      }
+    gsap.fromTo( this.camera._objRef, 
+      {
+        zoom: this.camera._objRef.zoom,
+        onUpdate: () => {
+          this.camera._objRef.updateProjectionMatrix();
+        }
+      },
+      {
+        duration: 1,
+        zoom: value ?? this.cameraZoom,
+        onUpdate: () => {
+          this.camera._objRef.updateProjectionMatrix();
+        }
     } );
   }
 
