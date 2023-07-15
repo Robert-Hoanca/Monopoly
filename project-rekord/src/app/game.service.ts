@@ -545,8 +545,8 @@ export class GameService {
   }
 
   addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
-    player ? this.showHidePlayerInfo$.next({type:'show', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'show', playerId: this.players[this.turn].id});
     new Observable((subscriber) => {
+      player ? this.showHidePlayerInfo$.next({type:'show', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'show', playerId: this.players[this.turn].id});
       this.addingPlayerMoney = true;
       this.playerMoneyChangeValue = amount;
       if(type=='add'){

@@ -432,6 +432,9 @@ export class PlayerComponent implements OnInit {
               }
               this.rotatedBack = false;
             }
+            if(this.player.prison.inPrison){
+              this.ShouldSpawnPrison(true);
+            }
             this.gameService.movingPlayer = false;
             this.gameService.disabledUserHoveringCard = false;
             this.playergoBack = false;

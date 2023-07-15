@@ -190,10 +190,12 @@ export class SoundService {
       }
   
       if(audio){
-        audio.pause()
+        try{audio.pause()}
+        catch{}
         audio.currentTime = 0;
         audio.volume = this.settingsService.settings.sound.sfxVolume;
-        audio.play()
+        try{audio.play()}
+        catch{}
       }
     }
   }

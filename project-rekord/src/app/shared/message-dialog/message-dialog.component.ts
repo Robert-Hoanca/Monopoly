@@ -56,12 +56,10 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.payRentToPlayer(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)],true);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
-          this.gameService.nextTurn();
         }else if(this.data.textData.amountDebt && ((this.data.textData.playerId? this.gameService.players.find(player => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]).money >= this.data.textData.amountDebt) && this.data.textData.debtWithWho == 'bank' && !this.gameService.checkBankrupt((this.data.textData.playerId? this.gameService.players.find(player => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]),this.data.textData.amountDebt)){
           this.data.textData.playerId? this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000 ,this.gameService.players.find(player => player.id == this.data.textData.playerId)) : this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
-          this.gameService.nextTurn();
         }
         if(this.gameService.setDebt){this.gameService.setDebt = false}
 

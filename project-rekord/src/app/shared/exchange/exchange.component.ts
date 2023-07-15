@@ -134,12 +134,15 @@ export class ExchangeComponent implements OnInit {
     });;
   }
   checkIfCanExchange(){
-    if((this.moneyToExchange[0] > 0 
-      || this.moneyToExchange[1] > 0 
-      || this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length 
-      || this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length)
-      &&  (this.moneyToExchange[0] <= this.playerToExchangeWith.money && this.moneyToExchange[1] <= this.gameService.players[this.gameService.turn].money)
-        ){
+    
+
+    if(
+      ( this.moneyToExchange[0] > 0 || this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length) 
+        ||
+      ( this.moneyToExchange[1] > 0 || this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length) 
+        && 
+      (this.moneyToExchange[0] <= this.playerToExchangeWith.money && this.moneyToExchange[1] <= this.gameService.players[this.gameService.turn].money)
+    ){
       return false;
     }else{
       return true;
