@@ -1,13 +1,14 @@
 .propertiesContainer{
     flex-wrap: wrap;
     width: 250px;
-    padding: 10px;
     .property{
-        width: 10px;
-        height: 15px;
+        width: 5px;
+        height: 10px;
         position: relative;
-        margin-left: 10px;
         margin-top: 10px;
+        &:not(:first-child){
+            margin-left: 10px;
+        }
         cursor: pointer;
         .propDistrict{
             position: absolute;
@@ -16,6 +17,25 @@
             height: 15px;
             width: 100%;
             border-radius: 5px 5px 0px 0px;
+        }
+    }
+    .getOutCard{
+        width: 37px;
+        height: 42px;
+        position: relative;
+        margin-top: 10px;
+        cursor: pointer;
+        mat-icon{
+            margin-top: -10px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .counter{
+            position: absolute;
+            bottom: 0;
+            font-size: 12px;
         }
     }
     .chosenProperty{

@@ -1,0 +1,210 @@
+.home{
+    width: 100vw;
+    height: 100vh;
+    font-family: 'bebasNeue';
+    overflow: hidden;
+    &__ui-container{
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+
+        &__title{
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            pointer-events: none;
+            span{
+               font-size: 18px;
+            }
+        }
+    }
+    
+    .playText{
+        position: absolute;
+        bottom: 100px;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+        animation: scaleAnimation infinite 1.5s;
+    }
+
+    .chooseModeContainer {
+        position: absolute;
+        bottom: 100px;
+        width: 100%;
+        button{
+            overflow: hidden;
+        }
+        button:first-child{
+            margin-right: 20px;
+        }
+    }
+
+    .rightsSection{
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+    }
+    .sideButtons{
+        position: absolute;
+        right: 20px;
+        bottom: 50px;
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        flex-direction: column;
+    }
+}
+
+#homeCanvas{
+    opacity: 0.8;
+}
+
+.about-page{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+
+#diceSvg{
+    path{
+        stroke-width: 10px;
+    }
+}
+
+
+@media screen and (min-width: 600px) {
+
+    .home{
+    
+        &__ui-container{
+    
+            &__title{
+                font-size: 150px;
+                margin-top: -50px;
+                span{
+                   font-size: 18px;
+                }
+            }
+        }
+    }
+
+    .playText{
+        font-size: 25px;
+    }
+    .rightsSection{
+        font-size: 15px;
+    }
+
+    .chooseModeContainer {
+        button{
+            width: 180px;
+            height: 65px;
+            font-size: 24px;
+            ::ng-deep .mat-button-wrapper{
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+                span{
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                }
+                mat-icon{
+                    margin-left: 10px;
+                    font-size: 30px;
+                    height: 30px;
+                    width: 30px;
+                }
+            }
+           
+        }
+    }
+    .about-page{
+        height: -webkit-fill-available;
+    }
+
+}
+
+@media screen and (max-width: 600px) {
+
+    .home{
+        height: -webkit-fill-available;
+        &__ui-container{
+            height: -webkit-fill-available;
+            &__title{
+                font-size: 80px;
+                margin-top: -30px;
+                span{
+                   font-size: 18px;
+                }
+            }
+        }
+    }
+    .playText{
+        font-size: 20px;
+    }
+    .rightsSection{
+        font-size: 10px;
+    }
+
+    .chooseModeContainer {
+        button{
+            width: 110px;
+            height: 50px;
+            font-size: 18px;
+            ::ng-deep .mat-button-wrapper{
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+                span{
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                }
+                img{
+                    margin-left: 10px;
+                    font-size: 30px;
+                    height: 30px;
+                    width: 30px;
+                }
+            }
+           
+        }
+    }
+
+    #diceSvg{
+      width: 130%;
+    }
+    
+
+}
+
+@keyframes scaleAnimation {
+
+    0%{
+        transform: scale(1);
+    }
+
+    50%{
+        transform: scale(0.8);
+    }
+
+    100%{
+        transform: scale(1);
+    }
+
+}

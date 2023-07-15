@@ -1,3 +1,4 @@
 <div id="routerContainer">
+  <app-loading-screen *ngIf="gameService.loading"></app-loading-screen>
   <router-outlet></router-outlet>
 </div>

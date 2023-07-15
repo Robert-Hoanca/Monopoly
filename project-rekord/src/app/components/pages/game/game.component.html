@@ -1,0 +1,214 @@
+<div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '', gameService.enableCursor ? 'hoveringCard' : '']">
+
+    <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event); gamePhysicsService.renderPhysicsWorld()">
+        <th-scene [autoUpdate]="true" #scene [thStats]="gameService.godMode">
+            
+            <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
+            <th-hemisphereLight [castShadow]="false"></th-hemisphereLight>
+            <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
+            <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
+
+            <app-dice *ngIf="gameService.startToDice" [diceIndex]="0"></app-dice>
+            <app-dice *ngIf="gameService.startToDice" [diceIndex]="1"></app-dice>
+
+            <th-orthographicCamera
+                [left]="-gameService.distance * this.gameService.aspect"
+                [right]="(gameService.distance * this.gameService.aspect)"
+                [top]="gameService.distance"
+                [bottom]="-gameService.distance"
+                [near]="-1000"
+                [far]="2000"
+                [position]="[-10,10,-10]"
+                [zoom]="gameService.cameraZoom"
+                #camera
+                
+            >
+                <th-mapControls #cameraControls [target]="[8,0,8]" [enablePan]="gameService.godMode" [enableZoom]="true" [enableDamping]="gameService.godMode" [enableRotate]="gameService.godMode"></th-mapControls>
+            </th-orthographicCamera>
+
+            <app-decoration-item [whereAmI]="'insideCanvas'"></app-decoration-item>
+        </th-scene>
+    </th-canvas>
+
+    <app-decoration-item [whereAmI]="'outsideCanvas'"></app-decoration-item>
+      
+    <div id="playersContainer" fxLayout="column" fxLayoutAlign="space-around start">
+        <mat-card *ngFor="let player of gameService.players; let i = index" [ngClass]="['playerCard',player.bankrupt? 'bankrupt': 'noBankrupt']" fxLayout="row" fxLayoutAlign="start center" [attr.player-id]="player.name + i">
+           <div class="infoContaner" fxLayoutAlign="space-between start">
+                <span class="name">{{player.name}}</span>
+                <span class="money" *ngIf="!player.bankrupt">{{player.money}} €</span>
+           </div>
+            <mat-icon *ngIf="gameService.players[gameService.turn].id === player.id" class="material-symbols-outlined actualTurnPlayer">person</mat-icon>
+            <div id="passedStart" *ngIf="(player.addingMoney || player.removingMoney) && !player.bankrupt" [@passedStartMoney]>
+                <span [ngStyle]="{'color': player.addingMoney ? 'green' : 'red'}"> <span [innerHTML]="player.addingMoney ? '+' : '-'"></span> {{gameService.playerMoneyChangeValue}}</span>
+            </div>
+
+        </mat-card>
+    </div>
+
+    <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
+        <button mat-raised-button id="bankRupt" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.askIfShouldGoBankrupt()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gameService.addingPlayerMoney" color="warn" [matTooltipPosition]="'above'" matTooltip="Go Bankrupt"><mat-icon class="material-symbols-outlined">home</mat-icon></button>
+        <button mat-raised-button id="seeProperties" *ngIf="!gameService.players[gameService.turn].canDice" [disabled]="!getActualPlayerProps().length && !gameService.players[gameService.turn].prison.getOutCards || gameService.playerWhoWonId != '' || gameService.movingPlayer || gameService.addingPlayerMoney" (click)="gameService.showPlayerProps()" [matTooltipPosition]="'above'" matTooltip="See Player Info"><span class="title">Player Info</span><mat-icon class="material-symbols-outlined">person</mat-icon> <mat-icon class="material-symbols-outlined info">info</mat-icon> </button>
+        <button mat-raised-button id="openExchange" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Start an Exchange"><span class="title">Exchange</span><mat-icon class="material-symbols-outlined">currency_exchange</mat-icon></button>
+        <button mat-raised-button id="nextTurnBtn" *ngIf="!gameService.players[gameService.turn].canDice" (click)="tryToGoNextTurn()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="End Your Turn"><span class="title">End Turn</span><mat-icon class="material-symbols-outlined">logout</mat-icon></button>
+        <button mat-raised-button id="diceBtn" *ngIf="gameService.players[gameService.turn].canDice" (click)="rollTheDice()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Throw The Dice"><span class="title">Dice Roll</span><mat-icon class="material-symbols-outlined">casino</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].canDice" [disabled]="gameService.players[gameService.turn].money<50 || gameService.playerWhoWonId != '' || gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" (click)="whatToDoInPrison('payToExit')" [matTooltipPosition]="'above'" matTooltip="Pay And Exit"><span class="title">Pay</span><mat-icon class="material-symbols-outlined">payments</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Use Free Card And Exit"><span class="title">Exit Free</span><mat-icon class="material-symbols-outlined">exit_to_app</mat-icon></button>
+    </div>
+
+    <div class="left-side-btns">
+        <button mat-icon-button id="pauseBtn" (click)="gameService.gamePaused=true"><mat-icon class="material-symbols-outlined">pause</mat-icon></button>
+        <button class="left-side-btns-isometric" *ngIf="gameService.actualView === 'top-down'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Isometric View" (click)="gameService.actualView = 'isometric';changeView('isometric')" [disabled]="gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney"> 
+            <svg>
+                <g id="icon">
+                    <g fill="#232323">
+                        <path d="M81.89 48.59L51.41 18.11a2 2 0 0 0-2.82 0L18.11 48.59a2 2 0 0 0 0 2.82l30.48 30.48a2 2 0 0 0 2.82 0l30.48-30.48a2 2 0 0 0 0-2.82zm-27.47 15.8l4.42 4.42-3.71 3.71-4.42-4.42zm.7-.71l3.93-3.92 4.42 4.42-3.93 3.92zm4.64-4.63l3.93-3.93 4.41 4.42-3.92 3.93zm4.63-4.63l3.71-3.71 4.42 4.42-3.71 3.71zM50 67.39L32.61 50 50 32.61 67.39 50zM36.32 55.12l3.92 3.93-4.42 4.42-3.92-3.93zm-5.13 3.72l-3.71-3.71 4.42-4.42 3.71 3.71zm9.76.92l3.93 3.93-4.42 4.41-3.93-3.92zm4.63 4.63l3.71 3.71-4.42 4.42-3.71-3.71zm0-28.78l-4.42-4.42 3.71-3.71 4.42 4.42zm-.7.7L41 40.24l-4.42-4.42 3.93-3.92zM40.24 41l-3.92 3.93-4.42-4.47 3.92-3.93zm-4.63 4.63l-3.71 3.66-4.42-4.42 3.71-3.71zM59.76 41l4.42-4.42 3.92 3.93-4.42 4.42zm-.71-.71l-3.93-3.93 4.42-4.41 3.93 3.92zm-4.63-4.63l-3.71-3.76 4.42-4.42 3.71 3.71zm10 10l4.42-4.42 3.71 3.71-4.45 4.34zM50 22.35l4.42 4.42L50 31.19l-4.42-4.42zM26.77 45.58L31.19 50l-4.42 4.42L22.35 50zM50 77.65l-4.42-4.42L50 68.81l4.42 4.42zm23.23-23.23L68.81 50l4.42-4.42L77.65 50z"></path>
+                    </g>
+                </g>
+            </svg>
+        </button>
+        <button class="left-side-btns-top-down" *ngIf="gameService.actualView === 'isometric'" mat-icon-button [matTooltipPosition]="'left'" matTooltip="Top-down View" (click)="gameService.actualView = 'top-down'; ;changeView('top-down')" [disabled]="gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney">
+            <svg>
+                <g id="icon">
+                    <g fill="#232323">
+                        <path d="M81.89 48.59L51.41 18.11a2 2 0 0 0-2.82 0L18.11 48.59a2 2 0 0 0 0 2.82l30.48 30.48a2 2 0 0 0 2.82 0l30.48-30.48a2 2 0 0 0 0-2.82zm-27.47 15.8l4.42 4.42-3.71 3.71-4.42-4.42zm.7-.71l3.93-3.92 4.42 4.42-3.93 3.92zm4.64-4.63l3.93-3.93 4.41 4.42-3.92 3.93zm4.63-4.63l3.71-3.71 4.42 4.42-3.71 3.71zM50 67.39L32.61 50 50 32.61 67.39 50zM36.32 55.12l3.92 3.93-4.42 4.42-3.92-3.93zm-5.13 3.72l-3.71-3.71 4.42-4.42 3.71 3.71zm9.76.92l3.93 3.93-4.42 4.41-3.93-3.92zm4.63 4.63l3.71 3.71-4.42 4.42-3.71-3.71zm0-28.78l-4.42-4.42 3.71-3.71 4.42 4.42zm-.7.7L41 40.24l-4.42-4.42 3.93-3.92zM40.24 41l-3.92 3.93-4.42-4.47 3.92-3.93zm-4.63 4.63l-3.71 3.66-4.42-4.42 3.71-3.71zM59.76 41l4.42-4.42 3.92 3.93-4.42 4.42zm-.71-.71l-3.93-3.93 4.42-4.41 3.93 3.92zm-4.63-4.63l-3.71-3.76 4.42-4.42 3.71 3.71zm10 10l4.42-4.42 3.71 3.71-4.45 4.34zM50 22.35l4.42 4.42L50 31.19l-4.42-4.42zM26.77 45.58L31.19 50l-4.42 4.42L22.35 50zM50 77.65l-4.42-4.42L50 68.81l4.42 4.42zm23.23-23.23L68.81 50l4.42-4.42L77.65 50z"></path>
+                    </g>
+                </g>
+            </svg>    
+        </button>
+    </div>
+
+    <ng-template #showDiceResultDialog>
+
+        <div class="doubleDiceTitle" *ngIf="gameService.players[gameService.turn].prison.doubleDiceCounter">
+            <span>x{{gameService.players[gameService.turn].prison.doubleDiceCounter}}</span>
+        </div>
+        <div *ngFor="let res of gamePhysicsService.diceRes" [ngClass]="['dice', getDiceResClass(res)]" [@showDice]>       
+            <div class="dotsContainer">
+                <div class="dot" *ngIf="res < 4"></div>
+                <div class="dot" *ngIf="res >= 2 && res <= 3"></div>
+                <div class="dot" *ngIf="res == 3"></div>
+                <div *ngIf="res > 3 && res < 6" class="innerDotsContainer">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div *ngIf="res == 5" class="innerDotsContainer">
+                    <div class="dot"></div>
+                </div>
+                <div *ngIf="res > 3 && res < 6" class="innerDotsContainer">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div *ngIf="res === 6" class="innerDotsContainer">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div *ngIf="res === 6" class="innerDotsContainer">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+
+    <div id="debugger" *ngIf="gameService.debugMode" fxLayout="column">
+
+        <div class="theme" fxLayout="column">
+            <span class="title">Theme Colors</span>
+
+            <mat-form-field>
+                <mat-label>Themes</mat-label>
+                <mat-select [(ngModel)]="gameService.debugSelectedTheme">
+                    <mat-option *ngFor="let theme of gameService.themes; let i = index" (click)="gameService.chooseSessionColor(i)" [value]="'Theme_' + i"> Theme_{{ i }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <div fxLayoutAlign="space-between center">
+                <button mat-raised-button (click)="gameService.addNewTheme()"> <mat-icon>add</mat-icon> Add Theme</button> 
+                <button mat-raised-button (click)="gameService.setThemesDb(this.gameService.themes)" [disabled]="canSaveThemes()"> <mat-icon>save</mat-icon> Save Themes</button>
+            </div>
+            <br><br>
+
+            <mat-form-field>
+                <mat-label>Background</mat-label>
+                <div class="colorContainer" fxLayoutAlign="start center">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.background">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.background">
+                </div>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Card Color</mat-label>
+                <div class="colorContainer" fxLayoutAlign="start center">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor('card', gameService.sessionTheme.cardColor)">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardColor" (ngModelChange)="gameService.changeCardColor('card', gameService.sessionTheme.cardColor)">
+                </div>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Card Border</mat-label>
+                <div class="colorContainer" fxLayoutAlign="start center" fxLayoutAlign="start center">
+                    <input matInput type="text" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor('border', gameService.sessionTheme.cardBorder)">
+                    <input matInput type="color" [(ngModel)]="gameService.sessionTheme.cardBorder" (ngModelChange)="gameService.changeCardColor('border', gameService.sessionTheme.cardBorder)">
+                </div>
+            </mat-form-field>
+        </div>
+
+        <div class="camera" fxLayout="column">
+            <span class="title">Camera</span>
+            <mat-form-field>
+                <mat-label>Position X</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.position.x">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Position Y</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.position.y">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Position Z</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.position.z">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Zoom</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.camera._objRef.zoom">
+            </mat-form-field>
+
+            <span class="title">Camera Controls </span>
+            <mat-form-field>
+                <mat-label>Target X</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.x">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Target Y</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.y">
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Target Z</mat-label>
+                <input matInput type="number" [(ngModel)]="gameService.cameraControls._objRef.target.z">
+            </mat-form-field>
+
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="gameService.gamePaused" class="pausedGame" fxLayout="column" fxLayoutAlign="center center">
+    
+    <ng-container *ngIf="!pauseOptions">
+        <button mat-raised-button (click)="gameService.gamePaused=false">Continue</button>
+        <button mat-raised-button (click)="pauseOptions = true">Options</button>
+        <button mat-raised-button (click)="gameService.goBackHome()">Home</button>
+        <button mat-raised-button *ngIf="gameService.godMode" id="debugButton" (click)="gameService.debugMode = !gameService.debugMode"> {{gameService.debugMode ? 'Disable' :  'Enable' }} Debugger</button>
+    </ng-container>
+
+    <div class="pausedGame__options" *ngIf="pauseOptions">
+       <settings (close)="pauseOptions = false"></settings>
+    </div>
+
+</div>

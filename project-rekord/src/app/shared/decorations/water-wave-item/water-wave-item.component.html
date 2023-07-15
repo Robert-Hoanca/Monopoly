@@ -1,0 +1,7 @@
+<th-mesh
+    [position]="[randomStartingPointX,0,randomStartingPointZ]"
+    #water_waveRef
+>
+    <th-boxGeometry [args]="[randomWaveSize, 0.01, randomWaveSize]"></th-boxGeometry>
+    <th-meshBasicMaterial [args]="{color: '#fff'}" [transparent]="true" [opacity]="waterOpacity"></th-meshBasicMaterial>
+</th-mesh>

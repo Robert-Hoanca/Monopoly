@@ -1,0 +1,241 @@
+#chooseMode{
+    min-height: 100vh;
+    min-width: 100vw;
+
+    #startGame{
+        width: 100%;
+        margin-top: 20px;
+        button{
+            width: 200px;
+            height: 50px;
+            background: #c4dfc4;
+            font-weight: bold;
+        }
+    }
+    #localSaves{
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        .localSave{
+            height: 200px;
+            width: 200px;
+            z-index: 0;
+            position: relative;
+            cursor: pointer;
+            .saveContainer{
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                mat-form-field,button{
+                    pointer-events: all;
+                    width: 100%;
+                }
+                mat-icon{
+                    pointer-events: none;
+                }
+                .title{
+                    font-weight: bold;
+                    font-size: 18px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    width: 180px;
+                    text-align: center;
+                }
+                .timeBegan{
+                    font-size: 12px;
+                    margin-top: 10px;
+                }
+            }
+
+            .deleteBtn{
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                pointer-events: all;
+                z-index: 2;
+            }
+        }
+    }
+    #addSpecialPawn{
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+        background: #fff;
+        width: 25px;
+        height: 25px;
+        color: black;
+    }
+
+    #players{
+        #createdPlayers{
+            .creationContainer{
+                //margin-top: 20px;
+
+                #createPlayer{
+                    background: transparent;
+                    border: 15px solid #fff;
+                    border-radius: 5px;
+
+                    .choosePawn{
+                        .pawnModel {
+                            .pawnChange {
+                                align-items: center;
+                                background: #fff;
+                                border-radius: 5px
+                            }
+                        }
+                    }
+                    .pawnInfoContainer{
+                        background: #fff;
+                        border-radius: 5px;
+                        margin-top: 10px;
+                        padding: 10px;
+                    }
+                }
+
+
+            }
+            .createdPlayersContainer{
+                .playerCard{
+                    background: transparent;
+                    border: 15px solid #fff;
+                    border-radius: 5px;
+                    .info{
+                        height: 25px;
+                        display: flex;
+                        align-items: center;
+                        background: #fff;
+                        border-radius: 5px;
+                        min-height: 30px;
+                        margin-top: 5px;
+                        padding: 5px 10px;
+                        .label{
+                            width: 30%;
+                            display: flex;
+                            align-items: center;
+                            font-weight: bold;
+                        }
+                        .value{
+                            width: 130px;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                        }
+                    }
+                }
+               
+            }
+        }
+        .go-back-home{
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+        }
+    }
+   
+
+    #mapsContainer{
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        mat-card.map{
+            min-width: 150px;
+            height: 70px;
+            margin: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            align-items: center;
+            .title{
+                margin-left: 10px;
+            }
+        }
+
+        .chosenMap{
+            border: 1px solid black;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+
+            mat-icon{
+                animation: popScale 0.25s ease;
+            }
+            
+        }
+    }
+}
+@keyframes popScale {
+    from {
+        transform: scale(0);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #players{
+        padding: 60px 0px;
+        #createdPlayers{
+            align-items: center;
+            justify-content: center;
+            .createdPlayersContainer{
+                flex-wrap: wrap;
+                justify-content: space-between;
+                .playerCard{
+                    margin-top: 10px;
+                }
+            }
+        }
+    }
+    #localSaves{
+        flex-direction: column;
+        height: -webkit-fill-available;
+    }
+    #startGame{
+        padding: 20px 0px;
+    }
+    #mapsContainer{
+        width: 100%;
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        .map{
+            width: 40%;
+        }
+    }
+}
+@media screen and (min-width: 600px) {
+
+    #localSaves{
+        flex-direction: row;
+    }
+    #players{
+        padding-top: 50px;
+        #createdPlayers{
+            justify-content: center;
+            align-items: end;
+            .createdPlayersContainer{
+                margin-right: 20px;
+                .playerCard{
+                    margin-right: 20px;
+                }
+            }
+        }
+    }
+    #mapsContainer{
+        position: absolute;
+        bottom: 150px;
+        justify-content: start;
+        width: 90%;
+    }
+    #startGame{
+        position: absolute;
+        bottom: 50px;
+        right: 20px;
+    }
+}

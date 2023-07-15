@@ -1,0 +1,17 @@
+<th-mesh
+    [position]="[randomStartingPointX,100,randomStartingPointZ]"
+    [rotation]="[0 , 0 , 0]"
+    #rainDropRef
+>
+    <th-boxGeometry [args]="[0.05, 0.2 , 0.05]"></th-boxGeometry>
+    <th-meshBasicMaterial [args]="{color: '#fff'}" [transparent]="true" [opacity]="rainDropOpacity"></th-meshBasicMaterial>
+</th-mesh>
+
+<th-mesh
+    [position]="[randomStartingPointX,0,randomStartingPointZ]"
+    #rainSplashRef
+    [scale]="[1,1,1]"
+>
+    <th-boxGeometry [args]="[0.5, 0.01 , 0.5]"></th-boxGeometry>
+    <th-meshBasicMaterial [args]="{color: '#fff'}" [transparent]="true" [opacity]="rainSplashOpacity"></th-meshBasicMaterial>
+</th-mesh>

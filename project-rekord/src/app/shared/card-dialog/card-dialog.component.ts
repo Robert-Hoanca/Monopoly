@@ -2,6 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GameService } from 'src/app/game.service';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-card-dialog',
@@ -32,9 +33,10 @@ export class CardDialogComponent implements OnInit {
   completedSeriesCards:Array<any> = [];
   ownerName:string = '';
 
-  constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
+  constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
+    this.soundService.playSound('open-card');
   }
   ngAfterViewInit(){
     if(this.data.completedSeries){
@@ -68,27 +70,27 @@ export class CardDialogComponent implements OnInit {
   addHouse(){
     //this.houses.push('');
     this.data.card.housesCounter++;
-    this.gameService.addingRemovingMoney('remove', this.data.card.houseCost, 250);
+    this.gameService.addingRemovingMoney('remove', this.data.card.houseCost, 1000);
     //this.gameService.players[this.gameService.turn].money -= this.data.card.houseCost;
   }
 
   removeHouse(){
     //this.houses.splice((this.houses.length -1),1);
     this.data.card.housesCounter--;
-    this.gameService.addingRemovingMoney('add', ((this.data.card.houseCost / 100) * 50), 250);
+    this.gameService.addingRemovingMoney('add', ((this.data.card.houseCost / 100) * 50), 1000);
     //this.gameService.players[this.gameService.turn].money += ((this.data.card.houseCost / 100) * 50);
   }
 
   addHotel(){
     //this.hotel = true;
     this.data.card.hotelCounter++;
-    this.gameService.addingRemovingMoney('remove', this.data.card.hotelCost, 250);
+    this.gameService.addingRemovingMoney('remove', this.data.card.hotelCost, 1000);
     //this.gameService.players[this.gameService.turn].money -= this.data.card.hotelCost;
   }
   removeHotel(){
     //this.hotel = false;
     this.data.card.hotelCounter--;
-    this.gameService.addingRemovingMoney('add', ((this.data.card.hotelCost / 100) * 50), 250);
+    this.gameService.addingRemovingMoney('add', ((this.data.card.hotelCost / 100) * 50), 1000);
     //this.gameService.players[this.gameService.turn].money += ((this.data.card.hotelCost / 100) * 50);
   }
   getContrastColor(bgColor:string) {
@@ -104,5 +106,9 @@ export class CardDialogComponent implements OnInit {
     if(this.completedSeriesCards[0]){
       return this.gameService.players.find(player => player.id === this.completedSeriesCards[0].owner).name;
     }
+  }
+
+  ngOnDestroy(){
+    this.soundService.playSound('open-card');
   }
 }

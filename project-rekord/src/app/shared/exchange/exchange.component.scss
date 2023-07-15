@@ -1,11 +1,13 @@
 #exchangeContainer{
+    padding: 20px;
     .exchangeTitle{
         width: 100%;
-        box-shadow: 0px 6px 9px -11px #000000;
-        padding: 20px;
+        //box-shadow: 0px 6px 9px -11px #000000;
+        //padding: 20px;
+        padding-bottom: 10px;
         h1{
             margin: 0;
-            font-size: 18px;
+            font-size: 14px;
         }
         .closeDialog{
             height: 40px;
@@ -15,13 +17,20 @@
             box-shadow: none;
         }
     }
+    hr.divider{
+        height: 1px;
+        background: #A8A8A8;
+        border: none;
+        margin: 0;
+        width: 100%;
+    }
     .choosePlayer{
         display: flex;
         justify-content: space-between;
         flex-wrap: wrap;
         width: 100%;
         .playersContainer{
-            padding: 20px;
+            //padding: 20px;
             height: 200px;
             display: flex;
             align-items: center;
@@ -41,8 +50,8 @@
         .exchangeProperties{
             display: flex;
             .playerContainer{
-                box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
-                padding: 15px;
+                //box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+                //padding: 15px;
                 .titleContainer{
                     width: 100%;
                     display: flex;
@@ -63,20 +72,49 @@
                         right: 0;
                     }
                     span{
-                        font-weight: bold;
+                        font-weight: 500;
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                    }
+                    .money{
                         margin-left: 10px;
                     }
                 }
 
                 .exchangeOptions{
                     margin-top: 20px;
+                    width: 100%;
+                    height: 100%;
+                    mat-form-field{
+                        width: 100%;
+                    }
+                    .playerProperties{
+                        max-height: 208px;
+                        overflow-y: auto;
+                        overflow-x: hidden;
+                        background: #eeeeee;
+                        border-radius: 5px;
+                        padding: 0px 10px;
+                        padding-bottom: 10px;
+                        height: 100%;
+
+                        &::-webkit-scrollbar {
+                            width: 5px;
+                        }
+
+                        &::-webkit-scrollbar-thumb {
+                            background: #c4c4c4;
+                            border-radius: 5px;
+                        }
+                    }
                 }
             }
         }
         
         
         .handshakeButton{
-            margin: 20px 0px;
+            //margin: 20px 0px;
             width: 200px;
             height: 50px;
             background: #7cb77c;
@@ -85,6 +123,16 @@
             transition: all 250ms ease;
             &[disabled="true"]{
                 filter: grayscale(1);
+            }
+        }
+
+        .goBackMessage{
+            font-size: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            &:hover{
+                text-decoration: underline;
             }
         }
     }
@@ -111,20 +159,46 @@
 
 @media screen and (max-width: 600px) {
     .exchangeContainer{
-        width: 290px;
-        padding: 20px;
+        width: 100%;
+        min-width: 290px;
+        //padding: 20px;
     }
     .exchangeProperties{
         flex-direction: column;
         align-items: start;
         justify-content: start;
         width: 100%;
+        padding: 10px 0px;
+        .divider{
+            height: 1px;
+            width: 100%;
+            background: #A8A8A8;
+            margin: 10px 0px;
+        }
         
         .playerContainer{
             width: 100%;
-            &:last-child{
-                margin-top: 20px;
+            padding: 10px 0px;
+
+            .titleContainer{
+                height: 30px;
+                .name{
+                    width: 60%;
+                }
+                .money{
+                    width: 20%;
+                    justify-content: end;
+                    margin-right: 30px;
+                }
+                .expandMore{
+                    width: 20%;
+                }
             }
+
+            .playerProperties{
+                width: 93%;
+            }
+
         }
     }
     .choosePlayer{
@@ -140,10 +214,23 @@
 @media screen and (min-width: 600px) {
     .exchangeProperties{
         width: 600px;
-        padding: 20px;
-        justify-content: space-evenly;
+        padding: 20px 0px;
+        justify-content: space-between;
+        .divider{
+            width: 1px;
+            background: #A8A8A8;
+        }
         .playerContainer{
             width: 45%;
+            .titleContainer{
+                .name{
+                    width: 70%;
+                }
+                .money{
+                    width: 30%;
+                    justify-content: end;
+                }
+            }
         }
     }
 

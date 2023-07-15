@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { collection, getFirestore, doc, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { collection, getFirestore, doc, getDoc, getDocs, setDoc, deleteDoc } from '@angular/fire/firestore';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import 'firebase/firestore';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Observable, Subject, switchMap, take, timer } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CardDialogComponent } from './shared/card-dialog/card-dialog.component';
 import { ExchangeComponent } from './shared/exchange/exchange.component';
 import * as uuid from 'uuid';
 import gsap from 'gsap'
 import { Vector3 } from 'three';
-import * as THREE from 'three';
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
-import { off } from 'process';
+import * as THREE from 'three';
+import { SoundService } from './sound.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,29 +40,48 @@ export class GameService {
     playerWhoWonId : '',
     localId: '',
   };
+  loading:boolean = false;
   localSaves:any = {};
   allLocalSaves:Array<any> = [];
   localSaveName:string = '';
   gamePaused:boolean=false;
   userDevice:string='';
   gameScene:any;
+
+  //Game Colors
   bgColors = [];
   sessionColor:string= '';
+  sessionTheme:any;
   players: Array<any> = [];
-  ambientLightColor:string='#ff8326'
+  themes: any;
+  debugSelectedTheme:string = '';
 
   choosenMode:string = '';
   db = getFirestore();
+  godData:any;
   chosenMap:string = 'monopolyMap';
 
   //Camera
   camera:any;
+  aspect = window.innerWidth / window.innerHeight;
+  distance:number = 15;
   cameraControls:any;
   cameraPosition: Vector3 | any;
-  movingCamera:boolean= false;
   movingPlayer:boolean = false;
+  enableMapControls:boolean = false;
+  cameraZoom:number = 1.2;
+  actualView:string = 'isometric';
 
-  setPlayerToCenter = true;
+  //Renderer
+  rendererOptions:any={
+    shadowMap:{
+    },
+    antialias: true,
+  }
+
+  // --- Game --- //
+
+  //GameTime
   beginTime:number = 0;
   endTime:number = 0;
   gameAmountTime:string = '';
@@ -76,50 +94,85 @@ export class GameService {
   pawnUrls:Array<any> = [];
   specialPawnTypes: any = [];
   specialPawn:String='';
+  randomChest:any;
+  randomChance:any;
+  turn:number= 0;
+  amountRent:number=0;
+  amountDebt:number=0;
+  setDebt:boolean = false;
+  
+  cardColorMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff});
+  cardBorderMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff , side : THREE.BackSide});
+  outlinePassResolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
+  playerShowingInfo:Array<string> = [];
+  visibleEdgeColor:THREE.Color = new THREE.Color('#000000');
+  hiddenEdgeColor:THREE.Color = new THREE.Color('#000000');
+  edgeGlow = 0.1;
+  edgeStrength = 20;
+  edgeThickness = 1;
+
+  debtWithWho:string='';
+  diceRes:Array<number> = [];
+
+  //Dice
   diceNumber:number|undefined;
   startToDice:boolean = false;
   playerWhoWonId:string = '';
   addingPlayerMoney:boolean=false;
   removingPlayerMoney:boolean=false;
   playerMoneyChangeValue:number= 0;
-  
 
+  //Subjects
   getCardPosition$ = new Subject();
   setPlayerPosition$ = new Subject();
   openTextDialog$ = new Subject();
+  shouldRemovePlayerCage$ = new Subject();
+  changeCardBorderColor$ = new Subject();
+  screenLoaded$ = new Subject();
+  showHidePlayerInfo$ = new Subject();
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
   exchangeRef: MatDialogRef<any> | undefined;
-  randomChest:any;
-  randomChance:any;
 
-  turn:number= 0;
-  amountRent:number=0;
-  amountDebt:number=0;
-  setDebt:boolean = false;
+  //Extra Options
+  debugMode:boolean = false;
+  godMode:boolean = false;
+  enableCursor:boolean = false;
+  disabledUserHoveringCard:boolean = false;
 
-  debtWithWho:string='';
-  diceRes:Array<number> = [];
+  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog, public soundService : SoundService) { }
 
-  setted:boolean=false;
-
-  constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog) { }
- 
   async retrieveDBData(){
     //const storage = getStorage();
 
+    //Debug God
+    const getInfo = doc(this.db, "god", 'debugGod');
+    this.godData = (await getDoc(getInfo)).data();
+
+    let localGodModeValue:any = localStorage.getItem("monopolyGodMode");
+    if(localStorage.getItem("monopolyGodMode") && JSON.parse(localGodModeValue)){
+      this.godMode = true;
+    }
+
     //Maps
-    const getMaps = await getDocs(collection(this.db, "gameTables"));
-    getMaps.forEach((doc) => {
-      this.gameMaps.push(doc.id)
-    });
+    await this.getGameMaps();
 
     //bgColors
     const getBgColors = doc(this.db, "colors", 'bgColors');
-    const colors = await (await getDoc(getBgColors)).data();
+
+
+    const colors = (await getDoc(getBgColors)).data();
     if(colors){
       this.bgColors = colors['colors'];
+    }
+
+
+    //Themes
+    const getThemes = doc(this.db, "colors", 'themes');
+    const themes = await (await getDoc(getThemes)).data();
+    if(themes){
+      this.themes = themes['themes'];
     }
 
     //PlayerModel
@@ -135,51 +188,72 @@ export class GameService {
         this.pawnUrls.push('/assets/blenderModels/pawns/' + pawn.value + '/scene.gltf')
     });
 
-    /*this.pawnTypes.forEach((pawn:any) => {
-      console.log(pawn.value)
-      getDownloadURL(ref(storage, 'projectRekord/assets/pawns/' + pawn.value + '/scene.gltf'))
-      .then((url) => {
-        if(url){
-          this.pawnModels.push(url)
-        }
-      })
-      .catch((error) => {
-        console.log("error ",error)
-      });
-      console.log("pawnModels ",this.pawnModels)
-    });*/
-    this.cameraPosition = new THREE.Vector3(-10,10,-10);
+    this.loading = false;
   }
 
-  chooseSessionColor(){
-    this.sessionColor = this.bgColors[Math.floor(Math.random()* this.bgColors.length)];
+  async getGameMaps(){
+    const getMaps = await getDocs(collection(this.db, "gameTables"));
+    this.gameMaps = [];
+    getMaps.forEach((doc) => {
+      this.gameMaps.push(doc.id)
+    });
   }
+
+  chooseSessionColor(index?:number){
+    this.sessionTheme = index !== undefined ? this.themes[index] : this.themes[Math.floor(Math.random() * this.themes.length)];
+    this.sessionColor = this.sessionTheme.background;
+    this.changeCardColor('card', this.sessionTheme.cardColor)
+    this.changeCardColor('border', this.sessionTheme.cardBorder)
+  }
+
+  addNewTheme(){
+    this.themes.push({
+      background : '#fdfd96',
+      cardColor : '#fff',
+      cardBorder : '#000',
+      new : true,
+    });
+    this.sessionTheme = this.themes[this.themes.length - 1];
+    this.debugSelectedTheme = 'Theme_' + (this.themes.length - 1);
+  }
+
   LightenDarkenColor(col:string,amt:number) {
     //Return a lighten / darken color based on the given color
-    var usePound = false;
-    if ( col[0] == "#" ) {
-        col = col.slice(1);
-        usePound = true;
+    let amount = amt;
+    let finalHex = '';
+
+    while(finalHex.length < 7){
+      var usePound = false;
+      if ( col[0] == "#" ) {
+          col = col.slice(1);
+          usePound = true;
+      }
+  
+      var num = parseInt(col,16);
+  
+      var r = (num >> 16) + amt;
+  
+      if ( r > 255 ) r = 255;
+      else if  (r < 0) r = 0;
+  
+      var b = ((num >> 8) & 0x00FF) + amt;
+  
+      if ( b > 255 ) b = 255;
+      else if  (b < 0) b = 0;
+  
+      var g = (num & 0x0000FF) + amt;
+  
+      if ( g > 255 ) g = 255;
+      else if  ( g < 0 ) g = 0;
+      finalHex = (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+
+      if(finalHex.length < 7){
+        amount--;
+      }
     }
 
-    var num = parseInt(col,16);
 
-    var r = (num >> 16) + amt;
-
-    if ( r > 255 ) r = 255;
-    else if  (r < 0) r = 0;
-
-    var b = ((num >> 8) & 0x00FF) + amt;
-
-    if ( b > 255 ) b = 255;
-    else if  (b < 0) b = 0;
-
-    var g = (num & 0x0000FF) + amt;
-
-    if ( g > 255 ) g = 255;
-    else if  ( g < 0 ) g = 0;
-
-    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+    return finalHex;
   }
 
   returnInclude(element:any, string:string){
@@ -188,7 +262,9 @@ export class GameService {
   goBackHome(){
     location.reload();
   }
-
+  switchRouter(url:string){
+    this.router.navigateByUrl(url, { skipLocationChange: true });
+  }
 
   retrieveSavesFromLocal(){
     let localStorageAllSaves = [];
@@ -223,101 +299,116 @@ export class GameService {
     newPlayer.money = 1500;
     newPlayer.pawn.choosenPawnLabel = type == 'normal'? this.pawnTypes[pawnIndex].name : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).name;
     newPlayer.pawn.choosenPawnValue =  type == 'normal'? this.pawnTypes[pawnIndex].value : this.specialPawnTypes.find((pawn: { value: String; }) => pawn.value == this.specialPawn).value;
-    switch (this.players.filter(player => player.id != newPlayer.id).length) {
-      case 0:
-        newPlayer.pawn.position = [0.5,0,0.5]
-        newPlayer.pawn.cardSection = 0;
-        break;
-      case 1:
-        newPlayer.pawn.position = [0.5,0,-0.5]
-        newPlayer.pawn.cardSection = 1;
-        break;
-      case 2:
-        newPlayer.pawn.position = [-0.5,0,-0.5]
-        newPlayer.pawn.cardSection = 2;
-        break;
-      case 3:
-        newPlayer.pawn.position = [-0.5,0,0.5]
-        newPlayer.pawn.cardSection = 3;
-        break;
-    
-      default:
-        newPlayer.pawn.position = [0,0,0]
-        break;
-    }
+    newPlayer.pawn.cardSection = this.players.filter(player => player.id != newPlayer.id).length;
+    newPlayer.pawn.position = [0,0,0]
     newPlayer.pawn.rotationSide = 0;
     newPlayer.canDice = false;
     newPlayer.actualCard = 0;
     this.players.push(newPlayer);
-    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1); 
+    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1);
     this.specialPawn= '';
   }
 
-  async setCameraPosition(camera:any,x:number, y:number,z:number, duration:number, offset?:number, playerMoving?:boolean, axis?:string) : Promise<any>{
-    //Move the game camere to a given position
-    let xOffset = offset;
-    let zOffset = offset;
-    //If the camera should follow the player then calculate the offset of the camera
-    if(xOffset != undefined && zOffset != undefined && playerMoving != undefined){
-      if(10 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 20){
-        xOffset+=0;
-      }else if(30 < this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 39){
-        xOffset-=10;
+  setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number, force?:boolean){
+    //Camera
+
+    if((this.userDevice.includes('phone') && this.actualView === 'isometric') || force){
+      if(cameraPosition){
+        gsap.fromTo(this.camera._objRef.position, {x: this.camera._objRef.position.x}, {x: cameraPosition[0], duration: duration/1000, onUpdate : () =>{
+          this.handlePlayerCardWhenSceneMoving();
+        }});
+        gsap.fromTo(this.camera._objRef.position, {y: this.camera._objRef.position.y}, {y: cameraPosition[1], duration: duration/1000});
+        gsap.fromTo(this.camera._objRef.position, {z: this.camera._objRef.position.z}, {z: cameraPosition[2], duration: duration/1000});
       }
-      if(20 < this.players[this.turn].actualCard && this.players[this.turn].actualCard < 30){
-        zOffset+=0;
-      }else if(0 <= this.players[this.turn].actualCard && this.players[this.turn].actualCard <= 10){
-        zOffset-=10;
+
+      //Camera Controls
+      if(cameraControlsPosition){
+        gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: cameraControlsPosition[0], duration: duration/1000});
+        gsap.fromTo(this.cameraControls._objRef.target, {y:this.cameraControls._objRef.target.y}, {y: cameraControlsPosition[1], duration: duration/1000});
+        gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: cameraControlsPosition[2], duration: duration/1000});
       }
     }
-    //If the camera should follow the player then, based on given axis, move the camera on that axis to the given position. Otherwise move the entire camera position at a time to that position
-   if(playerMoving){
-    if(axis){
-       if(axis == 'x'){
-        gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: xOffset ? (x + xOffset) : x, duration: 1000/1000});
-        gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: 1000/1000});
-       }else if(axis == 'z'){
-        gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: offset ? (y + offset) : y, duration: 1000/1000});
-        gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: zOffset ? (z + zOffset) : z, duration: 1000/1000});
-       }
+  }
+
+  setCameraOnPlayer(timeOutTimer:number){
+
+    if(this.userDevice.includes('phone')){
+      const playerCardIndex = this.players[this.turn].actualCard;
+      let numberToSumSub = 0;
+
+      if(playerCardIndex <= 10){
+        numberToSumSub = playerCardIndex;
+      } else if (playerCardIndex >= 10 && playerCardIndex <= 20){
+        numberToSumSub = 10 - (playerCardIndex - 10);
+      }else if (playerCardIndex >= 20 && playerCardIndex <= 30){
+        numberToSumSub = - (playerCardIndex - 20);
+      }else if (playerCardIndex >= 30 && playerCardIndex <= 39){
+        numberToSumSub = - (40 - playerCardIndex);
+      }
+
+      timer(timeOutTimer).pipe(take(1)).subscribe({
+        complete: () => {
+          this.setCameraPosition([(-10) + numberToSumSub , 10 , (-10) - numberToSumSub], [(8) + numberToSumSub, 0 , (8) - numberToSumSub], 1000)
+        }
+      })
     }
-   }else if(!playerMoving){
-    
-    this.movingCamera = true;
-    gsap.fromTo(camera._objRef.position, {x: camera._objRef.position.x}, {x: axis == 'diceRoll' ? x : (xOffset ? (x + xOffset) : x), duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {y: camera._objRef.position.y}, {y: axis == 'diceRoll' ? y : (offset ? (y + (offset/2)) : y), duration: duration/1000});
-    gsap.fromTo(camera._objRef.position, {z: camera._objRef.position.z}, {z: axis == 'diceRoll' ? z : (zOffset ? (z + zOffset) : z), duration: duration/1000});
-    setTimeout(() => {
-      this.movingCamera = false;
-     }, duration);
-   }
-   //Make the camera look at a target
-   gsap.fromTo(this.cameraControls._objRef.target, {x: this.cameraControls._objRef.target.x}, {x: axis == 'diceRoll' ? 0: x, duration: 1000/1000});
-   gsap.fromTo(this.cameraControls._objRef.target, {y: this.cameraControls._objRef.target.y}, {y: axis == 'diceRoll' ? 0: y, duration: 1000/1000});
-   gsap.fromTo(this.cameraControls._objRef.target, {z: this.cameraControls._objRef.target.z}, {z: axis == 'diceRoll' ? 0: z, duration: 1000/1000});
 
   }
 
+  setCameraZoom(value?:number){
+    gsap.fromTo( this.camera._objRef, 
+      {
+        zoom: this.camera._objRef.zoom,
+        onUpdate: () => {
+          this.camera._objRef.updateProjectionMatrix();
+        }
+      },
+      {
+        duration: 1,
+        zoom: value ?? this.cameraZoom,
+        onUpdate: () => {
+          this.camera._objRef.updateProjectionMatrix();
+        }
+    } );
+  }
+
   getCardPosition(cardIndex:any){
+    this.disabledUserHoveringCard = true;
     this.getCardPosition$.next(cardIndex);
+  }
+
+  changeCardColor(type:string, color:string){
+    if(type === 'card'){
+      this.cardColorMaterial = new THREE.MeshBasicMaterial({color :  color})
+    }else if(type === 'border'){
+      this.cardBorderMaterial = new THREE.MeshBasicMaterial({color : color , side : THREE.BackSide})
+    }
+  }
+
+  resizeCanvas(event:any, camera:any){
+    if(camera._objRef != undefined){
+     this.setCameraZoom();
+    }
+    this.aspect = event.width / event.height;
+    this.handlePlayerCardWhenSceneMoving();
   }
 
   setPlayerPosition(cardPosition:Array<number>, newCardNum:number){
     let oldCardPosition = JSON.parse(JSON.stringify((this.players[this.turn].actualCard)));
+    this.changeCardBorderColor$.next({type: 'hoverFromPlayerMoving',color: '#ffffff', newCardIndex:newCardNum})
     this.players[this.turn].actualCard = newCardNum;
     this.setPlayerPosition$.next({cardPosition, oldCardPosition});
   }
 
   async startGame(){
+    this.loading = true;
+    this.soundService.playAmbientMusic()
     if(this.localSaves == 'new'){
       this.beginTime = Date.now();
       const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
       this.gameTable  = (await getDoc(gameTableRef)).data();
       this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
       this.players[this.turn].canDice = true;
-      setTimeout(() => {
-        this.textDialog({text: this.players[this.turn].name + ' begins the game!'}, 'playerWhoBegins')
-      }, 1500);
     }else{
       this.gameTable = this.localSaves.gameTable;
       this.players = this.localSaves.players;
@@ -333,10 +424,10 @@ export class GameService {
       this.localSaveName = this.localSaves.localId;
       if(this.localSaves.playerWhoWonId){
         this.playerWhoWonId = this.localSaves.playerWhoWonId;
-        this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!'}, 'finishGame')
+        this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
       }
     }
-    this.router.navigateByUrl('game', { skipLocationChange: true });
+    this.switchRouter('game');
   }
 
   nextTurn(){
@@ -357,45 +448,13 @@ export class GameService {
         }
       }
     }
-    this.players[this.turn] = this.players[this.turn];
+    //this.players[this.turn] = this.players[this.turn];
+    this.textDialog({playerName: this.players[this.turn].name},'changeTurn');
+    this.setCameraOnPlayer(0);
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
-    
-    if(this.randomChance || this.randomChest){
-      this.randomChance = undefined;
-      this.randomChance = undefined;
-    }
-    this.setCameraPosition(this.camera, this.players[this.turn].pawn.position[0],this.players[this.turn].pawn.position[1],this.players[this.turn].pawn.position[2], 2500, 5, false);
-  }
-  
-  //OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
-  async rollTheDice(){
-    if(!this.players[this.turn].prison.inPrison){
-      this.startToDice = true;
-      /* this.diceRes = this.getDiceRoll();
-      if(this.diceRes[0]==this.diceRes[1]){
-        this.players[this.turn].prison.doubleDiceCounter++;
-        this.players[this.turn].canDice = true;
-      }else{
-        this.players[this.turn].prison.doubleDiceCounter=0;
-        this.players[this.turn].canDice = false;
-      }
-      this.diceNumber =( (this.diceRes[0] + this.diceRes[1]) + this.players[this.turn].actualCard);
-      if(this.diceNumber && this.diceNumber > (this.gameTable.cards.length - 1)){
-        this.diceNumber = 0 + (((this.diceRes[0] + this.diceRes[1])-((this.gameTable.cards.length - 1) - this.players[this.turn].actualCard)) - 1);
-      }*/
-      // this.getCardPosition(this.diceNumber)
-     
-    }else{
-     this.whatToDoInprison('prisonRoll')
-    }
-  }
 
-  getDiceRoll(){
-    //ADD doubleDiceCounter COLORING TO THE DICE
-    const dice1 = Math.round(Math.random() * (6 - 1) + 1);
-    const dice2 = Math.round(Math.random() * (6 - 1) + 1);
-    return [dice1,dice2];
+    this.resetChestChance();
   }
 
   payTaxes(property:any){
@@ -440,7 +499,7 @@ export class GameService {
         return property.rentCosts.normal;
       }
     }else if(property.cardType == 'station'){
-      const numOfStations = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'station').length; 
+      const numOfStations = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'station').length;
       switch(numOfStations){
         case 1:
           return property.rentCosts.one;
@@ -452,11 +511,12 @@ export class GameService {
           return property.rentCosts.four;
       }
     }else if(property.cardType == 'plant'){
+      const maxPlants = this.gameTable.cards.filter((prop: { cardType: any; }) => prop.cardType == 'plant').length;
       const numOfPlants = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'plant').length;
       switch(numOfPlants){
         case 1:
           return ((diceNumber[0] + diceNumber[1]) *4);
-        case 2:
+        case maxPlants:
           return ((diceNumber[0] + diceNumber[1]) * 10);
       }
     }
@@ -466,13 +526,17 @@ export class GameService {
     if(property.cardType == 'property' || property.cardType == 'station' || property.cardType == 'plant'){
       this.openCardDialog(this.gameTable.cards[this.players[this.turn].actualCard]);
       if(this.gameTable.cards[(this.players[this.turn].actualCard)].owner && this.gameTable.cards[(this.players[this.turn].actualCard)].owner!=this.players[this.turn].id && !this.gameTable.cards[(this.players[this.turn].actualCard)].distrained){
-        this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.players[this.turn].actualCard)],this.diceRes);
-        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney'); 
+        
+        if(this.diceNumber !== undefined || property.cardType == 'property' || property.cardType == 'station'){
+          this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.players[this.turn].actualCard)],this.diceRes);
+          this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner).name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney');
+        }
+      
       }
     }else if(property.cardType == 'goToPrison' || this.players[this.turn].prison.doubleDiceCounter == 3){
-      this.textDialog({text: this.players[this.turn].name + ' is going to prison.'}, 'goingToPrison');
+      this.textDialog({text: this.players[this.turn].name + ' have to go to prison.'}, 'goingToPrison');
     }else if(property.cardType == 'taxes'){
-      this.textDialog({text:this.players[this.turn].name + ' has payed ' + property.taxesCost + ' of taxes.', property, bankTaxes:true}, 'payMoney');
+      this.textDialog({text:this.players[this.turn].name + ' have to pay ' + property.taxesCost + ' of taxes.', property, bankTaxes:true}, 'payMoney');
     }else if(property.cardType == 'chance'){
       this.getChestChance('chance');
     }else if(property.cardType == 'communityChest'){
@@ -481,24 +545,33 @@ export class GameService {
   }
 
   addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
-    this.playerMoneyChangeValue = amount;
-    if(type=='add'){
-      player? player.addingMoney = true : this.players[this.turn].addingMoney = true;
-      player != undefined? player.money += amount : this.players[this.turn].money += amount;
-      setTimeout(() => {
-        player? player.addingMoney = false : this.players[this.turn].addingMoney = false;
-      }, duration);
+    new Observable((subscriber) => {
+      player ? this.showHidePlayerInfo$.next({type:'show', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'show', playerId: this.players[this.turn].id});
+      this.addingPlayerMoney = true;
+      this.playerMoneyChangeValue = amount;
+      if(type=='add'){
+        player? player.addingMoney = true : this.players[this.turn].addingMoney = true;
+        player != undefined? player.money += amount : this.players[this.turn].money += amount;
+      }else if(type=='remove'){
+        player? player.removingMoney = true : this.players[this.turn].removingMoney = true;
+        player != undefined? player.money -= amount : this.players[this.turn].money -= amount;
+      }
+      this.soundService.playSound('money')
+      subscriber.next(duration)
+    }).pipe(switchMap((data:any):any => {
+      return timer(data)
+    })).pipe(take(1)).subscribe({
+      next : (data) => {
+        if(type=='add'){
+          player? player.addingMoney = false : this.players[this.turn].addingMoney = false;
+        }else if(type=='remove'){
+          player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
+        }
+        player ? this.showHidePlayerInfo$.next({type:'hide', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'hide', playerId: this.players[this.turn].id});
+        this.addingPlayerMoney = false;
+      }
+    })
 
-    }else if(type=='remove'){
-      player? player.removingMoney = true : this.players[this.turn].removingMoney = true;
-      player != undefined? player.money -= amount : this.players[this.turn].money -= amount;
-      setTimeout(() => {
-        player? player.removingMoney = false : this.players[this.turn].removingMoney = false;
-      }, duration);
-    }
-    setTimeout(() => {
-      this.addingRemovingMoneyProps()
-    }, (duration + 500))
   }
 
   addingRemovingMoneyProps(){
@@ -517,7 +590,7 @@ export class GameService {
 
   //MANAGE PROPERTIES
   showPlayerProps(){
-    this.textDialog({text: this.players[this.turn].name, showPlayerProps:true}, 'showPlayerProps')
+    this.textDialog({text: this.players[this.turn].name, showPlayerProps:true, playerId: this.players[this.turn].id}, 'showPlayerProps')
   }
 
   buyProperty(property:any){
@@ -634,28 +707,12 @@ export class GameService {
 
   //EVENTS
   goToPrison(){
+    this.disabledUserHoveringCard = true;
     this.players[this.turn].prison.inPrison = true;
-    this.getCardPosition$.next(10);
+    const prisonIndex = this.gameTable.cards.findIndex((card: { cardType: string; }) => card.cardType === 'prison');
+    this.players[this.turn].prison.doubleDiceCounter = 0;
+    this.getCardPosition$.next(prisonIndex);
     this.players[this.turn].canDice=false;
-  }
-//OLD CODE --> UNUSED FUNCTION --> MOVED IN GAME.COMPONENT
-  whatToDoInprison(action:string){
-    if(action == 'payToExit'){
-      this.exitFromPrison(true, false);
-    }if(action == 'freeExit'){
-      this.exitFromPrison(false, false);
-    }else if(action == 'prisonRoll'){
-      const diceRes = this.getDiceRoll();
-      if(diceRes[0] == diceRes[1]){
-        this.exitFromPrison(false, true,diceRes[0],diceRes[1]);
-        
-      }else if(this.players[this.turn].prison.inPrisonTurnCounter == 2){
-        this.exitFromPrison(true, false,diceRes[0],diceRes[1]);
-      }else{
-        this.players[this.turn].prison.inPrisonTurnCounter++;
-        this.players[this.turn].canDice = false;
-      }
-    }
   }
 
   exitFromPrison(shouldPay:boolean, exitFromDice:boolean, dice1?:number, dice2?:number){
@@ -663,7 +720,7 @@ export class GameService {
       if(this.players[this.turn].money < 50){
         this.calculateAmountDebt(50);
       }else{
-        this.textDialog({text:this.players[this.turn].name + ' has payed ' + 50 +' and exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2, shouldPay, exitFromDice}, 'exitFromPrison');
+        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + 50 +' and then exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2, shouldPay, exitFromDice}, 'exitFromPrison');
       }
       this.players[this.turn].canDice=true;
     }else if(exitFromDice && dice1 && dice2){
@@ -672,6 +729,11 @@ export class GameService {
       this.textDialog({text:this.players[this.turn].name + ' exit from prison using free card.', actualPlayer: this.players[this.turn],shouldPay, exitFromDice}, 'exitFromPrison');
       this.players[this.turn].canDice=true;
     }
+    this.shouldRemovePlayerCage$.next({
+      playerId: this.players[this.turn].id,
+      oldCardPosition: this.players[this.turn].actualCard
+    })
+
     this.players[this.turn].prison.inPrison=false;
     this.players[this.turn].prison.doubleDiceCounter=0;
     this.players[this.turn].prison.inPrisonTurnCounter=0;
@@ -684,7 +746,7 @@ export class GameService {
   }
 
   //Find if a player has completed a completed series of the given card
-  checkCompletedSeries(properties:Array<any>){ //property:any,playerId:string
+  checkCompletedSeries(properties:Array<any>){
     const possibleDistricts:any = [];
     const foundCompleted:Array<any> = [];
     properties.forEach(property => {
@@ -710,7 +772,7 @@ export class GameService {
     this.openCompletedSeriesDialog(foundCompleted);
   }
 
-  //Get a chanche or communityChest card 
+  //Get a chanche or communityChest card
   getChestChance(cardType:string){
     if(cardType=='chance'){
       const randomNum = (Math.round(Math.random() * ( this.gameTable.chance.length - 1) ) + 0);
@@ -720,6 +782,13 @@ export class GameService {
       const randomNum = (Math.round(Math.random() * ( this.gameTable.communitychest.length - 1)) + 0)
       this.randomChest = this.gameTable.communitychest[randomNum]
       this.textDialog(this.randomChest,'communityChest');
+    }
+  }
+
+  resetChestChance(){
+    if(this.randomChance || this.randomChest){
+      this.randomChance = undefined;
+      this.randomChance = undefined;
     }
   }
 
@@ -758,6 +827,7 @@ export class GameService {
 
   goBankRupt(){
     this.players[this.turn].bankrupt = true;
+    this.showHidePlayerInfo$.next({type: 'show', playerId : JSON.parse(JSON.stringify(this.players[this.turn].id))})
     this.checkIfSomeoneWon();
   }
 
@@ -767,7 +837,7 @@ export class GameService {
       this.endTime = Date.now();
       this.playerWhoWonId = this.players.find(player => !player.bankrupt).id;
       this.calculateGameTime()
-      this.textDialog({text: this.players.find(player => !player.bankrupt).name + ' has won the game!', playerWhoWonId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
+      this.textDialog({text: this.players.find(player => !player.bankrupt).name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
     }else{
       await this.gameTable.cards.filter((card:any) => card.owner == this.players[this.turn].id).forEach((foundCard:any) => {
         foundCard.owner = '';
@@ -778,7 +848,7 @@ export class GameService {
             foundCard.hotelCounter = 0;
           }
         }
-       
+
       });
       this.nextTurn()
     }
@@ -790,7 +860,7 @@ export class GameService {
     seconds = seconds % 3600;
     var minutes = Math.round(( seconds / 60 )); // 60 seconds in 1 minute
     seconds = Math.round(seconds % 60);
-    this.gameAmountTime = hours + ' : ' + minutes + ' : ' + seconds;
+    this.gameAmountTime = hours + 'h : ' + minutes + 'm : ' + seconds + 's';
   }
 
   //Calculate the amount of debt that a player have to pay to continue playing
@@ -825,390 +895,72 @@ export class GameService {
     }
   }
 
-  test(number?:number){
-    if(number !== undefined){
-      this.randomChance = {
-        title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-        action: "move",
-        tileid: "trafalgarsquare",
-        cardIndex: number
-      };
-       this.textDialog({
-       title: "Advance to Trafalgar Square - If you pass Go, collect $200",
-       action: "move",
-       tileid: "trafalgarsquare",
-       cardIndex: number
-       },'chance');
-
-    }else{
-
-      this.randomChance = {
-        title: "Advance to Go (Collect $200)",
-        action: "move",
-        tileid: "go",
-        cardIndex: 0
-      };
-  
-      this.textDialog( this.randomChance,'chance');
-    }
-
+  getContrastColor(bgColor:string) {
+    var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+    var r = parseInt(color.substring(0, 2), 16); // hexToR
+    var g = parseInt(color.substring(2, 4), 16); // hexToG
+    var b = parseInt(color.substring(4, 6), 16); // hexToB
+    return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ?
+    '#000' : '#fff';
   }
-  
-  /////////////////DELETE
-  async setDB(){
-    let cardsData = [];
-    for (let index = 0; index < 40; index++) {
 
-      //NORMAL PROPERTIES
-      if(index != 0 && index !=2 && index != 4 && index != 5 && index != 7 && index != 10 &&
-        index != 12 &&index != 15 &&index != 17 &&index != 20 && index != 22 &&index != 25 &&index != 28 &&
-        index != 30 &&index != 33 &&index != 35 &&index != 36 && index != 38){
-          cardsData.push({
-            canBuy: true,
-            cost: 50,
-            distrained: false,
-            distrainedCost: 60,
-            name: '',
-            owner: '',
-            cardType:'property',
-            exchangeSelected: false,
-            completedSeries: false,
-            district:'',
-            rentCosts : {
-              normal: 10,
-              completedSeriesBasic: 20,
-              one: 30,
-              two: 80,
-              three: 120,
-              four: 200,
-              hotel: 350
-            },
-            housesCounter:0,
-            hotelCounter:0,
-            houseCost:50,
-            hotelCost:50,
-          })
-      }else if(index == 7 || index == 22 || index == 36){//CHANCE
-        cardsData.push({
-          canBuy: false,
-          distrained: false,
-          name: "Chance",
-          cardType:'chance',
-          chances : [
+  getObjectScreenPosition(object:any){
+    const objectPosition = new THREE.Vector3();
+    objectPosition.setFromMatrixPosition(object._objRef.matrixWorld);
+    objectPosition.project(this.camera._objRef)
 
-          ],
-        })
-      }else if(index == 2 || index == 17 || index == 33){//CHESTS
-        cardsData.push({
-          canBuy: false,
-          name: "Community Chest",
-          cardType:'communityChest',
-          chests : [
-            
-          ],
-        })
-      }else if(index == 30){//GO TO PRISON
-        cardsData.push({
-          canBuy: false,
-          name: "Prison",
-          cardType:'goToPrison',
-        })
-      }else if(index == 20){//PARKING AREA
-        cardsData.push({
-          canBuy: false,
-          name: "Parking Area",
-          cardType:'parkArea',
-        })
-      }else if(index == 4 || index == 38){//TAXES
-        cardsData.push({
-          canBuy: false,
-          name: "Taxes",
-          cardType:'taxes',
-          taxesCost: 100,
-        })
-      }else if(index == 5 || index == 15 ||  index == 25 || index == 35){//STATIONS
-        cardsData.push({
-          canBuy: true,
-          cost: 200,
-          distrained: false,
-          distrainedCost: 60,
-          name: "Train Station",
-          owner: "",
-          cardType:'station',
-          district:'station',
-          exchangeSelected: false,
-          completedSeries: false,
-          rentCosts : {
-            one: 50,
-            two: 100,
-            three: 150,
-            four: 200,
-          },
-          //numOfStations:0
-        })
-      }else if(index == 10){//PRISON
-        cardsData.push({
-          canBuy: false,
-          name: "Prison Area",
-          cardType:'prison',
-        })
-      }else if(index == 12 || index == 28){//PLANT
-        cardsData.push({
-          canBuy: true,
-          cost: 150,
-          distrained: false,
-          distrainedCost: 60,
-          name: "",
-          owner: "",
-          cardType:'plant',
-          district:'plant',
-          exchangeSelected: false,
-          completedSeries: false,
-          //numOfPlants:0
-        })
-      }else if(index == 0){//START
-        cardsData.push({
-          canBuy: false,
-          name: "Start",
-          cardType:'start',
-          reward: 200,
-        })
-      }
+    let canvasElement:any = document.querySelector('canvas[id*="rendererCanvas"]');
+
+    if(canvasElement){
+
+      const left = (objectPosition.x + 1) * canvasElement.offsetWidth / 2;
+      const top = (-objectPosition.y + 1) * canvasElement.offsetHeight / 2;
+      
+      return [ top , left]
     }
-//DistrictName
-    cardsData[1].district = '#663300';
-    cardsData[3].district = '#663300';
-    cardsData[1].name = 'Old Kent Road';
-    cardsData[3].name = 'Whitechapel Road';
+    return [];
+  }
 
-    cardsData[6].district = '#0099CC';
-    cardsData[8].district = '#0099CC';
-    cardsData[9].district = '#0099CC';
-    cardsData[6].name = 'The Angel Islington';
-    cardsData[8].name = 'Euston Road';
-    cardsData[9].name = 'Pentonville Road';
-
-    cardsData[11].district = '#FF3399';
-    cardsData[13].district = '#FF3399';
-    cardsData[14].district = '#FF3399';
-    cardsData[11].name = 'Pall Mall';
-    cardsData[13].name = 'Whitehall';
-    cardsData[14].name = 'Northumberland Avenue';
-
-    cardsData[16].district = '#FF9933';
-    cardsData[18].district = '#FF9933';
-    cardsData[19].district = '#FF9933';
-    cardsData[16].name = 'Bow Street';
-    cardsData[18].name = 'Marlborough Street';
-    cardsData[19].name = 'Vine Street';
-
-    cardsData[21].district = '#FF3300';
-    cardsData[23].district = '#FF3300';
-    cardsData[24].district = '#FF3300';
-    cardsData[21].name = 'The Strand';
-    cardsData[23].name = 'Fleet Street';
-    cardsData[24].name = 'Trafalgar Square';
-
-    cardsData[26].district = '#FFFF33';
-    cardsData[27].district = '#FFFF33';
-    cardsData[29].district = '#FFFF33';
-    cardsData[26].name = 'Leicester Square';
-    cardsData[27].name = 'Coventry Street';
-    cardsData[29].name = 'Piccadilli';
-    
-    cardsData[31].district = '#339933';
-    cardsData[32].district = '#339933';
-    cardsData[34].district = '#339933';
-    cardsData[31].name = 'Regent Street';
-    cardsData[32].name = 'Oxford Street';
-    cardsData[34].name = 'Bond Street';
-
-    cardsData[37].district = '#000066';
-    cardsData[39].district = '#000066';
-    cardsData[37].name = 'Park Lan';
-    cardsData[39].name = 'Mayfair';
-
-    cardsData[12].name = 'Electric Company';
-    cardsData[28].name = 'Water Works';
-
-    cardsData[5].name = 'King Cross Station';
-    cardsData[15].name = 'Marylebone Station';
-    cardsData[25].name = 'Fenchurch St Station';
-    cardsData[35].name = 'Liverpool Street Station';
-
-
-    
-    let chance= [
-    {
-      "title": "Advance to Go (Collect $200)",
-      "action": "move",
-      "tileid": "go",
-      "cardIndex": 0
-    },
-    {
-      "title": "Advance to Trafalgar Square - If you pass Go, collect $200",
-      "action": "move",
-      "tileid": "trafalgarsquare",
-      "cardIndex": 24
-    },
-    {
-      "title": "Advance to Pall Mall - If you pass Go, collect $200",
-      "action": "move",
-      "tileid": "pallmall",
-      "cardIndex": 11
-    },
-    {
-      "title": "Advance token to nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total ten times the amount thrown.",
-      "action": "movenearest",
-      "groupid": "plant",
-      "rentmultiplier": 10,
-    },
-    {
-      "title": "Advance token to the nearest Railroad and pay owner twice the rental to which he/she is otherwise entitled. If Railroad is unowned, you may buy it from the Bank.",
-      "action": "movenearest",
-      "groupid": "station",
-      "rentmultiplier": 2,
-    },
-    {
-      "title": "Bank pays you dividend of $50",
-      "action": "addfunds",
-      "amount": 50
-    },
-    {
-      "title": "Get out of Jail Free - This card may be kept until needed, or traded/sold",
-      "action": "jail",
-      "subaction": "getout"
-    },
-    {
-      "title": "Go Back 3 Spaces",
-      "action": "move",
-      "count": -3
-    },
-    {
-      "title": "Go to Jail - Go directly to Jail - Do not pass Go, do not collect $200",
-      "action": "jail",
-      "subaction": "goto"
-    },
-    {
-      "title": "Make general repairs on all your property - For each house pay $25 - For each hotel $100",
-      "action": "propertycharges",
-      "houses": 25,
-      "hotels": 100
-    },
-    {
-      "title": "Pay poor tax of $15",
-      "action": "removefunds",
-      "amount": 15
-    },
-    {
-      "title": "Take a trip to King Cross Station - If you pass Go, collect $200",
-      "action": "move",
-      "tileid": "kingcrossstation",
-      "cardIndex": 5
-    },
-    {
-      "title": "Take a walk on the Mayfair - Advance token to Boardwalk",
-      "action": "move",
-      "tileid": "mayfair",
-      "cardIndex": 39
-    },
-    {
-      "title": "You have been elected Chairman of the Board - Pay each player $50",
-      "action": "removefundstoplayers",
-      "amount": 50
-    },
-    {
-      "title": "Your building loan matures - Collect $150",
-      "action": "addfunds",
-      "amount": 50
+  handlePlayerCardWhenSceneMoving(){
+    if(!this.loading){
+      this.playerShowingInfo.forEach(playerId => {
+        this.showHidePlayerInfo$.next({type : 'onlySetPosition', playerId : playerId});
+      });
     }
-  ]
-    let communitychest = [
-    {
-      "title": "Advance to Go (Collect $200)",
-      "action": "move",
-      "tileid": "go",
-      "cardIndex": 0
-    },
-    {
-      "title": "Bank error in your favor - Collect $200 ",
-      "action": "addfunds",
-      "amount": 200
-    },
-    {
-      "title": "Doctor fee - Pay $50",
-      "action": "removefunds",
-      "amount": 50
-    },
-    {
-      "title": "From sale of stock you get $50",
-      "action": "addfunds",
-      "amount": 50
-    },
-    {
-      "title": "Get Out of Jail Free",
-      "action": "jail",
-      "subaction": "getout"
-    },
-    {
-      "title": "Go to Jail - Go directly to jail - Do not pass Go - Do not collect $200",
-      "action": "jail",
-      "subaction": "goto"
-    },
-    {
-      "title": "Grand Opera Night - Collect $50 from every player for opening night seats",
-      "action": "addfundsfromplayers",
-      "amount": 50
-    },
-    {
-      "title": "Holiday Fund matures - Receive $100",
-      "action": "addfunds",
-      "amount": 100
-    },
-    {
-      "title": "Income tax refund - Collect $20",
-      "action": "addfunds",
-      "amount": 20
-    },
-    {
-      "title": "Life insurance matures - Collect $100",
-      "action": "addfunds",
-      "amount": 100
-    },
-    {
-      "title": "Pay hospital fees of $100",
-      "action": "removefunds",
-      "amount": 100
-    },
-    {
-      "title": "Pay school fees of $150",
-      "action": "removefunds",
-      "amount": 150
-    },
-    {
-      "title": "Receive $25 consultancy fee",
-      "action": "addfunds",
-      "amount": 25
-    },
-    {
-      "title": "You are assessed for street repairs - $40 per house - $115 per hotel",
-      "action": "propertycharges",
-      "houses": 40,
-      "hotels": 115
-    },
-    {
-      "title": "You have won second prize in a beauty contest - Collect $10",
-      "action": "addfunds",
-      "amount": 10
-    },
-    {
-      "title": "You inherit $100",
-      "action": "addfunds",
-      "amount": 100
-    }
-  ]
+  }
 
+  test(){
+    const numOfCells = -10
+    this.randomChance = {
+      action: "move",
+      count: numOfCells,
+      title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
+    };
+    //this.randomChance = this.gameTable.chance[8]
 
-    await setDoc(doc(this.db, "gameTables", "monopolyMap"), {cards: cardsData, chance: chance,communitychest: communitychest});
+    // this.randomChance = {
+    //   action: "jail",
+    //   subaction: 'goto',
+    //   title: 'Go To Prison '
+    // };
+
+    this.textDialog(this.randomChance,'chance');
+  }
+
+  //Database Management
+
+  async setThemesDb(themes:any){
+    this.themes.filter((theme:any) => theme.new).forEach((theme:any) => {
+      delete theme.new
+    });
+    setDoc(doc(this.db, "colors", "themes"), {themes});
+  }
+
+  async saveMapToDb(mapName:string,gameTable:any){
+    setDoc(doc(this.db, "gameTables", mapName), gameTable);
+  }
+
+  async deleteMapFromDb(mapName:string){
+    deleteDoc(doc(this.db, "gameTables", mapName));
   }
 }

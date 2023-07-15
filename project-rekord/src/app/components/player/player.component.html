@@ -2,6 +2,28 @@
     loadGLTF
     [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '/scene.gltf'"
     [scale]="player.pawn.scale"
+    (onMouseEnter)="player.bankrupt ? '' : showPlayerInfo('show')"
+    (onMouseExit)="player.bankrupt ? '' :  showPlayerInfo('hide')"
     #playerRef
+>
+</th-object3D>
+
+<th-object3D
+    loadGLTF
+    [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '/scene.gltf'"
+    [scale]="[0.053,0.053, 0.053]"
+    [name]="'player_outline'"
+    (onLoaded)="setOutline();rotatePlayer(player.pawn.rotation[1], false);calcPlayerPosInCard(this.player.pawn.cardSection);setPlayerPosition([this.player.pawn.position[0] + this.inCardPosition[0], this.player.pawn.position[1] + this.inCardPosition[1] , this.player.pawn.position[2] + this.inCardPosition[2]], true)"
+    #playerRefOutline
+>
+</th-object3D>
+
+
+<th-object3D
+[position]="cagePosition"
+[scale]="[0,0,0]"
+loadGLTF
+[url]="'/assets/blenderModels/card/definitiveCard/prisonCage.gltf'"
+#cageRef
 >
 </th-object3D>

@@ -1,0 +1,86 @@
+<div class="theme-editor" [ngStyle]="{'background': gameService.sessionTheme.background}">
+
+    <button class="theme-editor__go-home" mat-raised-button (click)="gameService.switchRouter('home')"> <mat-icon> arrow_back </mat-icon> Home</button>
+
+    <div class="theme-editor__container">
+        <mat-card class="theme-editor__container__background" *ngFor="let theme of gameService.themes" [ngStyle]="{'background' : theme.background}" (click)="editTheme(theme)">
+            <div class="theme-editor__container__background__cardColor" [ngStyle]="{'background' : theme.cardColor, 'border-color ': theme.cardBorder}">
+    
+            </div>
+        </mat-card>
+
+        <button mat-raised-button class="theme-editor__container__add-new" fxLayoutAlign="center center" (click)="gameService.addNewTheme()">
+            <mat-icon>add</mat-icon>
+        </button>
+
+        <button mat-raised-button class="theme-editor__container__save-themes" fxLayoutAlign="center center" (click)="openSaveDialog()">
+            <mat-icon>save</mat-icon>
+        </button>
+    </div>
+</div>
+
+
+
+<ng-template #themeDialogRef>
+
+    <div class="editing-container">
+        
+        <mat-card class="editing-container__background" fxLayoutAlign="center center" [ngStyle]="{'background' : clickedTheme.background}">
+
+            <div class="editing-container__background__card-color" [ngStyle]="{'background' : clickedTheme.cardColor, 'border-color ': clickedTheme.cardBorder}">
+
+            </div>
+
+        </mat-card>
+
+
+        <div class="editing-container__input-container" fxLayout="column">
+            <mat-form-field>
+                <mat-label>Background Color</mat-label>
+                <div class="input-container__input_wrapper" fxLayout="row">
+                    <input matInput type="text" [(ngModel)]="clickedTheme.background">
+                    <input matInput type="color" [(ngModel)]="clickedTheme.background">
+                </div>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Card Color</mat-label>
+                <div class="input-container__input_wrapper" fxLayout="row">
+                    <input matInput type="text" [(ngModel)]="clickedTheme.cardColor">
+                    <input matInput type="color" [(ngModel)]="clickedTheme.cardColor">
+                </div>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Border Color</mat-label>
+                <div class="input-container__input_wrapper" fxLayout="row">
+                    <input matInput type="text" [(ngModel)]="clickedTheme.cardBorder">
+                    <input matInput type="color" [(ngModel)]="clickedTheme.cardBorder">
+                </div>
+            </mat-form-field>
+
+
+            <button mat-raised-button color="warn" (click)="deleteTheme(clickedTheme)"> Delete Theme </button>
+
+        </div>
+
+    </div>
+
+</ng-template>
+
+<ng-template #saveThemesRef>
+
+    <div class="save-container" fxLayout="column">
+
+        <span class="save-container__title">You are going to overwrite all the themes, are you sure ?</span>
+
+        <div fxLayout="row" class="save-container__buttons-container" fxLayoutAlign="space-around center">
+
+            <button mat-raised-button color="warn" (click)="saveAllThemes()"> Yes</button>
+            <button mat-raised-button (click)="closeDialog()"> No</button>
+
+        </div>
+
+   </div>
+
+</ng-template>

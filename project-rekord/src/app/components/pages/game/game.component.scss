@@ -1,0 +1,350 @@
+#gameContainer{
+    width: 100%;
+    height: 100%;
+    &.paused{
+        filter: blur(5px);
+    }
+    &.hoveringCard{
+        cursor: pointer;
+    }
+    #gameCanvas{
+        width: 100%;
+        height: 100%;
+    }
+    #playersContainer{
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        overflow: hidden;
+        .playerCard{
+            position: absolute;
+            font-size: 12px;
+            transition: width 250ms ease;
+            &:not(.show){
+                animation: reverseScaleAnim 0.3s ease;
+                opacity: 0;
+                pointer-events: none;
+            }
+            &.show{
+                opacity: 1;
+                pointer-events: all;
+                animation: scaleAnim 0.3s ease;
+                z-index: 2;
+            }
+            .infoContaner{
+                width: 100%;
+            }
+            &.bankrupt{
+                &:not(.show){
+                    opacity: 0;
+                }
+                background: #c73b2f;
+                opacity: 0.7;
+                pointer-events: none!important;
+                .infoContaner{
+                    color: #fff;
+                }
+                z-index: 1;
+            }
+            .actualTurnPlayer{
+                position: absolute;
+                left: -32px;
+                height: 30px;
+                width: 30px;
+                background: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+            }
+
+            #passedStart{
+                position: absolute;
+                opacity: 1;
+                right: -55px;
+                max-width: 80px;
+                transition: all 250ms ease;
+                font-weight: bold;
+                color: green;
+                background: #fff;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+        }
+    }
+    #gameButtons{
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        pointer-events: none;
+        padding: 10px;
+        background: #ffffff08;
+        button{
+            pointer-events: all;
+            .title{
+                font-weight: bold;
+            }
+
+            &[disabled="true"] mat-icon.info{
+                background:unset;
+            }
+
+
+            &#bankRupt{
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:after{
+                    content: '';
+                    background: #fff;
+                    position: absolute;
+                    transform: rotate(-45deg);
+                }
+                &[disabled="true"]{
+                    &:after{
+                        opacity: 0.5;
+                    }
+                }
+            }
+        }
+    }
+
+    .left-side-btns{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        #pauseBtn{
+            z-index: 1;
+        }
+        &-isometric, &-top-down{
+            svg{
+                height: 30px;
+                width: 30px;
+            }
+            &[disabled]{
+                svg #icon > g{
+                    fill: #00000042;
+                }
+            }
+        }
+        &-isometric{
+            #icon{
+                transform: scale(0.3);
+            }
+        }
+    
+        &-top-down{
+            svg{
+                transform: rotate(45deg);
+            }
+            #icon{
+                transform: scale(0.3);
+            }
+        }
+    }
+}
+
+.actualPlayerProperty{
+    position: relative;
+    .districtColor{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 5px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #playersContainer{
+        height: -webkit-fill-available;
+        flex-wrap: wrap;
+        height: 390px;
+        .playerCard{
+            padding: 10px 0px!important;
+            //width: 100px!important;
+            padding: 5px 10px !important;
+            .actualTurnPlayer{
+                text-indent: 0px;
+            }
+            .name{
+                max-width: 90px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .money{
+                margin-left: 10px;
+            }
+        }
+    }
+
+    #gameButtons{
+        button{
+            .title{
+                display: none;
+            }
+            height: 45px;
+            &#seeProperties{
+                mat-icon.info{
+                    position: absolute;
+                    top: 20px;
+                    right: 8px;
+                    background: #fff;
+                    border-radius: 50%;
+                    font-size: 18px;
+                    height: 18px;
+                    width: 18px;
+                    margin: 0;
+                }
+            }
+
+            &#bankRupt{
+                &:after{
+                    width: 2px;
+                    height: 65%;
+                }
+            }
+        }
+    }
+   
+
+    #debugger{
+        height: -webkit-fill-available;
+    }
+
+}
+
+@media screen and (min-width: 600px) {
+    #playersContainer{
+        height: 100%;
+        .playerCard{
+            //width: 160px;
+            padding: 5px 10px !important;
+            .name, .money{
+                height: 25px;
+                display: flex;
+                align-items: center;
+            }
+            .money{
+                margin-left: 10px;
+            }
+        }
+    }
+
+    #gameButtons{
+        button{
+            height: 50px;
+            &#seeProperties{
+                mat-icon.info{
+                    position: absolute;
+                    top: 20px;
+                    right: 8px;
+                    background: #fff;
+                    border-radius: 50%;
+                    font-size: 18px;
+                    height: 18px;
+                    width: 18px;
+                    margin: 0;
+                }
+            }
+
+            &#bankRupt{
+                &:after{
+                    width: 2px;
+                    height: 50%;
+                }
+            }
+
+            &:not(#bankRupt) mat-icon{
+                margin-left: 5px;
+            }
+        }
+    }
+}
+
+#debugger{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: auto;
+    height: 100vh;
+    padding: 0px 10px;
+    background-color: #fdfd96;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    overflow-y: scroll;
+    .title{
+        font-size: 16px;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin: 10px 0px;
+    }
+    .theme{
+        margin-top: 20px;
+        mat-form-field{
+            display: flex;
+            input[type="color"]{
+                width: 25px;
+                height: 25px;
+            }
+        }
+    }
+    .camera{
+        margin-top: 20px;
+    }
+}
+
+.pausedGame{
+    width: 100%;
+    height: 100%;
+    background: rgba(218, 217, 217, 0.493);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    button{
+        margin-top: 30px;
+        width: 300px;
+        height: 50px;
+        &#debugButton{
+            background: #fdfd96;
+        }
+    }
+}
+
+@keyframes scaleAnim {
+    0%{
+        opacity: 0;
+        transform: scale(0);
+    }
+    50%{
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100%{
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes reverseScaleAnim {
+    0%{
+        opacity: 1;
+        transform: scale(1);
+    }
+    50%{
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100%{
+       
+        opacity: 0;
+        transform: scale(0);
+    }
+}

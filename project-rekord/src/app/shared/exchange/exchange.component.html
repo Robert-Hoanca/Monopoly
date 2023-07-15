@@ -3,6 +3,7 @@
         <h1>Exchange Properties</h1>
         <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
     </div>
+    <hr class="divider">
     <div *ngIf="!playerToExchangeWith" class="choosePlayer">
         <!-- <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button> -->
        <div [ngClass]="['playersContainer', getPlayersToExchangeWith().length === 1 ? 'solo' : 'multi']">
@@ -16,38 +17,48 @@
         <div class="exchangeProperties">
             <div fxLayout="column" fxLayoutAlign="start center" class="playerContainer">
                 <div class="titleContainer" fxLayoutAlign="start center">
-                    <span>{{gameService.players[gameService.turn].name}}</span>
+                    <span class="name">{{gameService.players[gameService.turn].name}}</span>
+
+                    <span class="money">{{gameService.players[gameService.turn].money}}$</span>
 
                     <button mat-icon-button class="expandMore" *ngIf="!gameService.userDevice.includes('computer')" (click)="changeActualExpanded(gameService.players[gameService.turn].id)" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center">{{actualExpanded == gameService.players[gameService.turn].id? 'expand_less' : 'expand_more'}}</mat-icon></button>
                 </div>
               <div class="exchangeOptions" [@mmAnimationGrowHeight] *ngIf="(actualExpanded == gameService.players[gameService.turn].id) || gameService.userDevice.includes('computer')" fxLayout="column" fxLayoutAlign="start center">
                 <mat-form-field appearance="fill">
                     <mat-label>Amount of Money</mat-label>
-                    <input matInput type="number" [(ngModel)]="moneyToExchange[0]">
+                    <input matInput type="number" [(ngModel)]="moneyToExchange[0]" [min]="0" [max]="gameService.players[gameService.turn].money">
                 </mat-form-field>
-                <app-player-properties [playerId]="gameService.players[gameService.turn].id" [imInExchange]="true"></app-player-properties>
+                <div class="playerProperties" *ngIf="actualPlayerProps.length">
+                    <app-player-properties [playerId]="gameService.players[gameService.turn].id" [imInExchange]="true"></app-player-properties>
+                </div>
               </div>
             </div>
 
-    
+            <div class="divider"></div>
+
             <div fxLayout="column" fxLayoutAlign="start center"  class="playerContainer">
                 <div class="titleContainer" fxLayoutAlign="start center">
-                    <button mat-icon-button fxLayoutAlign="center center" (click)="goBackToSelection()" class="exchangeGoBackBtn" [matTooltipPosition]="'above'" matTooltip="Change Player"><mat-icon fxLayoutAlign="center center">arrow_back</mat-icon></button>
-                    <span>{{playerToExchangeWith.name}}</span>
-
+                    <!-- <button mat-icon-button fxLayoutAlign="center center" (click)="goBackToSelection()" class="exchangeGoBackBtn" [matTooltipPosition]="'above'" matTooltip="Change Player"><mat-icon fxLayoutAlign="center center">arrow_back</mat-icon></button> -->
+                    <span class="name">{{playerToExchangeWith.name}}</span>
+                    <span class="money">{{playerToExchangeWith.money}}$</span>
                     <button mat-icon-button class="expandMore" *ngIf="!gameService.userDevice.includes('computer')" (click)="changeActualExpanded(playerToExchangeWith.id)" fxLayoutAlign="center center"><mat-icon fxLayoutAlign="center center">{{actualExpanded == playerToExchangeWith.id? 'expand_less' : 'expand_more'}}</mat-icon></button>
                 </div>
               <div  class="exchangeOptions" *ngIf="(actualExpanded == playerToExchangeWith.id) || gameService.userDevice.includes('computer')" [@mmAnimationGrowHeight] fxLayout="column" fxLayoutAlign="start center">
                 <mat-form-field appearance="fill">
                     <mat-label>Amount of Money</mat-label>
-                    <input matInput type="number" [(ngModel)]="moneyToExchange[1]">
+                    <input matInput type="number" [(ngModel)]="moneyToExchange[1]" [min]="0" [max]="playerToExchangeWith.money">
                 </mat-form-field>
-                <app-player-properties [playerId]="playerToExchangeWith.id" [imInExchange]="true"></app-player-properties>
+                <div class="playerProperties" *ngIf="playerToExchangeProps.length">
+                    <app-player-properties [playerId]="playerToExchangeWith.id" [imInExchange]="true"></app-player-properties>
+                </div>
               </div>
                
             </div>
         </div>
         <button mat-raised-button (click)="startExchange = true" class="handshakeButton" [matTooltipPosition]="'above'" matTooltip="Finalise Exchange" [disabled]="checkIfCanExchange()"> <mat-icon>handshake</mat-icon> </button>
+        <span class="goBackMessage" (click)="goBackToSelection()">
+            Go Back To Selection
+        </span>
         
     </div>
 

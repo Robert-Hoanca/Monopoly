@@ -1,0 +1,88 @@
+<div class="home" (click)="goToChooseModeView()" [ngStyle]="{'background-color': returnSessionBg(), 'color' : returnSessionColor()}" fxLayout="column" fxLayoutAlign="center center"> <!--(click)="goToChooseModeView()"-->
+    
+    <div class="home__ui-container" fxLayout="column" fxLayoutAlign="center center">
+        <h1 class="home__ui-container__title" (click)="$event.stopPropagation()" fxLayoutAlign="center center" fxLayout="column" [ngStyle]="{'color' : gameService.sessionTheme.cardColor}">
+            Monopoly  
+            <!-- <span>Js Edition</span> -->
+        </h1>
+
+
+        <div *ngIf="choosingMode" class="chooseModeContainer" fxLayoutAlign="center center">
+            <button mat-raised-button @AnimationScale (click)="chooseMode('local')" fxLayoutAlign="center center"><span>Local</span><img src="./../../../assets/icons/chooseMode/person.svg" alt=""></button>
+            <button mat-raised-button @AnimationScale (click)="chooseMode('online')" [disabled]="true" fxLayoutAlign="center center"> <span>Online</span><img src="./../../../assets/icons/chooseMode/groups.svg" alt=""></button>
+        </div>
+
+    
+        <span class="playText" *ngIf="!choosingMode" [ngStyle]="{'color' : gameService.sessionTheme.cardColor}">PLAY</span>
+
+        <span class="rightsSection" [ngStyle]="{'color': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" (click)="$event.stopPropagation()">@Hoanca Robert 2022 All Rights Reserved</span>
+
+        <div class="sideButtons" >
+            <button mat-icon-button id="info-btn" (click)="$event.stopPropagation(); gameService.switchRouter('about')" [matTooltipPosition]="'left'" matTooltip="Info"><mat-icon class="material-symbols-outlined">info</mat-icon></button>
+            <button mat-icon-button id="settings-btn" (click)="$event.stopPropagation();openGodModePopup()" [matTooltipPosition]="'left'" matTooltip="Settings" [disabled]="errorGodMode"><mat-icon class="material-symbols-outlined">settings</mat-icon></button>
+            <button mat-icon-button *ngIf="gameService.godMode" id="theme-editor-btn" (click)="$event.stopPropagation();gameService.switchRouter('theme-editor')" [matTooltipPosition]="'left'" matTooltip="Edit Themes"><mat-icon class="material-symbols-outlined">format_paint</mat-icon></button>
+            <button mat-icon-button *ngIf="gameService.godMode" id="gameTable-editor-btn" (click)="$event.stopPropagation();gameService.switchRouter('gameTable-editor')" [matTooltipPosition]="'left'" matTooltip="Edit GameTable"><mat-icon class="material-symbols-outlined">edit_note</mat-icon></button>
+        </div>
+    </div>
+
+    <svg id="diceSvg" width="1080" height="1080" viewBox="0 0 1080 1080" xml:space="preserve">
+        <g transform="matrix(1 0 0 1 540 540)" id="6b93b554-2fe7-48a8-90f7-efe5e091bb33">
+        <rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; visibility: hidden;" vector-effect="non-scaling-stroke" x="-540" y="-540" rx="0" ry="0" width="1080" height="1080"></rect>
+        </g>
+        <g transform="matrix(1 0 0 1 540 540)" id="a08ec393-34b2-4df5-920d-cecdd80c080b">
+        </g>
+        <g transform="matrix(1 0 0 1 540 540)">
+        <g  vector-effect="non-scaling-stroke">
+                <g transform="matrix(0.13 0 0 -0.13 0 0)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-9810, -4502.31)" d="M 9685 6760 C 9595 6737 9631 6751 8765 6388 C 8358 6217 7985 6057 7936 6032 C 7777 5951 7697 5854 7653 5690 C 7636 5630 7635 5546 7635 4535 C 7635 3518 7636 3440 7653 3368 C 7663 3326 7684 3264 7701 3232 C 7737 3159 7832 3066 7920 3017 C 8016 2964 9481 2274 9553 2248 C 9607 2228 9635 2225 9765 2225 C 9902 2225 9922 2228 9990 2252 C 10117 2296 11497 2877 11638 2945 C 11836 3041 11917 3124 11967 3285 C 11984 3342 11985 3406 11985 4470 C 11985 5520 11984 5599 11967 5660 C 11939 5761 11912 5810 11841 5881 C 11760 5962 11721 5982 10845 6395 C 10097 6748 10123 6736 10035 6761 C 9943 6786 9783 6786 9685 6760 z M 10065 6648 C 10162 6611 11533 5964 11647 5902 C 11741 5851 11821 5770 11848 5699 C 11890 5587 11891 5536 11888 4425 C 11884 3283 11886 3330 11832 3225 C 11799 3159 11723 3096 11609 3041 C 11464 2971 10016 2366 9927 2338 C 9829 2307 9701 2308 9610 2339 C 9546 2361 8311 2940 8056 3067 C 7871 3160 7804 3227 7761 3365 C 7748 3409 7745 3549 7743 4485 C 7740 5192 7743 5578 7750 5622 C 7774 5780 7837 5869 7975 5942 C 8087 6000 9641 6649 9722 6670 C 9833 6700 9948 6693 10065 6648 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 0.18 -185.36)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-9811.38, -5892.52)" d="M 9697 5979 C 9644 5967 9584 5934 9566 5908 C 9551 5888 9552 5884 9572 5863 C 9613 5819 9694 5796 9810 5796 C 9921 5796 9986 5812 10043 5852 C 10124 5910 9988 5991 9816 5989 C 9771 5988 9718 5984 9697 5979 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 203.73 -34.1)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-11337.96, -4758.05)" d="M 11332 4974 C 11234 4925 11170 4820 11162 4694 C 11154 4570 11187 4514 11266 4517 C 11416 4523 11545 4725 11509 4899 C 11488 5000 11432 5024 11332 4974 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 -92.14 14.93)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-9118.97, -4390.33)" d="M 9003 4625 C 8967 4600 8947 4530 8953 4453 C 8956 4415 8963 4368 8970 4348 C 8987 4290 9041 4218 9093 4183 C 9193 4116 9254 4132 9278 4231 C 9306 4339 9258 4493 9173 4571 C 9103 4635 9044 4654 9003 4625 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 81.03 17)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-10417.72, -4374.79)" d="M 10449 4604 C 10343 4572 10254 4447 10243 4314 C 10230 4158 10297 4095 10417 4150 C 10525 4199 10593 4316 10594 4455 C 10595 4548 10575 4593 10527 4610 C 10510 4615 10497 4620 10496 4619 C 10495 4619 10474 4612 10449 4604 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 -150.04 62.89)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-8684.71, -4030.64)" d="M 8567 4260 C 8530 4231 8517 4180 8522 4091 C 8530 3949 8618 3817 8723 3789 C 8816 3764 8853 3814 8848 3955 C 8842 4099 8783 4202 8678 4254 C 8615 4285 8600 4286 8567 4260 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 142.45 66.98)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-10878.39, -3999.94)" d="M 10883 4224 C 10785 4176 10715 4067 10703 3948 C 10696 3869 10713 3796 10744 3775 C 10800 3735 10919 3780 10984 3866 C 11066 3974 11080 4145 11012 4223 C 10993 4245 10927 4245 10883 4224 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 -207.97 110.94)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-8250.19, -3670.23)" d="M 8142 3904 C 8082 3862 8067 3729 8110 3616 C 8155 3499 8284 3400 8358 3426 C 8400 3441 8415 3483 8415 3585 C 8415 3665 8411 3683 8384 3740 C 8348 3816 8293 3875 8236 3901 C 8186 3924 8171 3924 8142 3904 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 204 116.56)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-11339.98, -3628.09)" d="M 11332 3844 C 11270 3813 11226 3765 11191 3690 C 11169 3643 11165 3621 11165 3543 C 11165 3466 11168 3447 11186 3424 C 11230 3364 11324 3378 11408 3458 C 11491 3535 11531 3660 11509 3769 C 11488 3870 11432 3894 11332 3844 z" stroke-linecap="round"></path>
+        </g>
+                <g transform="matrix(0.13 0 0 -0.13 81.41 167.63)">
+        <path [ngStyle]="{'fill': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20), 'stroke': gameService.LightenDarkenColor(gameService.sessionTheme.background, -20)}" vector-effect="non-scaling-stroke" transform=" translate(-10420.55, -3245.1)" d="M 10447 3476 C 10372 3449 10309 3385 10268 3294 C 10237 3224 10235 3085 10266 3043 C 10278 3028 10298 3011 10312 3006 C 10374 2984 10480 3040 10536 3124 C 10618 3248 10618 3441 10535 3478 C 10503 3493 10495 3493 10447 3476 z" stroke-linecap="round"></path>
+        </g>
+        </g>
+        </g>
+    </svg>
+</div>
+
+<ng-template #godModeDialogRef>
+
+        <settings [whereAmI]="'home'"></settings>
+
+        <div class="god-container" fxLayoutAlign="center start" fxLayout="column">
+
+                <span [ngClass]="['god-container__title', errorGodMode ? 'error' : '']"> {{ errorGodMode ? ' Wrong Password, retry :D ' : 'Insert the Password' }}</span>
+
+                <mat-form-field *ngIf="!errorGodMode">
+                <mat-label>Password</mat-label>
+                <input matInput type="text" [(ngModel)]="godPassword">
+                </mat-form-field>
+
+                <button *ngIf="!errorGodMode" mat-raised-button (click)="tryToGoGodMode()"> Enable God Mode </button>
+        </div>
+
+
+</ng-template>

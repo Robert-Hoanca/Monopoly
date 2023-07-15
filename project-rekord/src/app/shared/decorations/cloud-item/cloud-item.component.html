@@ -1,0 +1,10 @@
+<th-mesh
+    [position]="[randomStartingPointX,randomCloudHeightPos,randomStartingPointZ]"
+    #cloudRef
+>
+
+  <th-boxGeometry [args]="[randomCloudWidthX, randomCloudHeigthY, randomCloudWidthZ]"></th-boxGeometry>
+  <th-meshBasicMaterial [args]="{color: '#fff'}" [transparent]="true" [opacity]="cloudOpacity"
+  ></th-meshBasicMaterial>
+
+</th-mesh>

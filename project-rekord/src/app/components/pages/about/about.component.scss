@@ -1,0 +1,47 @@
+.about-page{
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0px;
+    &-text{
+        > *{
+            margin-top: 30px;
+        }
+        &-title{
+            font-size: 45px;
+            text-align: center;
+        }
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        font-family: 'bebasNeue';
+        letter-spacing: 5px;
+
+        &-section{
+            font-size: 35px;
+            &-title{
+                font-weight: bold;
+            }
+            &-description{
+                margin-left: 20px;
+                &-normal{
+                    -webkit-text-stroke-width: 0.5px;
+                    color: transparent;
+                }
+                font-size: 25px;
+                &-bold{
+                    text-indent: 10px;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+    &-go-home{
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1;
+    }
+}

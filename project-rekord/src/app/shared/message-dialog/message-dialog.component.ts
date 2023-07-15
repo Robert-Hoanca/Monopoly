@@ -1,8 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Subject } from 'rxjs';
+import { Subject, take, timer } from 'rxjs';
 import { GameService } from 'src/app/game.service';
 import { CardDialogComponent } from '../card-dialog/card-dialog.component';
+import { SoundService } from 'src/app/sound.service';
 
 @Component({
   selector: 'app-message-dialog',
@@ -14,10 +15,22 @@ export class MessageDialogComponent implements OnInit {
   getCardPosition$ = new Subject();
   movedNearest:boolean=false;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
+    if(this.data.eventType === 'changeTurn'){
+      timer(1000).pipe(take(1)).subscribe({
+        complete: () => {
+          this.closeDialog();
+        } 
+      })
+    }
 
+    if(this.data.eventType === 'chance' || this.data.eventType === 'communityChest'){
+      this.soundService.playSound('open-card')
+    }else{
+      this.soundService.playSound('open-dialog')
+    }
   }
 
   ngAfterViewInit(){
@@ -43,12 +56,10 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.payRentToPlayer(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)],true);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
-          this.gameService.nextTurn();
         }else if(this.data.textData.amountDebt && ((this.data.textData.playerId? this.gameService.players.find(player => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]).money >= this.data.textData.amountDebt) && this.data.textData.debtWithWho == 'bank' && !this.gameService.checkBankrupt((this.data.textData.playerId? this.gameService.players.find(player => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]),this.data.textData.amountDebt)){
           this.data.textData.playerId? this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000 ,this.gameService.players.find(player => player.id == this.data.textData.playerId)) : this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
-          this.gameService.nextTurn();
         }
         if(this.gameService.setDebt){this.gameService.setDebt = false}
 
@@ -125,7 +136,7 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.players[this.gameService.turn].prison.getOutCards ++;
         }else if(data.subaction == 'goto'){
           this.closeDialog();
-          this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' is going to prison.'}, 'goingToPrison');
+          this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' have to go to prison.'}, 'goingToPrison');
         }
         break;
       case 'propertycharges':
@@ -170,6 +181,7 @@ export class MessageDialogComponent implements OnInit {
             this.gameService.calculateAmountDebt(removefundstoplayersAmount, otherPlayer.id)
           }
         });
+
         setTimeout(() => {
           this.gameService.addingRemovingMoney('remove',removefundstoplayersAmount, 1000)
         }, 1000);
@@ -201,6 +213,14 @@ export class MessageDialogComponent implements OnInit {
 
   getPlayerWhoWin(){
     return this.gameService.players.find(player => player.id == this.gameService.playerWhoWonId)
+  }
+
+  getActualPlayerProps(){
+    return this.gameService.gameTable.cards.filter((card:any) => card.owner === this.data.textData.playerId).length
+  }
+
+  ngOnDestroy(){
+    this.soundService.playSound('open-dialog');
   }
 }
 

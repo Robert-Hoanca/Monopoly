@@ -1,27 +1,47 @@
-<div id="messageContainer">
+<div id="messageContainer" [ngClass]="data.eventType === 'chance' || data.eventType === 'communityChest' ? 'card' : ''" [ngStyle]="{background : data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest' ? '#fff' : ''}">
 
     <div *ngIf="data.eventType === 'showPlayerProps'" class="messageTitle" fxLayoutAlign="space-between center">
-        <h1>View Properties</h1>
+        <h1>Player Info</h1>
         <button mat-raised-button (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
+
     </div>
 
+    <div *ngIf="data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest' && data.eventType !== 'showPlayerProps'" fxLayoutAlign="space-between center" class="messageTitle">
+        <h1>Message</h1>
+    </div>
+    <hr class="messageDivider" *ngIf="data.eventType !== 'showDiceResult' && data.eventType !== 'chance' && data.eventType !== 'communityChest'">
+
     <div *ngIf="data.eventType != 'showDiceResult' && data.eventType != 'chance' && data.eventType != 'communityChest'" class="messageDialogTextContainer">
-        <h1 class="messageText">{{data.textData.text ?? data.textData.title}}</h1>
-        <div *ngIf="gameService.playerWhoWonId != ''" class="winScreen">
-            <div>Player money: {{getPlayerWhoWin().money}} €</div>
+        <h1 *ngIf="this.data.eventType !== 'changeTurn' && !data.textData.showPlayerProps" class="messageText">{{data.textData.text ?? data.textData.title}}</h1>
+        <div class="playerInfos" *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps ) && this.getActualPlayerProps()">
+            <mat-icon class="material-symbols-outlined icon">
+                person
+            </mat-icon>
+            <span class="name">
+                {{gameService.players[gameService.turn].name}}
+            </span>
+            <span class="money">
+                {{gameService.players[gameService.turn].money}}$
+            </span>
+        </div>
+        <div *ngIf="gameService.playerWhoWonId != '' && this.data.eventType !== 'changeTurn'" class="winScreen">
             <div>Time to finish the game:</div>
             <div class="time">{{gameService.gameAmountTime}}</div>
         </div>
-    
-        <div *ngIf="gameService.playerWhoWonId != '' || data.textData.showPlayerProps" class="playerProps">
-            <h3>Player properties:</h3>
+
+        <div *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps ) && getActualPlayerProps()" class="playerProps">
             <app-player-properties [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
         </div>
-        <div class="finishWarning" fxLayoutAlign="space-evenly center">
+        <div *ngIf="data.eventType !== 'changeTurn' && !data.textData.showPlayerProps" class="finishWarning" fxLayoutAlign="space-evenly center">
             <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn" class="bankRuptBtn">Confirm</button>
             <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt" class="bankRuptBtn">No</button>
             <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps'" class="okBtn">Ok</button>
         </div>
+        
+        <div *ngIf="data.eventType === 'changeTurn'" class="changedTurn">
+            <span> It's {{data.textData.playerName }} turn.</span>
+        </div>
+
     </div>
 
     <div *ngIf="data.eventType === 'chance' || data.eventType === 'communityChest'" class="specialCardContainer">
@@ -38,8 +58,5 @@
             <button  mat-raised-button (click)="executeAndClose()" class="okBtnCards">Ok</button>
         </div>
     </div>
-    <div *ngIf="this.data.eventType === 'showDiceResult'">
-        
-    </div>
-    
+
 </div>

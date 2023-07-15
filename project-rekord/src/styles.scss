@@ -37,7 +37,7 @@ $monopoly-theme: mat.define-light-theme((
 body{
     margin: 0;
     padding: 0;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 }
 html, body { height: 100%; }
@@ -50,10 +50,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   overflow: hidden;
 }
 .exchangePanel{
-  max-width: 60%;
+  max-width: 90vw!important;
   max-height: 80%;
   .mat-dialog-container{
-    border-radius: 0px 5px 5px 5px;
+    border-radius: 5px;
     position: relative;
     overflow: visible;
   }
@@ -99,12 +99,29 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     box-shadow: none;
     padding: 0;
     display: flex;
-    height: 150px;
+    height: 240px;
     width: 300px;
     align-items: center;
     justify-content: space-evenly;
+    position: relative;
+  }
+  .doubleDiceTitle{
+    background: #fff;
+    position: absolute;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-radius: 50%;
   }
   .dice{
+    &.double_one{
+      background-color: #f1f16f;
+      border-radius: 5px;
+    }
+    &.double_two{
+      background-color: #e14b4b;
+    }
     width: 100px;
     height: 100px;
     background: #fff;
@@ -169,11 +186,226 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
+.theme-edit-dialog{
+  .editing-container{
+
+    display: flex;
+    flex-direction: row;
+
+    &__background{
+
+      width: 300px;
+      height: 300px;
+
+      &__card-color{
+        width: 100px;
+        height: 100px;
+        border-width: 2px;
+        border-style: solid;
+      }
+    }
+
+    &__input-container{
+      padding: 15px;
+      &__input_wrapper{
+        input[type="color"]{
+          width: 25px;
+          height: 25px;
+        }
+      }
+    }
+
+  }
+}
+.save-themes-dialog{
+  width: 300px;
+
+  .save-container{
+
+    padding: 20px;
+  
+    &__title{
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    &__buttons-container{
+      margin-top: 20px;
+    }
+
+  }
+}
+
+
+.card-edit-dialog{
+
+  .card-editing-container{
+    padding: 20px;
+
+    &__card{
+
+      &__delete-card{
+        width: 100%;
+      }
+      .cardForm{
+        width: 220px;
+        height: 350px;
+        position: relative;
+        border-radius: 0px 4px 4px 4px;
+        &.owned{
+            border-radius: 0px 0px 4px 4px;
+        }
+    
+        .propDistrict{
+            position: absolute;
+            height: 50px;
+            width: calc(100% - 32px);
+        }
+        .cardCosts{
+            margin-top: 55px;
+            .rentsWithProps{
+                .props{
+                    .house, .hotel{
+                        height:20px;
+                        position: relative;
+                        margin-top: 5px;
+                        span{
+                            position: absolute;
+                            z-index: 2;
+                            font-size: 10px;
+                            color: #fff;
+                        }
+                    }
+                   .hotel{
+                        mat-icon{
+                            color: red;
+                        }
+                        span{
+                            background: red;
+                        }
+                    }
+                    .house{
+                        mat-icon{
+                            color: green;
+                        }
+                        span{
+                            background: green;
+                        }
+                    }
+                }
+                .rent{
+                    width: 100%;
+                    .house,.hotel{
+                        margin-top: 5px;
+                    }
+                }
+            }
+        }
+        .separator{
+            height: 0.5px;
+            width: 100%;
+            background: grey;
+        }
+    }
+    }
+
+    &__inputs-container{
+
+      padding: 20px;
+      flex-wrap: wrap;
+
+      &__input_wrapper{
+        input[type="color"]{
+          width: 25px;
+          height: 25px;
+        }
+      }
+
+    }
+
+  }
+
+}
+
+.warning-delete-dialog{
+  width: 300px;
+
+  .warning-container{
+
+    padding: 20px;
+  
+    &__title{
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    &__buttons-container{
+      margin-top: 20px;
+    }
+
+  }
+}
+
+.mat-option[aria-disabled="true"]{
+  pointer-events: none;
+}
+
+.god-mode-dialog{
+  .god-container{
+    width: 300px;
+    padding: 20px;
+    font-size: 12px;
+    &__title{
+      font-size: 14px;
+      font-weight: bold;
+      &.error{
+        color: red;
+      }
+    }
+    button{
+      font-size: 12px;
+    }
+  }
+}
+
+.home-info-dialog{
+  width: 400xp;
+  font-size: 18px;
+  .info-container{
+    padding: 20px;
+
+    .bold{
+      font-weight: bold;
+    }
+
+  }
+}
+
 //On Mobile
 @media screen and (max-width: 600px) {
+  body{
+    height: -webkit-fill-available;
+  }
   .propertyInfo{
     .mat-dialog-container{
       justify-content: center;
+    }
+  }
+
+  .card-edit-dialog .card-editing-container{
+    padding: 20px;
+    overflow-y: scroll;
+    height: 600px;
+    flex-direction: column!important;
+    align-items: center;
+  }
+
+  .theme-edit-dialog{
+    .editing-container{
+      display: flex;
+      flex-direction: column;
     }
   }
 }

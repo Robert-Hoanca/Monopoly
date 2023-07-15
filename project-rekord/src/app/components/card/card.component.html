@@ -1,55 +1,54 @@
-<th-object3D
-    loadGLTF
-    [url]="url"
-    [position]="position"
-    [rotation]="rotation"
-    (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): '';"
-    [receiveShadow]="true"
-    [castShadow]="true"
-    [name]="'cardNumber'+ cardIndex"
-    (onMouseEnter)="hoverCard('enter')"
-    (onMouseExit)="hoverCard('exit')"
-    [scale]="[1,1,1]"
-    #cardRef
+<th-mesh
+  [position]="position"
+  [rotation]="rotation"
+  (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): '';"
+  [receiveShadow]="false"
+  [castShadow]="false"
+  [name]="'cardNumber'+ cardIndex"
+  (onMouseEnter)="(this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant') && (!gameService.movingPlayer || (!gameService.movingPlayer && gameService.disabledUserHoveringCard)) ? changeCardBorderColor('#ffffff') : ''; enableCursorOnHover(true)"
+  (onMouseExit)="(this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant') && !gameService.movingPlayer && !gameService.disabledUserHoveringCard? changeCardBorderColor(this.gameService.sessionTheme.cardBorder) : ''; enableCursorOnHover(false)"
+  [material]="gameService.cardColorMaterial"
+  #cardRef
 >
-</th-object3D>
+  <th-boxGeometry [args]="[2 , 0.4 , 2]"></th-boxGeometry>
+</th-mesh>
 
-<th-object3D
-    loadGLTF
-    [url]="url"
-    [position]="position"
-    [scale]="[1.1, 1.1, 1.1]"
-    [name]="'cardOutline'+ cardIndex"
-    #cardOutlineRef
+
+<th-mesh
+  [position]="position"
+  [name]="'cardOutline'+ cardIndex"
+  [material]="gameService.cardBorderMaterial"
+  #cardOutlineRef
 >
-</th-object3D>
+<th-boxGeometry [args]="[2.075 , 0.475 , 2.075]"></th-boxGeometry>
+</th-mesh>
 
 <div *ngIf="card.housesCounter && !card.hotelCounter">
-  <app-house *ngFor="let item of [].constructor(card.housesCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [houseIndex]="i+1" [cardIndex]="cardIndex"></app-house>
+  <app-house *ngFor="let item of [].constructor(card.housesCounter);let i = index" [card]="card" [cardPosition]="[position[0], 0, position[2]]" [cardRotation]="rotation" [houseIndex]="i+1" [cardIndex]="cardIndex"></app-house>
 </div>
 
 <div *ngIf="card.hotelCounter && card.housesCounter==4">
-  <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="position" [cardRotation]="rotation" [cardIndex]="cardIndex"></app-hotel>
+  <app-hotel *ngFor="let item of [].constructor(card.hotelCounter);let i = index" [card]="card" [cardPosition]="[position[0], 0, position[2]]" [cardRotation]="rotation" [cardIndex]="cardIndex"></app-hotel>
 </div>
 
 <th-mesh
   *ngIf="card.cardType=='property' || card.cardType=='plant' || card.cardType=='station'"
   [rotation]="rotation"
   [position]="carpetPosistion"
-  [scale]="[2, 0.1, 0.4]"
-  [receiveShadow]="true"
-  [castShadow]="true"
+  [receiveShadow]="false"
+  [castShadow]="false"
   #carpetRef
 >
-  <th-boxGeometry></th-boxGeometry>
+  <th-boxGeometry [args]="[2,0.1,0.4]"></th-boxGeometry>
   <th-meshBasicMaterial [args]="{color: gameService.checkCardColorDistrict(card.district)}"
   ></th-meshBasicMaterial>
 </th-mesh>
+
 <th-object3D
   *ngIf="card.cardType=='start' || card.cardType=='parkArea' || card.cardType=='prison' || card.cardType=='chance' || card.cardType=='communityChest' ||  card.cardType=='goToPrison' || card.cardType=='taxes'"
     loadGLTF
     [url]="returnSpecialCardUrl(card.cardType)"
-    [position]="position"
+    [position]="[position[0], 0, position[2]]"
     [rotation]="returnSpecialCardObjRotation()"
 >
 </th-object3D>

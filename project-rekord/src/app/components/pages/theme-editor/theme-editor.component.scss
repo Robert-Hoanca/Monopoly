@@ -1,0 +1,52 @@
+.theme-editor{
+    width: 100vw;
+    min-height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    &__container{
+        width: 100vw;
+        min-height: 100vh;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        flex-wrap: wrap;
+
+        &__background{
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            cursor: pointer;
+            margin: 10px 10px;
+            &__cardColor{
+                width: 50px;
+                height: 50px;
+                border-width: 2px;
+                border-style: solid;
+            }
+        }
+
+        &__add-new, &__save-themes{
+            width: 232px;
+            height: 232px;
+            margin: 10px 10px;
+        }
+    }
+
+    &__go-home{
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .theme-editor{
+        &__container{
+            justify-content: center;
+        }
+    }
+}
