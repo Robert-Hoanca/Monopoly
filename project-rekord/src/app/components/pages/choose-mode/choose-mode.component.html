@@ -34,22 +34,37 @@
 
             <div class="createdPlayersContainer" fxLayout="row" fxLayoutAlign="center center">
                 <mat-card class="playerCard" *ngFor="let player of gameService.players" fxLayout="column" fxLayoutAlign="center space-around" [@mmAnimationScale]>
-                    <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '250px', width: '200px'}" >
-                        <th-scene [thStats]="false" >
+                    <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '250px', width: '200px'}">
+                        <th-scene [thStats]="false" #scene>
                             <th-ambientLight> </th-ambientLight>
                             <th-object3D
                                 loadGLTF
                                 [url]="'/assets/blenderModels/pawns/' + player.pawn.choosenPawnValue + '/scene.gltf'"
                                 [position]="[0,0,0]"
                                 [rotation]="[0,-2,0]"
+                                (onLoaded)="applyOutline(scene.objRef.children, outlinePass)"
                           
                             >
                             </th-object3D>
                             <th-perspectiveCamera
                                 [args]="[75, 2, 0.1, 1000]"
                                 [position]="[0,5,10]"
+                                #camera
                             >
                             </th-perspectiveCamera>
+
+                            <th-effectComposer>
+                                <th-renderPass></th-renderPass>
+                                <th-outlinePass
+                                    #outlinePass
+                                    [args]="[gameService.outlinePassResolution, scene.objRef, camera.objRef]"
+                                    [visibleEdgeColor]="gameService.visibleEdgeColor | color" 
+                                    [hiddenEdgeColor]="gameService.hiddenEdgeColor | color" 
+                                    [edgeThickness]="gameService.edgeThickness"
+                                    [edgeStrength]="gameService.edgeStrength">
+                                    
+                                    </th-outlinePass>
+                            </th-effectComposer> 
                           
                         </th-scene>
                       </th-canvas>
@@ -73,24 +88,46 @@
                 <mat-card id="createPlayer" *ngIf="gameService.players.length < 4">
 
                     <div class="choosePawn">
-                        <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '250px', width: '200px'}" >
-                            <th-scene [thStats]="false" >
-                                <th-ambientLight> </th-ambientLight>
-                                <th-object3D
-                                    loadGLTF
-                                    [url]="'/assets/blenderModels/pawns/' + gameService.pawnTypes[pawnModelCounter].value + '/scene.gltf'"
-                                    [position]="[0,0,0]"
-                                    [rotation]="[0,-2,0]"
-                                >
-                                </th-object3D>
-                          
-                                <th-perspectiveCamera
-                                    [args]="[75, 2, 0.1, 1000]"
-                                    [position]="[0,5,10]"
-                                >
-                                </th-perspectiveCamera>
+                        <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '250px', width: '200px'}">
+                                <th-scene #scene>
+                                    <th-ambientLight> </th-ambientLight>
+
+                                    <ng-container *ngFor="let type of gameService.pawnTypes; let i = index">
+    
+                                        <th-object3D
+                                            *ngIf="pawnModelCounter === i"
+                                            loadGLTF
+                                            [url]="'/assets/blenderModels/pawns/' + gameService.pawnTypes[i].value + '/scene.gltf'"
+                                            [position]="[0,0,0]"
+                                            [rotation]="[0,-2,0]"
+                                            (onLoaded)="applyOutline(scene.objRef.children, outlinePass)"
+                                        >
+                                        </th-object3D>
+                                
+                                    </ng-container>
                               
-                            </th-scene>
+                                    <th-perspectiveCamera
+                                        [args]="[75, 2, 0.1, 1000]"
+                                        [position]="[0,5,10]"
+                                        #camera
+                                    >
+                                    </th-perspectiveCamera>
+    
+                                    <th-effectComposer>
+                                        <th-renderPass></th-renderPass>
+                                        <th-outlinePass
+                                            #outlinePass
+                                            [args]="[gameService.outlinePassResolution, scene.objRef, camera.objRef]"
+                                            [visibleEdgeColor]="gameService.visibleEdgeColor | color" 
+                                            [hiddenEdgeColor]="gameService.hiddenEdgeColor | color" 
+                                            [edgeStrength]="gameService.edgeStrength"
+                                            [edgeThickness]="gameService.edgeThickness"
+                                            >
+                                            
+                                            </th-outlinePass>
+                                    </th-effectComposer> 
+                                  
+                                </th-scene>
                           </th-canvas>
                       
                         <div class="pawnModel" *ngFor="let pawn of filterPawns();let i = index">

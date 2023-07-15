@@ -103,7 +103,13 @@ export class GameService {
   
   cardColorMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff});
   cardBorderMaterial:THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({color : 0xffffff , side : THREE.BackSide});
+  outlinePassResolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
   playerShowingInfo:Array<string> = [];
+  visibleEdgeColor:THREE.Color = new THREE.Color('#000000');
+  hiddenEdgeColor:THREE.Color = new THREE.Color('#000000');
+  edgeGlow = 0.1;
+  edgeStrength = 20;
+  edgeThickness = 1;
 
   debtWithWho:string='';
   diceRes:Array<number> = [];

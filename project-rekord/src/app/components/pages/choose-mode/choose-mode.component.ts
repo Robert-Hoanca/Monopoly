@@ -1,6 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { RaycasterEmitEvent, ThOutlinePass } from 'ngx-three';
 import { GameService } from 'src/app/game.service';
+import { Vector2 } from 'three';
 
 @Component({
   selector: 'app-choose-mode',
@@ -98,4 +100,18 @@ export class ChooseModeComponent implements OnInit {
     return dateFormat.getDate() + ' / ' + dateFormat.getMonth() + ' / ' + dateFormat.getFullYear();
   }
 
+  applyOutline(elements:Array<any>, outlinePass:any){
+    if(elements){
+      outlinePass.selectedObjects = elements;
+    }
+  }
+
+  onHover(event: RaycasterEmitEvent, outlinePass:any) {
+    if (!event.component.objRef) {
+      return;
+    }
+    console.log(event)
+
+    outlinePass.selectedObjects = [event.component.objRef];
+  }
 }

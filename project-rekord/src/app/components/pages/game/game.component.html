@@ -1,7 +1,7 @@
 <div id="gameContainer" fxLayout="column" fxLayoutAlign="center center" [ngClass]="[gameService.gamePaused ? 'paused' : '', gameService.enableCursor ? 'hoveringCard' : '']">
 
     <th-canvas id="gameCanvas" #canvas (onResize)="gameService.resizeCanvas($event, camera)" [shadow]="false" [rendererParameters]="gameService.rendererOptions" [ngStyle]="{background : gameService.sessionTheme.background}" (onRender)="resizeCanvas($event); gamePhysicsService.renderPhysicsWorld()">
-        <th-scene [autoUpdate]="true" #scene>
+        <th-scene [autoUpdate]="true" #scene [thStats]="gameService.godMode">
             
             <th-ambientLight #ambientLight [castShadow]="false"></th-ambientLight>
             <th-hemisphereLight [castShadow]="false"></th-hemisphereLight>
