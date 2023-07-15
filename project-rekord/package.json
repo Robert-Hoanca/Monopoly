@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "export-master": "npm run build monopoly && netlify deploy --prod"
   },
   "private": true,
   "dependencies": {
