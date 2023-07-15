@@ -930,18 +930,21 @@ export class GameService {
   }
 
   test(){
-    const numOfCells = -10
-    this.randomChance = {
-      action: "move",
-      count: numOfCells,
-      title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
-    };
-    //this.randomChance = this.gameTable.chance[8]
-
+    // const numOfCells = -3
     // this.randomChance = {
-    //   action: "jail",
-    //   subaction: 'goto',
-    //   title: 'Go To Prison '
+    //   action: "move",
+    //   count: numOfCells,
+    //   title: 'Go Back ' + Math.abs(numOfCells) + ' Spaces'
+    // };
+
+    //this.randomChance = this.gameTable.chance[8]
+    
+    // const cardIndex = 3;
+    // this.randomChance = {
+    //   action: "move",
+    //   cardIndex: cardIndex,
+    //   titleid: 'go',
+    //   title: 'Go to cell ' + cardIndex
     // };
 
     this.textDialog(this.randomChance,'chance');
