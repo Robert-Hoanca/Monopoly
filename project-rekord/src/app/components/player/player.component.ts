@@ -78,18 +78,47 @@ export class PlayerComponent implements OnInit {
     this.finalRotation = [0,this.calcPlayerRotation(side),0];
     
     //Calculate player position in the new card.
-    const playerInTheSameCard = this.gameService.players.filter(player => player.id !== this.player.id && player.actualCard === this.player.actualCard).length;
+    const playerInTheSameCard = this.gameService.players.filter(player => player.id !== this.player.id && player.actualCard === this.player.actualCard);
     this.oldInCardIndex = this.player.pawn.cardSection;
-    this.inCardPositionIndex = playerInTheSameCard > 0 ? playerInTheSameCard : 0;
+
+    this.inCardPositionIndex = this.calculateNewCardSection(playerInTheSameCard)
+
+    //this.inCardPositionIndex = playerInTheSameCard > 0 ? playerInTheSameCard : 0;
 
     //Calculate player final position
     this.finalPosition = JSON.parse(JSON.stringify(toGoPosition)); //Position to save in the storage
     this.calcPlayerPosInCard(this.inCardPositionIndex) //Position to use in game
 
 
+
     this.player.pawn.position = this.finalPosition;
     this.player.pawn.cardSection = this.inCardPositionIndex;
     this.player.pawn.rotation = this.finalRotation;
+  }
+
+  //Calculate player new cardSection based on other player's position.
+  calculateNewCardSection(players:any){
+    if(players.length === 0){
+      return 0;
+    }
+
+    let knownIndexes:Array<number> = [];
+    if(players.length){
+      players.forEach((player:any) => {
+        knownIndexes.push(player.pawn.cardSection)
+      });
+
+      if(!knownIndexes.includes(0)){
+        return 0;
+      }else if(!knownIndexes.includes(1)){
+        return 1;
+      }else if(!knownIndexes.includes(2)){
+        return 2;
+      }else if(!knownIndexes.includes(3)){
+        return 3;
+      }
+    }
+    return 0;
   }
 
   //Calculate in which side of the card the player should go based on its "cardSection" and in which side of the map it is.
@@ -317,6 +346,10 @@ export class PlayerComponent implements OnInit {
     const goingBack = this.playergoBack; 
     let cellCounter = 0;
 
+    if(totOfCells === 0 && !goingBack){
+      return;
+    }
+
     //If player is going back, rotate the player by 180deg accordingly to his actual side.
     if(goingBack && !this.rotatedBack){
       let side = this.whichSideAmI(oldCardPosition);
@@ -340,13 +373,13 @@ export class PlayerComponent implements OnInit {
     }
 
     //Set player position to center
-    if(this.movingPlayerCell !== this.player.actualCard && !this.gameService.movingPlayer){
+    if(this.movingPlayerCell === oldCardPosition && !this.gameService.movingPlayer){
       //Calculating and updating "playerPos" to match the center
       let isPositive = oldCardPosition < 20 ? true : false //Rappresent if the current axis ( x || z) is positive or negative ( x+ / x- || z+ / z-)
       let amountOfDistance = this.movePlayerToCenter(currentAxis, isPositive);
       playerPos += amountOfDistance;
 
-      if(totOfCells === 0){
+      if(totOfCells === 0 && goingBack){
         this.playerMovingAnimation(currentAxis, playerPos, true) //Needed to fix position on start when turning back
       }
       this.gameService.movingPlayer = true;
