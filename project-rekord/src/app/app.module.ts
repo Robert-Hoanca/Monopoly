@@ -55,7 +55,7 @@ import { GrassItemComponent } from './shared/decorations/grass-item/grass-item.c
 import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rain-drops-item.component';
 import { AboutComponent } from './components/pages/about/about.component';
 import { SettingsComponent } from './shared/settings/settings.component';
-
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 @NgModule({
   declarations: [
     AppComponent,
@@ -89,6 +89,7 @@ import { SettingsComponent } from './shared/settings/settings.component';
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     provideFirestore(() => getFirestore()),
+    AngularFireDatabaseModule,
     BrowserAnimationsModule,
     MatInputModule,
     MatButtonModule,
