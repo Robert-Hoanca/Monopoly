@@ -9,7 +9,7 @@
 
         <div *ngIf="choosingMode" class="chooseModeContainer" fxLayoutAlign="center center">
             <button mat-raised-button @AnimationScale (click)="chooseMode('local')" fxLayoutAlign="center center"><span>Local</span><img src="./../../../assets/icons/chooseMode/person.svg" alt=""></button>
-            <button mat-raised-button @AnimationScale (click)="chooseMode('online')" [disabled]="true" fxLayoutAlign="center center"> <span>Online</span><img src="./../../../assets/icons/chooseMode/groups.svg" alt=""></button>
+            <button mat-raised-button @AnimationScale (click)="chooseMode('online')" fxLayoutAlign="center center"> <span>Online</span><img src="./../../../assets/icons/chooseMode/groups.svg" alt=""></button>
         </div>
 
     

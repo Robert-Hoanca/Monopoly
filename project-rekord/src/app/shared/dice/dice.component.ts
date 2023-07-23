@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import * as CANNON from 'cannon-es'
-import { GamePhysicsService } from 'src/app/game-physics.service';
 import gsap from 'gsap';
+import { GamePhysicsService } from 'src/app/services/game-physics.service';
 @Component({
   selector: 'app-dice',
   templateUrl: './dice.component.html',

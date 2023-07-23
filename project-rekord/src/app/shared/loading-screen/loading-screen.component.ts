@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GameService } from 'src/app/game.service';import { animate, style, transition, trigger } from '@angular/animations';
+import { GameService } from 'src/app/services/game.service';import { animate, style, transition, trigger } from '@angular/animations';
 import { take, timer } from 'rxjs';
 
 @Component({

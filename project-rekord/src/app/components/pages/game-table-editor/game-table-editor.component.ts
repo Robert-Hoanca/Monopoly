@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { GameService } from 'src/app/game.service';
+import { GameService } from 'src/app/services/game.service';
 import {doc, getDoc } from '@angular/fire/firestore';
 import { MatDialog } from '@angular/material/dialog';
 import { take, timer } from 'rxjs';

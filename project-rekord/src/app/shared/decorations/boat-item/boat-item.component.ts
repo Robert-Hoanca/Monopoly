@@ -1,8 +1,8 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import gsap from 'gsap'
-import { GameService } from 'src/app/game.service';
+import { DecorationsService } from 'src/app/services/decorations.service';
+import { GameService } from 'src/app/services/game.service';
 import * as THREE from 'three';
-import { DecorationsService } from '../../decoration-item/decorations.service';
 
 
 @Component({

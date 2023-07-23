@@ -1,7 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { RaycasterEmitEvent, ThOutlinePass } from 'ngx-three';
-import { GameService } from 'src/app/game.service';
+import { GameService } from 'src/app/services/game.service';
+import { OnlineService } from 'src/app/services/online.service';
 import { Vector2 } from 'three';
 
 @Component({
@@ -39,7 +40,7 @@ export class ChooseModeComponent implements OnInit {
 
   url:string='';
 
-  constructor(public gameService: GameService) { }
+  constructor(public gameService: GameService, public onlineService : OnlineService) { }
 
   ngOnInit(): void {
   }

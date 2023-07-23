@@ -1,9 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subject, take, timer } from 'rxjs';
-import { GameService } from 'src/app/game.service';
+import { GameService } from 'src/app/services/game.service';
 import { CardDialogComponent } from '../card-dialog/card-dialog.component';
-import { SoundService } from 'src/app/sound.service';
+import { SoundService } from 'src/app/services/sound.service';
 
 @Component({
   selector: 'app-message-dialog',

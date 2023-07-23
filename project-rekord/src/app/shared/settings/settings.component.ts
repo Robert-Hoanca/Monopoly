@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { SettingsService } from 'src/app/settings.service';
-import { SoundService } from 'src/app/sound.service';
+import { SettingsService } from 'src/app/services/settings.service';
+import { SoundService } from 'src/app/services/sound.service';
 
 @Component({
   selector: 'settings',

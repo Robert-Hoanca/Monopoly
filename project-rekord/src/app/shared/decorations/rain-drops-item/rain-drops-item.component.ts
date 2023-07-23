@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { GameService } from 'src/app/game.service';
+import { GameService } from 'src/app/services/game.service';
 import gsap from 'gsap'
-import { DecorationsService } from '../../decoration-item/decorations.service';
+import { DecorationsService } from 'src/app/services/decorations.service';
 
 @Component({
   selector: 'app-rain-drops-item',

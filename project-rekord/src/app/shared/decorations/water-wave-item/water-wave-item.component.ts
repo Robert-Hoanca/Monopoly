@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ThMesh } from 'ngx-three';
-import { DecorationsService } from '../../decoration-item/decorations.service';
+import { DecorationsService } from 'src/app/services/decorations.service';
 
 @Component({
   selector: 'app-water-wave-item',

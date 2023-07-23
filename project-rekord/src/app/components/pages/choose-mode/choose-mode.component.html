@@ -178,5 +178,20 @@
             <button class="startGameBtn"  mat-raised-button (click)="gameService.startGame()" [disabled]="gameService.players.length<2">PLAY</button>
         </div>
     </div>
+
+
+    <div *ngIf="gameService.choosenMode === 'online'">
+        LOBBY
+
+        <mat-form-field>
+            <mat-label>Join Lobby</mat-label>
+            <input type="text" matInput [(ngModel)]="onlineService.joinLobbyName">
+        </mat-form-field>
+
+        <button mat-raised-button (click)="onlineService.joinLobby()"> JOIN </button>
+        <button mat-raised-button (click)="onlineService.createLobby()"> CREATE </button>
+
+    </div>
+
     
 </div>

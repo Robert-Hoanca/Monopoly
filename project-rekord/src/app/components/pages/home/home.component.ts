@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameService } from 'src/app/game.service';
-import {  doc, getDoc } from '@angular/fire/firestore';
+import { GameService } from 'src/app/services/game.service';
 import { switchMap, take, tap, timer } from 'rxjs';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { SoundService } from 'src/app/sound.service';
-import { SettingsService } from 'src/app/settings.service';
+import { SoundService } from 'src/app/services/sound.service';
+import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-home',

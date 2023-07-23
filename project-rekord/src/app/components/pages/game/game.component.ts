@@ -3,9 +3,9 @@ import { Component, HostListener, OnInit, TemplateRef, ViewChild } from '@angula
 import { MatDialog } from '@angular/material/dialog';
 import { gsap } from 'gsap';
 import { Subscription, take, timer } from 'rxjs';
-import { GamePhysicsService } from 'src/app/game-physics.service';
-import { GameService } from 'src/app/game.service';
-import { SoundService } from 'src/app/sound.service';
+import { GamePhysicsService } from 'src/app/services/game-physics.service';
+import { GameService } from 'src/app/services/game.service';
+import { SoundService } from 'src/app/services/sound.service';
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',

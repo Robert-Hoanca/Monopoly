@@ -1,9 +1,8 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { GameService } from 'src/app/game.service';
+import { GameService } from 'src/app/services/game.service';
 import * as THREE from 'three';
-import { Vector3 } from 'three';
 import gsap from 'gsap';
-import { SoundService } from 'src/app/sound.service';
+import { SoundService } from 'src/app/services/sound.service';
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',

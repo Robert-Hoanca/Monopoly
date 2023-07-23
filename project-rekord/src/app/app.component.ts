@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameService } from './game.service';
-import { DecorationsService } from './shared/decoration-item/decorations.service';
+import { GameService } from './services/game.service';
+import { DecorationsService } from './services/decorations.service';
 
 
 @Component({

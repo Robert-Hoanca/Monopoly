@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { DecorationsService } from './decorations.service';
+import { DecorationsService } from 'src/app/services/decorations.service';
 @Component({
   selector: 'app-decoration-item',
   templateUrl: './decoration-item.component.html',

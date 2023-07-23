@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { GLTFLoaderService } from 'ngx-three';
 import { Subscription } from 'rxjs';
-import { GameService } from 'src/app/game.service';
+import { GameService } from 'src/app/services/game.service';
 import * as THREE from 'three';
 @Component({
   selector: 'app-card',
