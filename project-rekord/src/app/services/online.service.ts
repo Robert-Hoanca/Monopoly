@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameService } from './game.service';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
+import { take } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -8,6 +9,8 @@ export class OnlineService {
 
   lobbyName:string = '';
   joinLobbyName:string = '';
+
+  lobbySubs$: Array<any> = [];
 
   constructor(public gameService : GameService, private realTimeDb: AngularFireDatabase) { 
     //console.log('------  gameService from onlineService', this.gameService)
@@ -21,7 +24,7 @@ export class OnlineService {
     const lobby:any = {
       gameName: '',
       gameTable:{},
-      players: [],
+      players: [{},{},{},{}],
       turn:0,
       diceNumber:0,
       debt: {
@@ -38,21 +41,35 @@ export class OnlineService {
       playerWhoWonId : '',
       localId: '',
       online: {
-        gameStatus: '',
-        lobbyName: '',
+        gameStatus: 'inLobby',
         messageType:'',
+        data: {},
         dice: {
           position: [0,0,0],
+          rotation: [0,0,0],
         }
       }
     }
     this.setData('', lobby);
+    this.enableLobbySubs()
   }
 
   joinLobby(){
-   //console.log('------ JOINING LOBBY :', this.joinLobbyName)
-   this.lobbyName = this.joinLobbyName;
-   //this.start()
+    this.gameService.loading = true;
+    this.lobbyName = this.joinLobbyName;
+    this.enableLobbySubs();
+    this.realTimeDb.object(this.lobbyName + '/online/gameStatus').valueChanges().pipe(take(1)).subscribe((data:any) => {
+      if(data){
+        this.gameService.onlineGameStatus = data;
+      }
+
+      if( this.gameService.onlineGameStatus === 'inGame'){
+        //console.log('starting game...')
+        this.startGame()
+       }
+    })
+
+    
   }
 
   setData(path:string, value:any){
@@ -67,38 +84,63 @@ export class OnlineService {
 
 
 
-  // start(){
+  enableLobbySubs(){
 
-  //   const propertiesToSub = [
-  //     {
-  //       field : 'debt',
-  //       path: '/debt/',
-  //     },
-  //     {
-  //       field : 'playerWhoWonId',
-  //       path: '/playerWhoWonId/',
-  //     },
-      
-  //     {
-  //       field : 'turn',
-  //       path: '/turn' ,
-  //     },
+    this.lobbySubs$.push(
+      this.realTimeDb.object(this.lobbyName + '/players').valueChanges().pipe().subscribe((data:any) => {
+        //console.log('players',data);
+        if(data){
+          this.gameService.players = data
+        }
+      })
+    )
 
-  //     {
-  //       field : 'diceNumber',
-  //       path: '/diceNumber' ,
-  //     },
-  //     {
-  //       field : 'time',
-  //       path: '/time' ,
-  //     },
-  //   ]
+    this.lobbySubs$.push(
+      this.realTimeDb.object(this.lobbyName + '/online/gameStatus').valueChanges().pipe().subscribe((data:any) => {
+       // console.log('gameStatus',data);
+        if(data){
+          this.gameService.onlineGameStatus = data
+        }
+      })
+    )
 
-  //   let subs: any = [];
+    this.realTimeDb.object(this.lobbyName + '/gameTable').valueChanges().pipe(take(2)).subscribe((data:any) => {
+      console.log('gameTable',data);
+      if(data){
+        this.gameService.gameTable = data
+      }
+    })
 
-  //   propertiesToSub.forEach(prop => {
-      
-  //   });
-  // }
+    
+  }
 
+
+  enableInGameObs(){
+
+    this.realTimeDb.object(this.lobbyName + 'online/messageType').valueChanges().subscribe(data => {
+      //console.log('messageType',data)
+    })
+
+    this.realTimeDb.object(this.lobbyName + 'online/dice/position').valueChanges().subscribe(data => {
+      //console.log('Dice Position',data)
+    })
+
+    this.realTimeDb.object(this.lobbyName + 'online/dice/rotation').valueChanges().subscribe(data => {
+      //console.log('Dice Rotation',data)
+    })
+
+    this.lobbySubs$.forEach(sub => {
+      sub.unsubscribe();
+    });
+    
+
+  }
+
+  startGame(){
+    if(this.gameService.onlineGameStatus === 'inLobby'){
+      this.gameService.setOnlineData$.next({path: '/online/gameStatus', value : 'inGame'})
+    }
+    this.enableInGameObs();
+    this.gameService.startGame()
+  }
 }

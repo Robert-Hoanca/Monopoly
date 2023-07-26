@@ -130,6 +130,7 @@ export class GameService {
   changeCardBorderColor$ = new Subject();
   screenLoaded$ = new Subject();
   showHidePlayerInfo$ = new Subject();
+  setOnlineData$ = new Subject();
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
@@ -140,6 +141,7 @@ export class GameService {
   godMode:boolean = false;
   enableCursor:boolean = false;
   disabledUserHoveringCard:boolean = false;
+  onlineGameStatus:string = 'inLobby';
 
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog, public soundService : SoundService) { }
 
@@ -304,9 +306,13 @@ export class GameService {
     newPlayer.pawn.rotationSide = 0;
     newPlayer.canDice = false;
     newPlayer.actualCard = 0;
-    this.players.push(newPlayer);
-    type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1);
-    this.specialPawn= '';
+    if(!this.amIOnline()){
+      this.players.push(newPlayer);
+    }else{
+      this.setOnlineData$.next({path: '/players/' + this.players.length, value : newPlayer})
+    }
+    //type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1);
+    //this.specialPawn= '';
   }
 
   setCameraPosition(cameraPosition:Array<number>, cameraControlsPosition:Array<number>, duration:number, force?:boolean){
@@ -403,30 +409,50 @@ export class GameService {
   async startGame(){
     this.loading = true;
     this.soundService.playAmbientMusic()
-    if(this.localSaves == 'new'){
-      this.beginTime = Date.now();
-      const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
-      this.gameTable  = (await getDoc(gameTableRef)).data();
-      this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
-      this.players[this.turn].canDice = true;
-    }else{
-      this.gameTable = this.localSaves.gameTable;
-      this.players = this.localSaves.players;
-      this.turn = this.localSaves.turn;
-      this.diceNumber = this.localSaves.diceNumber;
-      this.amountDebt = this.localSaves.debt.amountDebt;
-      this.amountRent = this.localSaves.amountRent;
-      this.debtWithWho = this.localSaves.debt.debtWithWho;
-      this.setDebt = this.localSaves.debt.setDebt;
-      this.beginTime = this.localSaves.time.begin;
-      this.endTime = this.localSaves.time.end;
-      this.gameAmountTime = this.localSaves.time.gameAmountTime;
-      this.localSaveName = this.localSaves.localId;
-      if(this.localSaves.playerWhoWonId){
-        this.playerWhoWonId = this.localSaves.playerWhoWonId;
-        this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
+
+    if(!this.amIOnline()){
+      if(this.localSaves == 'new'){
+        this.beginTime = Date.now();
+        const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
+        this.gameTable  = (await getDoc(gameTableRef)).data();
+        this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
+        this.players[this.turn].canDice = true;
+      }else{
+        this.gameTable = this.localSaves.gameTable;
+        this.players = this.localSaves.players;
+        this.turn = this.localSaves.turn;
+        this.diceNumber = this.localSaves.diceNumber;
+        this.amountDebt = this.localSaves.debt.amountDebt;
+        this.amountRent = this.localSaves.amountRent;
+        this.debtWithWho = this.localSaves.debt.debtWithWho;
+        this.setDebt = this.localSaves.debt.setDebt;
+        this.beginTime = this.localSaves.time.begin;
+        this.endTime = this.localSaves.time.end;
+        this.gameAmountTime = this.localSaves.time.gameAmountTime;
+        this.localSaveName = this.localSaves.localId;
+        if(this.localSaves.playerWhoWonId){
+          this.playerWhoWonId = this.localSaves.playerWhoWonId;
+          this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId).name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt).id}, 'finishGame')
+        }
       }
+    }else if(this.amIOnline()){
+      //retrieve data from a save service (?)
+
+      const beginTime = Date.now();
+      const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
+      const gameTable  = (await getDoc(gameTableRef)).data();
+      const turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
+
+      this.setOnlineData$.next({path : '/time/begin', value : beginTime})
+      
+      this.setOnlineData$.next({path : '/gameTable', value : gameTable})
+      
+      this.setOnlineData$.next({path : '/turn', value : turn})
+
+
     }
+
+
     this.switchRouter('game');
   }
 
@@ -965,5 +991,9 @@ export class GameService {
 
   async deleteMapFromDb(mapName:string){
     deleteDoc(doc(this.db, "gameTables", mapName));
+  }
+
+  amIOnline(){
+    return this.choosenMode === 'online' ? true : false;
   }
 }

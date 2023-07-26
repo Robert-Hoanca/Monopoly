@@ -56,6 +56,7 @@ import { RainDropsItemComponent } from './shared/decorations/rain-drops-item/rai
 import { AboutComponent } from './components/pages/about/about.component';
 import { SettingsComponent } from './shared/settings/settings.component';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { SaveComponent } from './shared/save/save.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -83,6 +84,7 @@ import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
     RainDropsItemComponent,
     AboutComponent,
     SettingsComponent,
+    SaveComponent
   ],
   imports: [
     BrowserModule,

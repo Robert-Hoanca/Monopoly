@@ -27,7 +27,7 @@
         </mat-card>
     </div>
 
-    <div *ngIf="gameService.choosenMode && gameService.localSaveName" id="players">
+    <div *ngIf="gameService.choosenMode && (gameService.localSaveName || onlineService.lobbyName)" id="players">
         <button class="go-back-home" mat-raised-button (click)="gameService.goBackHome()"><mat-icon>arrow_back</mat-icon> Home</button>
 
         <div id="createdPlayers" [fxLayout]="gameService.returnInclude(gameService.userDevice, 'computer' )? 'row' : 'column-reverse'">
@@ -175,12 +175,12 @@
             </mat-card>
         </div>
         <div id="startGame" [fxLayoutAlign]="(gameService.returnInclude(gameService.userDevice, 'computer' ) ? 'end' : 'center') + ' center'">
-            <button class="startGameBtn"  mat-raised-button (click)="gameService.startGame()" [disabled]="gameService.players.length<2">PLAY</button>
+            <button class="startGameBtn"  mat-raised-button (click)="startGame()" [disabled]="gameService.players.length<2">PLAY</button>
         </div>
     </div>
 
 
-    <div *ngIf="gameService.choosenMode === 'online'">
+    <div *ngIf="gameService.choosenMode === 'online' && !onlineService.lobbyName">
         LOBBY
 
         <mat-form-field>

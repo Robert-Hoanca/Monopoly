@@ -115,4 +115,14 @@ export class ChooseModeComponent implements OnInit {
 
     outlinePass.selectedObjects = [event.component.objRef];
   }
+
+  startGame(){
+
+    if(this.gameService.amIOnline()){
+      this.onlineService.startGame();
+    }else{
+      this.gameService.startGame();
+    }
+
+  }
 }
