@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { GameService } from './game.service';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
-import { take } from 'rxjs';
+import { of, take } from 'rxjs';
+import { GamePhysicsService } from './game-physics.service';
+import { allLobby } from '../shared/real-time-db/real-time-dv-save';
 @Injectable({
   providedIn: 'root'
 })
@@ -10,9 +12,13 @@ export class OnlineService {
   lobbyName:string = '';
   joinLobbyName:string = '';
 
-  lobbySubs$: Array<any> = [];
+  onlineData:any = {}
 
-  constructor(public gameService : GameService, private realTimeDb: AngularFireDatabase) { 
+  //Subs
+  lobbySubs$: Array<any> = [];
+  inGameSubs$: Array<any> = [];
+
+  constructor(public gameService : GameService, public gamePhysicsService : GamePhysicsService , private realTimeDb: AngularFireDatabase) { 
     //console.log('------  gameService from onlineService', this.gameService)
     //console.log('------ DB', this.realTimeDb)
   }
@@ -42,16 +48,16 @@ export class OnlineService {
       localId: '',
       online: {
         gameStatus: 'inLobby',
-        messageType:'',
-        data: {},
-        dice: {
-          position: [0,0,0],
-          rotation: [0,0,0],
-        }
+        message: {
+          type : '',
+          data : {}
+        },
+        playersIds : []
       }
     }
     this.setData('', lobby);
-    this.enableLobbySubs()
+    this.enableLobbySubs();
+    this.gameService.imLobbyMaster = true;
   }
 
   joinLobby(){
@@ -74,6 +80,12 @@ export class OnlineService {
 
   setData(path:string, value:any){
     this.realTimeDb.object(this.lobbyName + path).set(value);
+  }
+
+  getData(path:string){
+    this.realTimeDb.object(this.lobbyName + path).valueChanges().pipe(take(1)).subscribe(data => {
+
+    });
   }
 
   randomString(length:number, chars:string) {
@@ -99,34 +111,52 @@ export class OnlineService {
       this.realTimeDb.object(this.lobbyName + '/online/gameStatus').valueChanges().pipe().subscribe((data:any) => {
        // console.log('gameStatus',data);
         if(data){
-          this.gameService.onlineGameStatus = data
+          this.gameService.onlineGameStatus = data;
+          if(data === 'inGame'){
+            this.startGame()
+          }
         }
       })
     )
 
     this.realTimeDb.object(this.lobbyName + '/gameTable').valueChanges().pipe(take(2)).subscribe((data:any) => {
-      console.log('gameTable',data);
       if(data){
         this.gameService.gameTable = data
       }
     })
 
-    
+    this.inGameSubs$.push(
+      this.realTimeDb.object(this.lobbyName + '/online').valueChanges().pipe().subscribe((data:any) => {
+       // console.log('gameStatus',data);
+        if(data){
+          this.onlineData = data;
+        }
+      })
+    )
   }
 
 
   enableInGameObs(){
 
-    this.realTimeDb.object(this.lobbyName + 'online/messageType').valueChanges().subscribe(data => {
-      //console.log('messageType',data)
+    this.realTimeDb.object(this.lobbyName + '/online/message').valueChanges().subscribe(data => {
+      this.handleMessages(data);
     })
 
-    this.realTimeDb.object(this.lobbyName + 'online/dice/position').valueChanges().subscribe(data => {
-      //console.log('Dice Position',data)
+    this.realTimeDb.object(this.lobbyName + '/online/dices/0/position').valueChanges().subscribe(data => {
+      this.handleMessages({type : 'dice-pos', data : data, diceI : 0});
     })
 
-    this.realTimeDb.object(this.lobbyName + 'online/dice/rotation').valueChanges().subscribe(data => {
+    this.realTimeDb.object(this.lobbyName + '/online/dices/1/position').valueChanges().subscribe(data => {
+      this.handleMessages({type : 'dice-pos', data : data, diceI : 1});
+    })
+
+    this.realTimeDb.object(this.lobbyName + '/online/dices/0/rotation').valueChanges().subscribe(data => {
       //console.log('Dice Rotation',data)
+      this.handleMessages({type : 'dice-rot', data : data, diceI : 0});
+    })
+    this.realTimeDb.object(this.lobbyName + '/online/dices/1/rotation').valueChanges().subscribe(data => {
+      //console.log('Dice Rotation',data)
+      this.handleMessages({type : 'dice-rot', data : data, diceI : 1});
     })
 
     this.lobbySubs$.forEach(sub => {
@@ -142,5 +172,58 @@ export class OnlineService {
     }
     this.enableInGameObs();
     this.gameService.startGame()
+  }
+
+  handleMessages(message:any){
+      switch (message.type) {
+        case 'change-turn':
+          this.gameService.turn = message.data.turn;
+          this.gameService.players[this.gameService.turn].canDice = true;
+          this.itsMyTurn();
+          break;
+        case 'dice-start':
+          if(!this.gameService.itsMyTurn){
+            this.gameService.startToDice = true;
+          }
+          break;
+        case 'dice-roll':
+          this.gamePhysicsService.reproduceDiceRoll(message.data, message.data.diceI)
+          break
+        case 'dice-end':
+          this.gameService.startToDice = false;
+          break;
+        case 'change-money':
+          if(!this.gameService.itsMyTurn){
+            const player = this.gameService.players.find(player => player.id === message.data.playerId)
+            this.gameService.addingRemovingMoney(message.data.type, message.data.amount, message.data.duration, player)
+          }
+          break;
+        case 'change-player-pos':
+          if(!this.gameService.itsMyTurn){
+            this.gameService.getCardPosition(message.data.cardIndex)
+          }
+          break;
+        default:
+          break;
+    }
+  }
+
+  itsMyTurn(){
+    if(this.gameService.choosenMode === 'local' || 
+    (this.gameService.choosenMode === 'online' && this.onlineData?.playersId?.find((player:any) => player.id === this.gameService.players[this.gameService.turn].id && player.uuid === this.gameService.currentUUID))){
+      this.gameService.itsMyTurn = true;
+      return true;
+    }else{
+      this.gameService.itsMyTurn = false;
+      return false;
+    }
+  }
+
+
+  clearAllDatabase(){
+    const lobbys:any = allLobby;
+    for (const [key] of Object.entries(lobbys)) {
+      this.realTimeDb.object(key).remove();
+    }
   }
 }

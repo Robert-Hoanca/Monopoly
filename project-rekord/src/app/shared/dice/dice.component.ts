@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import * as CANNON from 'cannon-es'
 import gsap from 'gsap';
 import { GamePhysicsService } from 'src/app/services/game-physics.service';
+import { GameService } from 'src/app/services/game.service';
 @Component({
   selector: 'app-dice',
   templateUrl: './dice.component.html',
@@ -22,33 +23,54 @@ export class DiceComponent implements OnInit {
   positionY = 0;
   positionZ = 0;
 
-  constructor(public gamePhysicsService : GamePhysicsService) { }
+  constructor(public gamePhysicsService : GamePhysicsService, public gameService : GameService) { }
 
   ngOnInit(): void {
-    this.positionX = Math.round(Math.random() * 9 + 7);
-    this.positionY = Math.round(Math.random() * 15 + 10);
-    this.positionZ = Math.round(Math.random() * 9 + 7);
+    if(!this.gameService.amIOnline()){
+      this.positionX = Math.round(Math.random() * 15 + 5);
+      this.positionY = Math.round(Math.random() * 15 + 10);
+      this.positionZ = Math.round(Math.random() * 15 + 5);
 
-    this.diceBody.position.x = this.positionX;
-    this.diceBody.position.z = this.positionZ;
-    this.diceBody.position.y = this.positionY;
+      
+
+      this.diceBody.position.x = this.positionX;
+      this.diceBody.position.z = this.positionZ;
+      this.diceBody.position.y = this.positionY;
+      
+    }else{
+      this.positionX = Math.round(Math.random() * 15 + 5);
+      this.positionY = Math.round(Math.random() * 35 + 20);
+      this.positionZ = Math.round(Math.random() * 15 + 5);
+
+      this.diceBody.position.x = this.positionX;
+      this.diceBody.position.z = this.positionZ;
+      this.diceBody.position.y = this.positionY;
+    }
   }
 
   ngAfterViewInit(){
-  }
 
-  setDicePhysics(){
     this.diceMesh = this.diceRef._objRef;
     this.gamePhysicsService.diceArray.push({
       mesh: this.diceMesh,
-      body: this.diceBody
+      body: this.diceBody,
+      startPosition : {
+        x : this.positionX,
+        y : this.positionY,
+        z : this.positionZ
+      },
+      startRotation : {},
+      startForce : 0
     })
 
+  }
 
+  setDicePhysics(){
     this.gamePhysicsService.createDice({
       mesh: this.diceMesh,
       body: this.diceBody,
-      diceindex: this.diceIndex
+      diceindex: this.diceIndex,
+
     })
   }
 

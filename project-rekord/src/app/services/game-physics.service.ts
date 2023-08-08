@@ -2,10 +2,10 @@ import { Injectable, TemplateRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
-import { debounceTime, fromEvent ,take ,timer } from 'rxjs';
+import { debounceTime, fromEvent ,interval,take ,takeUntil,timer } from 'rxjs';
 import { GameService } from './game.service';
 import { SoundService } from './sound.service';
-
+import gsap from 'gsap';
 @Injectable({
   providedIn: 'root',
 })
@@ -22,10 +22,12 @@ export class GamePhysicsService {
   dicesRolling: boolean = false;
   showDiceResultDialogRef: TemplateRef<any> | any;
 
+  gravity:number = -50;
+
   constructor(public gameService: GameService, private dialog: MatDialog, public soundService : SoundService) {}
 
   initWorld() {
-    this.world.gravity.set(0, -50, 0); // -9.82 m/s² 
+    this.world.gravity.set(0, this.gravity, 0); // -9.82 m/s²
     this.world.defaultContactMaterial.restitution = 0.3;
     this.createDiceCase();
   }
@@ -76,8 +78,10 @@ export class GamePhysicsService {
 
   createDice(dice: any) {
     this.world.addBody(dice.body);
-    this.addDiceEvents(dice);
-    this.diceRoll(dice);
+    if(!this.gameService.amIOnline() || (this.gameService.amIOnline() && this.gameService.itsMyTurn)){
+      this.addDiceEvents(dice);
+      this.diceRoll(dice);
+    }
   }
 
   renderPhysicsWorld() {
@@ -107,7 +111,6 @@ export class GamePhysicsService {
         }
       }
     })
-
 
     fromEvent(dice.body, 'sleep')
       .pipe()
@@ -159,18 +162,38 @@ export class GamePhysicsService {
   }
 
   diceRoll(dice: any) {
+
+    const initialRotation = {
+      x : 2 * Math.PI * Math.random(),
+      y : 0,
+      z : 2 * Math.PI * Math.random()
+    }
+    const force = 3 * Math.random();
+
+    if(this.gameService.amIOnline()){
+
+      //Setting initial positions to each dice
+      this.diceArray[dice.diceindex].startRotation = initialRotation;
+      this.diceArray[dice.diceindex].startForce = force;
+
+      //Sending dice initial positions to each client connected
+      this.gameService.setOnlineData$.next({path: '/online/message/', value : {type : 'dice-roll', data : {
+        startPosition : this.diceArray[dice.diceindex].startPosition,
+        startRotation : initialRotation,
+        startForce : force,
+        diceI : dice.diceindex
+      }}})
+    }
+
+    //Setting initial velocity
     dice.body.velocity.setZero();
     dice.body.angularVelocity.setZero();
 
     // set initial rotation
-    dice.mesh.rotation.set(
-      2 * Math.PI * Math.random(),
-      0,
-      2 * Math.PI * Math.random()
-    );
+    dice.mesh.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
     dice.body.quaternion.copy(dice.mesh.quaternion);
 
-    const force = 3 + 0 * Math.random();
+    //Applying random force
     dice.body.applyImpulse(
       new CANNON.Vec3(force, 0, force),
       new CANNON.Vec3(0, 0.2, 0)
@@ -274,5 +297,31 @@ export class GamePhysicsService {
     this.dicesRolling = false;
     this.gameService.diceRes = this.diceRes;
     this.diceRes = [];
+  }
+
+  reproduceDiceRoll (dice:any, index:number) {
+    //Setting the position, rotation and force to the database data
+
+    const diceBody = this.diceArray[index].body;
+    const diceMesh = this.diceArray[index].mesh;
+    
+    diceBody.position.x = dice.startPosition.x;
+    diceBody.position.y = dice.startPosition.y;
+    diceBody.position.z = dice.startPosition.z;
+
+    //Setting initial velocity
+    diceBody.velocity.setZero();
+    diceBody.angularVelocity.setZero();
+
+    // set initial rotation
+    diceMesh.rotation.set(dice.startRotation.x, dice.startRotation.y, dice.startRotation.z);
+    diceBody.quaternion.copy(diceMesh.quaternion);
+
+    //Applying random force
+    diceBody.applyImpulse(
+      new CANNON.Vec3(dice.startForce, 0, dice.startForce),
+      new CANNON.Vec3(0, 0.2, 0)
+    );
+    diceBody.allowSleep = true;
   }
 }

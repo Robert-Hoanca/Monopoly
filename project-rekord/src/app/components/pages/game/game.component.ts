@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { Subscription, take, timer } from 'rxjs';
 import { GamePhysicsService } from 'src/app/services/game-physics.service';
 import { GameService } from 'src/app/services/game.service';
+import { OnlineService } from 'src/app/services/online.service';
 import { SoundService } from 'src/app/services/sound.service';
 @Component({
   selector: 'app-game',
@@ -96,7 +97,7 @@ export class GameComponent implements OnInit {
 
   pauseOptions:boolean = false;
 
-  constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService, public soundService : SoundService) {  }
+  constructor(public gameService: GameService,private dialog: MatDialog , public gamePhysicsService : GamePhysicsService, public soundService : SoundService, public onlineService : OnlineService) {  }
 
   ngOnInit(): void {
     this.gameService.addingRemovingMoneyProps();
@@ -189,6 +190,7 @@ export class GameComponent implements OnInit {
 
         if(!this.gameService.players[this.gameService.turn].prison.inPrison){
           this.gameService.startToDice = true;
+          this.gameService.setOnlineData$.next({path: '/online/message', value :{type : 'dice-start'}})
         }else{
          this.whatToDoInPrison('prisonRoll')
         }
@@ -204,6 +206,7 @@ export class GameComponent implements OnInit {
       this.gameService.exitFromPrison(false, false);
     }else if(action == 'prisonRoll'){
       this.gameService.startToDice = true;
+      this.gameService.setOnlineData$.next({path: '/online/message', value :{type : 'dice-start'}})
     }
   }
 

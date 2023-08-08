@@ -85,7 +85,7 @@
             </div>
 
             <div class="creationContainer">
-                <mat-card id="createPlayer" *ngIf="gameService.players.length < 4">
+                <mat-card id="createPlayer" *ngIf="gameService.players.length < 4 && !alreadyInGame()">
 
                     <div class="choosePawn">
                         <th-canvas [style]="{backgroundColor: this.gameService.sessionColor, height: '250px', width: '200px'}">
@@ -175,7 +175,7 @@
             </mat-card>
         </div>
         <div id="startGame" [fxLayoutAlign]="(gameService.returnInclude(gameService.userDevice, 'computer' ) ? 'end' : 'center') + ' center'">
-            <button class="startGameBtn"  mat-raised-button (click)="startGame()" [disabled]="gameService.players.length<2">PLAY</button>
+            <button class="startGameBtn" *ngIf="this.gameService.choosenMode === 'local' || (this.gameService.choosenMode === 'online' && this.gameService.imLobbyMaster)" mat-raised-button (click)="startGame()" [disabled]="gameService.players.length < 2">PLAY</button>
         </div>
     </div>
 
@@ -191,6 +191,10 @@
         <button mat-raised-button (click)="onlineService.joinLobby()"> JOIN </button>
         <button mat-raised-button (click)="onlineService.createLobby()"> CREATE </button>
 
+    </div>
+
+    <div *ngIf="onlineService.lobbyName">
+        {{ onlineService.lobbyName }}
     </div>
 
     

@@ -13,6 +13,7 @@ import { CardDialogComponent } from '../shared/card-dialog/card-dialog.component
 import { MessageDialogComponent } from '../shared/message-dialog/message-dialog.component';
 import { ExchangeComponent } from '../shared/exchange/exchange.component';
 import { SoundService } from './sound.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -131,6 +132,8 @@ export class GameService {
   screenLoaded$ = new Subject();
   showHidePlayerInfo$ = new Subject();
   setOnlineData$ = new Subject();
+  getOnlineData$ = new Subject();
+
 
   //DIALOGS
   cardInfoRef: MatDialogRef<any> | undefined;
@@ -142,8 +145,17 @@ export class GameService {
   enableCursor:boolean = false;
   disabledUserHoveringCard:boolean = false;
   onlineGameStatus:string = 'inLobby';
+  currentUUID:string = localStorage.getItem("rekord-uuid") ?? '';
+  imLobbyMaster:boolean = false;
+  itsMyTurn : boolean = false;
 
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog, public soundService : SoundService) { }
+
+  handleUuid(){
+    if(!localStorage.getItem("rekord-uuid")){
+      localStorage.setItem("rekord-uuid", uuid.v4());
+    }
+  }
 
   async retrieveDBData(){
     //const storage = getStorage();
@@ -310,6 +322,7 @@ export class GameService {
       this.players.push(newPlayer);
     }else{
       this.setOnlineData$.next({path: '/players/' + this.players.length, value : newPlayer})
+      this.setOnlineData$.next({path: '/online/playersId/' + this.players.length, value : {id : newPlayer.id , uuid: this.currentUUID , master : this.imLobbyMaster}})
     }
     //type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1);
     //this.specialPawn= '';
@@ -380,6 +393,12 @@ export class GameService {
 
   getCardPosition(cardIndex:any){
     this.disabledUserHoveringCard = true;
+    this.setOnlineData$.next({path : '/online/message/', value : {
+      type : 'change-player-pos',
+      data : {
+       cardIndex : cardIndex
+      }
+    }})
     this.getCardPosition$.next(cardIndex);
   }
 
@@ -447,8 +466,8 @@ export class GameService {
       
       this.setOnlineData$.next({path : '/gameTable', value : gameTable})
       
-      this.setOnlineData$.next({path : '/turn', value : turn})
-
+      this.setOnlineData$.next({path : '/turn', value : this.turn})
+      this.setOnlineData$.next({path : '/online/message', value : { type : 'change-turn' , data : { turn : this.turn}}})
 
     }
 
@@ -458,6 +477,7 @@ export class GameService {
 
   nextTurn(){
     if(this.startToDice){
+      this.setOnlineData$.next({path: '/online/message', value :{type : 'dice-end'}});
       this.startToDice = false;
     }
     if(this.turn == (this.players.length - 1)){
@@ -474,7 +494,8 @@ export class GameService {
         }
       }
     }
-    //this.players[this.turn] = this.players[this.turn];
+    this.setOnlineData$.next({path : '/turn', value : this.turn})
+    this.setOnlineData$.next({path : '/online/message', value : { type : 'change-turn' , data : { turn : this.turn}}})
     this.textDialog({playerName: this.players[this.turn].name},'changeTurn');
     this.setCameraOnPlayer(0);
     this.players[this.turn].canDice = true;
@@ -572,6 +593,15 @@ export class GameService {
 
   addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
     new Observable((subscriber) => {
+      this.setOnlineData$.next({path : '/online/message/', value : {
+        type : 'change-money',
+        data : {
+          type : type,
+          amount : amount,
+          duration : duration,
+          playerId : player ? player.id : this.players[this.turn].id
+        }
+      }})
       player ? this.showHidePlayerInfo$.next({type:'show', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'show', playerId: this.players[this.turn].id});
       this.addingPlayerMoney = true;
       this.playerMoneyChangeValue = amount;
@@ -582,6 +612,9 @@ export class GameService {
         player? player.removingMoney = true : this.players[this.turn].removingMoney = true;
         player != undefined? player.money -= amount : this.players[this.turn].money -= amount;
       }
+      this.setOnlineData$.next({
+        path : '/players/' + (player ? this.players.findIndex(player => player.id === player.id) : this.turn) + '/money', 
+        value : (player ? player.money : this.players[this.turn].money)})
       this.soundService.playSound('money')
       subscriber.next(duration)
     }).pipe(switchMap((data:any):any => {

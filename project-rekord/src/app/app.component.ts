@@ -19,5 +19,6 @@ export class AppComponent {
     this.decorationsService.chooseDecorations();
     this.gameService.loading = true;
     this.gameService.switchRouter('home')
+    this.gameService.handleUuid();
   }
 }

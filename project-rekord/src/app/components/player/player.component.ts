@@ -304,7 +304,7 @@ export class PlayerComponent implements OnInit {
           }
         }
         //When arrived on destination ask what to do in that cell.
-        this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[this.gameService.players[this.gameService.turn].actualCard]);
+        if(!this.gameService.amIOnline() || (this.gameService.amIOnline() && this.gameService.itsMyTurn)) this.gameService.whichPropertyAmI(this.gameService.gameTable.cards[this.gameService.players[this.gameService.turn].actualCard]);
       }
     }
   }

@@ -16,10 +16,11 @@ export class SaveComponent implements OnInit {
   ngOnInit(): void {
     this.subscriptions$.push(this.gameService.setOnlineData$.subscribe(
       (data:any) => {
-        //console.log('setting data: ', data.value)
-        this.onlineService.setData(data.path, data.value)
+        if(this.gameService.amIOnline()) this.onlineService.setData(data.path, data.value)
       }
-    ))
+    ));
+
+    //this.onlineService.clearAllDatabase()
   }
 
 }

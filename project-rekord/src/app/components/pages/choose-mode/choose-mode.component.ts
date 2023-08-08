@@ -111,7 +111,6 @@ export class ChooseModeComponent implements OnInit {
     if (!event.component.objRef) {
       return;
     }
-    console.log(event)
 
     outlinePass.selectedObjects = [event.component.objRef];
   }
@@ -125,4 +124,9 @@ export class ChooseModeComponent implements OnInit {
     }
 
   }
+
+  alreadyInGame(){
+    return this.onlineService.onlineData?.playersId?.find((player:any) => player.uuid === this.gameService.currentUUID) ? true : false;
+  }
+
 }
