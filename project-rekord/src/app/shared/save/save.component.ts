@@ -18,9 +18,7 @@ export class SaveComponent implements OnInit {
       (data:any) => {
         if(this.gameService.amIOnline()) this.onlineService.setData(data.path, data.value)
       }
-    ));
-
-    console.log('init save component')
+    ))
     //this.onlineService.clearAllDatabase()
   }
 
