@@ -20,6 +20,7 @@ export class SaveComponent implements OnInit {
       }
     ));
 
+    console.log('init save component')
     //this.onlineService.clearAllDatabase()
   }
 
