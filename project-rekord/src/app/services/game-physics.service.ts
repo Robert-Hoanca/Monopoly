@@ -190,6 +190,7 @@ export class GamePhysicsService {
         diceI : dice.diceindex,
         startDeltaTime : this.deltaTime
       }}})
+      return;
     }
 
 
