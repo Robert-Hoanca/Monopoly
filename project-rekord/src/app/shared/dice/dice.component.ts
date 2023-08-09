@@ -26,26 +26,13 @@ export class DiceComponent implements OnInit {
   constructor(public gamePhysicsService : GamePhysicsService, public gameService : GameService) { }
 
   ngOnInit(): void {
-    if(!this.gameService.amIOnline()){
-      this.positionX = Math.round(Math.random() * 15 + 5);
-      this.positionY = Math.round(Math.random() * 15 + 10);
-      this.positionZ = Math.round(Math.random() * 15 + 5);
+    this.positionX = Math.round(Math.random() * 15 + 5);
+    this.positionY = Math.round((Math.random() * (!this.gameService.amIOnline() ? 15 : 20)) + 10);
+    this.positionZ = Math.round(Math.random() * 15 + 5);
 
-      
-
-      this.diceBody.position.x = this.positionX;
-      this.diceBody.position.z = this.positionZ;
-      this.diceBody.position.y = this.positionY;
-      
-    }else{
-      this.positionX = Math.round(Math.random() * 15 + 5);
-      this.positionY = Math.round(Math.random() * 35 + 20);
-      this.positionZ = Math.round(Math.random() * 15 + 5);
-
-      this.diceBody.position.x = this.positionX;
-      this.diceBody.position.z = this.positionZ;
-      this.diceBody.position.y = this.positionY;
-    }
+    this.diceBody.position.x = this.positionX;
+    this.diceBody.position.z = this.positionZ;
+    this.diceBody.position.y = this.positionY;
   }
 
   ngAfterViewInit(){

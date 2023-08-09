@@ -23,6 +23,8 @@ export class GamePhysicsService {
   showDiceResultDialogRef: TemplateRef<any> | any;
 
   gravity:number = -50;
+  deltaTime:number = 0;
+  lastTime:number = 0;
 
   constructor(public gameService: GameService, private dialog: MatDialog, public soundService : SoundService) {}
 
@@ -91,6 +93,10 @@ export class GamePhysicsService {
       groundEl.mesh.quaternion.copy(groundEl.body.quaternion);
     });
     this.renderDices();
+
+    const currentTime = performance.now();
+    this.deltaTime = (currentTime - this.lastTime) / 1000; // Converti in secondi
+    this.lastTime = currentTime;
   }
 
   renderDices() {
@@ -170,20 +176,22 @@ export class GamePhysicsService {
     }
     const force = 3 * Math.random();
 
+    
     if(this.gameService.amIOnline()){
 
       //Setting initial positions to each dice
       this.diceArray[dice.diceindex].startRotation = initialRotation;
       this.diceArray[dice.diceindex].startForce = force;
-
       //Sending dice initial positions to each client connected
       this.gameService.setOnlineData$.next({path: '/online/message/', value : {type : 'dice-roll', data : {
         startPosition : this.diceArray[dice.diceindex].startPosition,
         startRotation : initialRotation,
         startForce : force,
-        diceI : dice.diceindex
+        diceI : dice.diceindex,
+        startDeltaTime : this.deltaTime
       }}})
     }
+
 
     //Setting initial velocity
     dice.body.velocity.setZero();
@@ -193,10 +201,19 @@ export class GamePhysicsService {
     dice.mesh.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
     dice.body.quaternion.copy(dice.mesh.quaternion);
 
+
+    
+    // Applying random force
+    const impulseForce = new CANNON.Vec3(force, 0, force);
+    const impulsePosition = new CANNON.Vec3(0, 0.2, 0);
+    impulseForce.scale(this.deltaTime, impulseForce); // Scale the force by deltaTime
+    impulsePosition.scale(this.deltaTime, impulsePosition); // Scale the position by deltaTime
+
+
     //Applying random force
     dice.body.applyImpulse(
-      new CANNON.Vec3(force, 0, force),
-      new CANNON.Vec3(0, 0.2, 0)
+      impulseForce,
+      impulsePosition
     );
     dice.body.allowSleep = true;
   }
@@ -317,10 +334,20 @@ export class GamePhysicsService {
     diceMesh.rotation.set(dice.startRotation.x, dice.startRotation.y, dice.startRotation.z);
     diceBody.quaternion.copy(diceMesh.quaternion);
 
+
+    // Applying random force
+    const deltaTime = dice.startDeltaTime;
+    const impulseForce = new CANNON.Vec3(dice.startForce, 0, dice.startForce);
+    const impulsePosition = new CANNON.Vec3(0, 0.2, 0);
+    impulseForce.scale(deltaTime, impulseForce); // Scale the force by deltaTime
+    impulsePosition.scale(deltaTime, impulsePosition); // Scale the position by deltaTime
+    
+    
+
     //Applying random force
     diceBody.applyImpulse(
-      new CANNON.Vec3(dice.startForce, 0, dice.startForce),
-      new CANNON.Vec3(0, 0.2, 0)
+      impulseForce,
+      impulsePosition
     );
     diceBody.allowSleep = true;
   }
