@@ -104,7 +104,9 @@ export class CardDialogComponent implements OnInit {
   
   getPlayerName(){
     if(this.completedSeriesCards[0]){
-      return this.gameService.players.find(player => player.id === this.completedSeriesCards[0].owner).name;
+      return this.gameService.players.find(player => player.id === this.completedSeriesCards[0].owner)?.name ?? '';
+    }else{
+      return ''
     }
   }
 

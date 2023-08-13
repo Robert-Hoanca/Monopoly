@@ -39,7 +39,7 @@ export class PlayerPropertiesComponent implements OnInit {
   }
 
   getPlayerGetOutCards(){
-    this.playerGetOutCards = this.gameService.players.find(player => player.id === this.playerId).prison.getOutCards;
+    this.playerGetOutCards = this.gameService.players.find(player => player.id === this.playerId)?.prison.getOutCards;
   }
 
   selectProperty(property:any){

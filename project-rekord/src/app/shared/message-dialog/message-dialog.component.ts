@@ -39,6 +39,7 @@ export class MessageDialogComponent implements OnInit {
   executeAndClose(){
     switch(this.data.eventType){
       case 'payMoney':
+        const player = (this.data.textData.playerId? this.gameService.players.find(player => player.id === this.data.textData.playerId) : this.gameService.players[this.gameService.turn])
         if(this.data.textData.bankTaxes){
           if(this.gameService.players[this.gameService.turn].money >= this.data.textData.property.taxesCost){
             this.gameService.payTaxes(this.data.textData.property);
@@ -56,7 +57,7 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.payRentToPlayer(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)],true);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
-        }else if(this.data.textData.amountDebt && ((this.data.textData.playerId? this.gameService.players.find(player => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]).money >= this.data.textData.amountDebt) && this.data.textData.debtWithWho == 'bank' && !this.gameService.checkBankrupt((this.data.textData.playerId? this.gameService.players.find(player => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]),this.data.textData.amountDebt)){
+        }else if(this.data.textData.amountDebt && player && (player.money >= this.data.textData.amountDebt) && this.data.textData.debtWithWho == 'bank' && !this.gameService.checkBankrupt((this.data.textData.playerId? this.gameService.players.find(player => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]),this.data.textData.amountDebt)){
           this.data.textData.playerId? this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000 ,this.gameService.players.find(player => player.id == this.data.textData.playerId)) : this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
@@ -88,14 +89,17 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.getCardPosition(this.gameService.players[this.gameService.turn].actualCard + (this.data.textData.dice1+this.data.textData.dice2));
         }
         break;
-      case 'backrupt':
-        this.gameService.players.find(player => player.id == this.data.textData.player.id).bankrupt = true;
-        this.gameService.players.find(player => player.id == this.data.textData.player.id).money = 0;
-        this.gameService.gameTable.cards.filter((card: { id: any; }) => card.id == this.data.textData.player.id).forEach((prop:any) => {
-          prop.owner = this.data.textData.playerToPay;
-          this.gameService.checkCompletedSeries([prop])
-        });
-        this.gameService.checkIfSomeoneWon();
+      case 'backrupt': //TO DO SISTEMARE LABEL
+        const bankRuptPlayer = this.gameService.players.find(player => player.id == this.data.textData.player.id);
+        if(bankRuptPlayer){
+          bankRuptPlayer.bankrupt = true;
+          bankRuptPlayer.money = 0;
+          this.gameService.gameTable.cards.filter((card: { id: any; }) => card.id == this.data.textData.player.id).forEach((prop:any) => {
+            prop.owner = this.data.textData.playerToPay;
+            this.gameService.checkCompletedSeries([prop])
+          });
+          this.gameService.checkIfSomeoneWon();
+        }
         break;
       case 'goBankRupt':
         this.gameService.goBankRupt();
