@@ -18,11 +18,13 @@ export class GamePhysicsService {
   groundArray: Array<any> = [];
   diceArray: Array<any> = [];
   diceRes: Array<number> = [];
+  onlineDiceData: Array<any> = [];
 
   dicesRolling: boolean = false;
   showDiceResultDialogRef: TemplateRef<any> | any;
 
   gravity:number = -50;
+  clock = new THREE.Clock();
   deltaTime:number = 0;
   lastTime:number = 0;
 
@@ -36,13 +38,13 @@ export class GamePhysicsService {
 
   createDiceCase() {
     //Bottom side
-    this.createGround(20, 20, [11, 0, 11], [-Math.PI / 2, 0, 0]);
+    this.createGround(40, 20, [11, 0, 11], [-Math.PI / 2, 0, 0]);
     //Z side
-    this.createGround(20, 20, [11, 10, 1], [0, 0, 0]);
-    this.createGround(20, 20, [11, 10, 21], [0, 0, 0]);
+    this.createGround(20, 45, [11, 10, 1], [0, 0, 0]);
+    this.createGround(20, 45, [11, 10, 21], [0, 0, 0]);
     //X side
-    this.createGround(20, 20, [1, 10, 11], [0, -Math.PI / 2, 0]);
-    this.createGround(20, 20, [21, 10, 11], [0, -Math.PI / 2, 0]);
+    this.createGround(20, 45, [1, 10, 11], [0, -Math.PI / 2, 0]);
+    this.createGround(20, 45, [21, 10, 11], [0, -Math.PI / 2, 0]);
   }
 
   createGround(
@@ -87,15 +89,26 @@ export class GamePhysicsService {
   }
 
   renderPhysicsWorld() {
-    this.world.step(this.time);
+
+    const currentTime = performance.now();
+    this.deltaTime = (currentTime - this.lastTime) / 1000; // Converti in secondi
+
+
+
     this.groundArray.forEach((groundEl) => {
       groundEl.mesh.position.copy(groundEl.body.position);
       groundEl.mesh.quaternion.copy(groundEl.body.quaternion);
     });
-    this.renderDices();
 
-    const currentTime = performance.now();
-    this.deltaTime = (currentTime - this.lastTime) / 1000; // Converti in secondi
+    this.diceArray.forEach((dice) => {
+      if (dice.mesh) {
+        dice.mesh.position.copy(dice.body.position);
+        dice.mesh.quaternion.copy(dice.body.quaternion);
+      }
+    });
+
+    //this.renderDices();
+    this.world.step(this.time, this.deltaTime);
     this.lastTime = currentTime;
   }
 
@@ -318,6 +331,7 @@ export class GamePhysicsService {
   }
 
   reproduceDiceRoll (dice:any, index:number) {
+
     //Setting the position, rotation and force to the database data
 
     const diceBody = this.diceArray[index].body;
@@ -337,17 +351,19 @@ export class GamePhysicsService {
 
 
     // Applying random force
-    const deltaTime = dice.startDeltaTime;
-    const impulseForce = new CANNON.Vec3(dice.startForce, 0, dice.startForce);
+    const initialForce =  new CANNON.Vec3(dice.startForce, 0, dice.startForce)
+    //const impulseForce = new CANNON.Vec3().copy(initialForce).scale(this.deltaTime);
     const impulsePosition = new CANNON.Vec3(0, 0.2, 0);
-    impulseForce.scale(deltaTime, impulseForce); // Scale the force by deltaTime
-    impulsePosition.scale(deltaTime, impulsePosition); // Scale the position by deltaTime
+
+
+    initialForce.scale(this.deltaTime, initialForce); // Scale the force by deltaTime
+    impulsePosition.scale(this.deltaTime, impulsePosition); // Scale the position by deltaTime
     
     
 
     //Applying random force
     diceBody.applyImpulse(
-      impulseForce,
+      initialForce,
       impulsePosition
     );
     diceBody.allowSleep = true;

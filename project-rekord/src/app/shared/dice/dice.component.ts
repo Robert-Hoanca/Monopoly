@@ -27,7 +27,7 @@ export class DiceComponent implements OnInit {
 
   ngOnInit(): void {
     this.positionX = Math.round(Math.random() * 15 + 5);
-    this.positionY = Math.round((Math.random() * (!this.gameService.amIOnline() ? 15 : 20)) + 10);
+    this.positionY = Math.round((Math.random() * (!this.gameService.amIOnline() ? 15 : 25)) + 10);
     this.positionZ = Math.round(Math.random() * 15 + 5);
 
     this.diceBody.position.x = this.positionX;

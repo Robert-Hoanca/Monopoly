@@ -187,7 +187,7 @@ export class OnlineService {
           }
           break;
         case 'dice-roll':
-          this.gamePhysicsService.reproduceDiceRoll(message.data, message.data.diceI)
+          this.gamePhysicsService.reproduceDiceRoll(message.data, message.data.diceI);
           break
         case 'dice-end':
           this.gameService.startToDice = false;
