@@ -26,10 +26,10 @@ export class DiceComponent implements OnInit {
   constructor(public gamePhysicsService : GamePhysicsService, public gameService : GameService) { }
 
   ngOnInit(): void {
-    this.positionX = Math.round(Math.random() * 15 + 5);
-    this.positionY = Math.round((Math.random() * (!this.gameService.amIOnline() ? 15 : 25)) + 10);
-    this.positionZ = Math.round(Math.random() * 15 + 5);
-
+    const startDice = this.gamePhysicsService.diceStartingFields[this.diceIndex];
+    this.positionX = startDice.startPosition.x;
+    this.positionY = startDice.startPosition.y;
+    this.positionZ = startDice.startPosition.z;
     this.diceBody.position.x = this.positionX;
     this.diceBody.position.z = this.positionZ;
     this.diceBody.position.y = this.positionY;
@@ -41,23 +41,23 @@ export class DiceComponent implements OnInit {
     this.gamePhysicsService.diceArray.push({
       mesh: this.diceMesh,
       body: this.diceBody,
-      startPosition : {
-        x : this.positionX,
-        y : this.positionY,
-        z : this.positionZ
-      },
-      startRotation : {},
-      startForce : 0
     })
 
   }
 
   setDicePhysics(){
+    const startDice = this.gamePhysicsService.diceStartingFields[this.diceIndex]
     this.gamePhysicsService.createDice({
       mesh: this.diceMesh,
       body: this.diceBody,
       diceindex: this.diceIndex,
-
+      startPosition : {
+        x : this.positionX,
+        y : this.positionY,
+        z : this.positionZ
+      },
+      startRotation : startDice.startRotation,
+      startForce : startDice.startForce
     })
   }
 

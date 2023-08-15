@@ -183,14 +183,14 @@ export class GameComponent implements OnInit {
 
     if(this.gameService.startToDice){
       this.gameService.startToDice = false;
+      this.gameService.setOnlineData$.next({path: '/online/message', value :{type : 'dice-end'}});
     }
 
     timer(time).subscribe({
       complete: ()=> {
 
         if(!this.gameService.players[this.gameService.turn].prison.inPrison){
-          this.gameService.startToDice = true;
-          this.gameService.setOnlineData$.next({path: '/online/message', value :{type : 'dice-start'}})
+          this.calculateDicesInitialPos();
         }else{
          this.whatToDoInPrison('prisonRoll')
         }
@@ -205,8 +205,7 @@ export class GameComponent implements OnInit {
     }if(action == 'freeExit'){
       this.gameService.exitFromPrison(false, false);
     }else if(action == 'prisonRoll'){
-      this.gameService.startToDice = true;
-      this.gameService.setOnlineData$.next({path: '/online/message', value :{type : 'dice-start'}})
+      this.calculateDicesInitialPos();
     }
   }
 
@@ -276,6 +275,46 @@ export class GameComponent implements OnInit {
         break;
     }
     this.gameService.setCameraZoom();
+  }
+
+  calculateDicesInitialPos(){
+    //Calculate dices start position / rotation / force
+    for (let i = 0; i < this.gamePhysicsService.diceCounter ; i++) {
+      const startPosition = {
+        x : Math.round(Math.random() * 15 + 2),
+        y : Math.round((Math.random() * (!this.gameService.amIOnline() ? 15 : 20)) + 10),
+        z : Math.round(Math.random() * 15 + 3)
+      }
+
+      const startRotation = {
+        x : 2 * Math.PI * Math.random(),
+        y : 0,
+        z : 2 * Math.PI * Math.random()
+      }
+      const startForce = 3 * Math.random();
+
+      this.gamePhysicsService.diceStartingFields[i] = {
+        startPosition : startPosition,
+        startRotation : startRotation,
+        startForce : startForce,
+        diceI : i,
+      }
+
+      //If i'm online and its my turn then send dices initial position to other players
+      if(this.gameService.amIOnline() && this.gameService.itsMyTurn){
+        this.gameService.setOnlineData$.next({path: '/online/message/', value : {type : 'dice-roll', data : {
+          startPosition : startPosition,
+          startRotation : startRotation,
+          startForce : startForce,
+          diceI : i,
+        }}})
+      }
+
+    }
+
+    if(!this.gameService.amIOnline()){
+      this.gameService.startToDice = true;
+    }
   }
 
   ngOnDestroy(){

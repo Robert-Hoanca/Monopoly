@@ -1007,13 +1007,12 @@ export class GameService {
     
     // const cardIndex = 3;
     // this.randomChance = {
-    //   action: "move",
-    //   cardIndex: cardIndex,
-    //   titleid: 'go',
-    //   title: 'Go to cell ' + cardIndex
+    //   action: "jail",
+    //   subaction: 'goto',
+    //   title: 'Go to jailll '
     // };
 
-    this.textDialog(this.randomChance,'chance');
+    //this.textDialog(this.randomChance,'chance');
   }
 
   //Database Management

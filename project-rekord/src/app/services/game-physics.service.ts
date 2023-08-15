@@ -14,11 +14,11 @@ export class GamePhysicsService {
     allowSleep: true,
   });
   time: number = 1 / 60;
-
+  diceCounter:number = 2;
   groundArray: Array<any> = [];
   diceArray: Array<any> = [];
   diceRes: Array<number> = [];
-  onlineDiceData: Array<any> = [];
+  diceStartingFields: Array<any> = [];
 
   dicesRolling: boolean = false;
   showDiceResultDialogRef: TemplateRef<any> | any;
@@ -82,19 +82,20 @@ export class GamePhysicsService {
 
   createDice(dice: any) {
     this.world.addBody(dice.body);
+    //Adding dice events only if i'm plating in local or it's my turn in a online match.
     if(!this.gameService.amIOnline() || (this.gameService.amIOnline() && this.gameService.itsMyTurn)){
       this.addDiceEvents(dice);
-      this.diceRoll(dice);
     }
+    this.diceRoll(dice, dice.diceindex)
   }
 
   renderPhysicsWorld() {
 
+    //Calculating deltatime each frame
     const currentTime = performance.now();
-    this.deltaTime = (currentTime - this.lastTime) / 1000; // Converti in secondi
+    this.deltaTime = (currentTime - this.lastTime) / 1000;
 
-
-
+    //Ground mesh follows ground physics body position and rotation
     this.groundArray.forEach((groundEl) => {
       groundEl.mesh.position.copy(groundEl.body.position);
       groundEl.mesh.quaternion.copy(groundEl.body.quaternion);
@@ -102,23 +103,14 @@ export class GamePhysicsService {
 
     this.diceArray.forEach((dice) => {
       if (dice.mesh) {
+        //Dice mesh follows dice physics body position and rotation
         dice.mesh.position.copy(dice.body.position);
         dice.mesh.quaternion.copy(dice.body.quaternion);
       }
     });
 
-    //this.renderDices();
     this.world.step(this.time, this.deltaTime);
     this.lastTime = currentTime;
-  }
-
-  renderDices() {
-    this.diceArray.forEach((dice) => {
-      if (dice.mesh) {
-        dice.mesh.position.copy(dice.body.position);
-        dice.mesh.quaternion.copy(dice.body.quaternion);
-      }
-    });
   }
 
   addDiceEvents(dice: any) {
@@ -180,56 +172,34 @@ export class GamePhysicsService {
       });
   }
 
-  diceRoll(dice: any) {
-
-    const initialRotation = {
-      x : 2 * Math.PI * Math.random(),
-      y : 0,
-      z : 2 * Math.PI * Math.random()
-    }
-    const force = 3 * Math.random();
-
-    
-    if(this.gameService.amIOnline()){
-
-      //Setting initial positions to each dice
-      this.diceArray[dice.diceindex].startRotation = initialRotation;
-      this.diceArray[dice.diceindex].startForce = force;
-      //Sending dice initial positions to each client connected
-      this.gameService.setOnlineData$.next({path: '/online/message/', value : {type : 'dice-roll', data : {
-        startPosition : this.diceArray[dice.diceindex].startPosition,
-        startRotation : initialRotation,
-        startForce : force,
-        diceI : dice.diceindex,
-        startDeltaTime : this.deltaTime
-      }}})
-      return;
-    }
-
+  diceRoll(dice: any, index:number) {
+    //Getting dice body and mesh
+    const diceBody = this.diceArray[index].body;
+    const diceMesh = this.diceArray[index].mesh;
 
     //Setting initial velocity
-    dice.body.velocity.setZero();
-    dice.body.angularVelocity.setZero();
+    diceBody.velocity.setZero();
+    diceBody.angularVelocity.setZero();
 
-    // set initial rotation
-    dice.mesh.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
-    dice.body.quaternion.copy(dice.mesh.quaternion);
+    //Setting initial rotation
+    diceMesh.rotation.set(dice.startRotation.x, dice.startRotation.y, dice.startRotation.z);
+    diceBody.quaternion.copy(diceMesh.quaternion);
 
-
-    
-    // Applying random force
-    const impulseForce = new CANNON.Vec3(force, 0, force);
+    //Creating force and impulsePos
+    const initialForce =  new CANNON.Vec3(dice.startForce, 0, dice.startForce)
     const impulsePosition = new CANNON.Vec3(0, 0.2, 0);
-    impulseForce.scale(this.deltaTime, impulseForce); // Scale the force by deltaTime
-    impulsePosition.scale(this.deltaTime, impulsePosition); // Scale the position by deltaTime
 
-
-    //Applying random force
-    dice.body.applyImpulse(
-      impulseForce,
+    //Scale the force by deltaTime
+    initialForce.scale(this.deltaTime, initialForce);
+    // Scale the position by deltaTime
+    impulsePosition.scale(this.deltaTime, impulsePosition);
+    
+    //Applying impulse
+    diceBody.applyImpulse(
+      initialForce,
       impulsePosition
     );
-    dice.body.allowSleep = true;
+    diceBody.allowSleep = true;
   }
 
   showRollResults() {
@@ -328,44 +298,5 @@ export class GamePhysicsService {
     this.dicesRolling = false;
     this.gameService.diceRes = this.diceRes;
     this.diceRes = [];
-  }
-
-  reproduceDiceRoll (dice:any, index:number) {
-
-    //Setting the position, rotation and force to the database data
-
-    const diceBody = this.diceArray[index].body;
-    const diceMesh = this.diceArray[index].mesh;
-    
-    diceBody.position.x = dice.startPosition.x;
-    diceBody.position.y = dice.startPosition.y;
-    diceBody.position.z = dice.startPosition.z;
-
-    //Setting initial velocity
-    diceBody.velocity.setZero();
-    diceBody.angularVelocity.setZero();
-
-    // set initial rotation
-    diceMesh.rotation.set(dice.startRotation.x, dice.startRotation.y, dice.startRotation.z);
-    diceBody.quaternion.copy(diceMesh.quaternion);
-
-
-    // Applying random force
-    const initialForce =  new CANNON.Vec3(dice.startForce, 0, dice.startForce)
-    //const impulseForce = new CANNON.Vec3().copy(initialForce).scale(this.deltaTime);
-    const impulsePosition = new CANNON.Vec3(0, 0.2, 0);
-
-
-    initialForce.scale(this.deltaTime, initialForce); // Scale the force by deltaTime
-    impulsePosition.scale(this.deltaTime, impulsePosition); // Scale the position by deltaTime
-    
-    
-
-    //Applying random force
-    diceBody.applyImpulse(
-      initialForce,
-      impulsePosition
-    );
-    diceBody.allowSleep = true;
   }
 }

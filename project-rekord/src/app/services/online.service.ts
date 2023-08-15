@@ -181,13 +181,11 @@ export class OnlineService {
           this.gameService.players[this.gameService.turn].canDice = true;
           this.itsMyTurn();
           break;
-        case 'dice-start':
-          if(!this.gameService.itsMyTurn){
+        case 'dice-roll':
+          this.gamePhysicsService.diceStartingFields[message.data.diceI] = message.data;
+          if(message.data.diceI === this.gamePhysicsService.diceCounter < 1){
             this.gameService.startToDice = true;
           }
-          break;
-        case 'dice-roll':
-          this.gamePhysicsService.reproduceDiceRoll(message.data, message.data.diceI);
           break
         case 'dice-end':
           this.gameService.startToDice = false;

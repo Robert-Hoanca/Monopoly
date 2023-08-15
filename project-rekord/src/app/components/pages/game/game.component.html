@@ -8,8 +8,9 @@
             <app-card *ngFor="let card of gameService.gameTable.cards;let i = index" [card]="card" [cardIndex]="i" [scene]="scene"></app-card>
             <app-player *ngFor="let player of gameService.players" [player]="player"></app-player>
 
-            <app-dice *ngIf="gameService.startToDice" [diceIndex]="0"></app-dice>
-            <app-dice *ngIf="gameService.startToDice" [diceIndex]="1"></app-dice>
+            <div *ngIf="gameService.startToDice">
+                <app-dice *ngFor="let dice of [].constructor(gamePhysicsService.diceCounter); let i = index" [diceIndex]="i"></app-dice>
+            </div>
 
             <th-orthographicCamera
                 [left]="-gameService.distance * this.gameService.aspect"
