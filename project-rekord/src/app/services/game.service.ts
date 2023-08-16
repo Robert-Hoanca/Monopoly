@@ -18,6 +18,7 @@ import { playerModel } from '../models/player';
 import { MessageTypes } from '../enums/onlineMessageType';
 import { SoundTypes } from '../enums/soundTypes';
 import { CardTypes } from '../enums/cardTypes';
+import { EventTypes } from '../enums/eventTypes';
 
 @Injectable({
   providedIn: 'root'
@@ -455,7 +456,7 @@ export class GameService {
         this.localSaveName = this.localSaves.localId;
         if(this.localSaves.playerWhoWonId){
           this.playerWhoWonId = this.localSaves.playerWhoWonId;
-          this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId)?.name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt)?.id}, 'finishGame')
+          this.textDialog({text: this.players.find(player => player.id == this.playerWhoWonId)?.name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt)?.id}, EventTypes.FINISH_GAME)
         }
       }
     }else if(this.amIOnline()){
@@ -500,7 +501,7 @@ export class GameService {
     }
     this.setOnlineData$.next({path : '/turn', value : this.turn})
     this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.CHANGE_TURN , data : { turn : this.turn}}})
-    this.textDialog({playerName: this.players[this.turn].name},'changeTurn');
+    this.textDialog({playerName: this.players[this.turn].name}, EventTypes.CHANGE_TURN);
     this.setCameraOnPlayer(0);
     this.players[this.turn].canDice = true;
     this.diceNumber = undefined;
@@ -580,14 +581,14 @@ export class GameService {
         
         if(this.diceNumber !== undefined || property.cardType == CardTypes.PROPERTY || property.cardType == CardTypes.STATION){
           this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.players[this.turn].actualCard)],this.diceRes);
-          this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner)?.name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney');
+          this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner)?.name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, EventTypes.PAYMONEY);
         }
       
       }
     }else if(property.cardType == CardTypes.GO_TO_PRISON || this.players[this.turn].prison.doubleDiceCounter == 3){
-      this.textDialog({text: this.players[this.turn].name + ' have to go to prison.'}, 'goingToPrison');
+      this.textDialog({text: this.players[this.turn].name + ' have to go to prison.'}, EventTypes.GO_TO_PRISON);
     }else if(property.cardType == CardTypes.TAXES){
-      this.textDialog({text:this.players[this.turn].name + ' have to pay ' + property.taxesCost + ' of taxes.', property, bankTaxes:true}, 'payMoney');
+      this.textDialog({text:this.players[this.turn].name + ' have to pay ' + property.taxesCost + ' of taxes.', property, bankTaxes:true}, EventTypes.PAYMONEY);
     }else if(property.cardType == CardTypes.CHANCE){
       this.getChestChance('chance');
     }else if(property.cardType == CardTypes.COMMUNITY_CHEST){
@@ -653,7 +654,7 @@ export class GameService {
 
   //MANAGE PROPERTIES
   showPlayerProps(){
-    this.textDialog({text: this.players[this.turn].name, showPlayerProps:true, playerId: this.players[this.turn].id}, 'showPlayerProps')
+    this.textDialog({text: this.players[this.turn].name, showPlayerProps:true, playerId: this.players[this.turn].id}, EventTypes.SHOW_PLAYER_PROPS)
   }
 
   buyProperty(property:any){
@@ -783,13 +784,13 @@ export class GameService {
       if(this.players[this.turn].money < 50){
         this.calculateAmountDebt(50);
       }else{
-        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + 50 +' and then exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2, shouldPay, exitFromDice}, 'exitFromPrison');
+        this.textDialog({text:this.players[this.turn].name + ' have to pay ' + 50 +' and then exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2, shouldPay, exitFromDice}, EventTypes.EXIT_FROM_PRISON);
       }
       this.players[this.turn].canDice=true;
     }else if(exitFromDice && dice1 && dice2){
-      this.textDialog({text:this.players[this.turn].name + ' has exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2,shouldPay, exitFromDice},'exitFromPrison');
+      this.textDialog({text:this.players[this.turn].name + ' has exit from prison.', actualPlayer: this.players[this.turn], dice1, dice2,shouldPay, exitFromDice}, EventTypes.EXIT_FROM_PRISON);
     }else if(!shouldPay && !exitFromDice){
-      this.textDialog({text:this.players[this.turn].name + ' exit from prison using free card.', actualPlayer: this.players[this.turn],shouldPay, exitFromDice}, 'exitFromPrison');
+      this.textDialog({text:this.players[this.turn].name + ' exit from prison using free card.', actualPlayer: this.players[this.turn],shouldPay, exitFromDice}, EventTypes.EXIT_FROM_PRISON);
       this.players[this.turn].canDice=true;
     }
     this.shouldRemovePlayerCage$.next({
@@ -840,11 +841,11 @@ export class GameService {
     if(cardType=='chance'){
       const randomNum = (Math.round(Math.random() * ( this.gameTable.chance.length - 1) ) + 0);
       this.randomChance = this.gameTable.chance[randomNum];
-      this.textDialog(this.randomChance,'chance');
+      this.textDialog(this.randomChance, EventTypes.CHANCE);
     }else{
       const randomNum = (Math.round(Math.random() * ( this.gameTable.communitychest.length - 1)) + 0)
       this.randomChest = this.gameTable.communitychest[randomNum]
-      this.textDialog(this.randomChest,'communityChest');
+      this.textDialog(this.randomChest, EventTypes.COMMUNITY_CHEST);
     }
   }
 
@@ -860,7 +861,7 @@ export class GameService {
     const playerProps= this.gameTable.cards.filter((card: { owner: any; })=>card.owner == player.id);
     let moneyFromDistrain = 0;
     if((player.money - moneyToSub - this.amountDebt)<0 && playerProps.length<1){
-      this.textDialog({text: player.name + ' went bankrupt', player, playerToPay}, 'backrupt');
+      this.textDialog({text: player.name + ' went bankrupt', player, playerToPay}, EventTypes.BANKRUPT);
       return true;
     }else if(playerProps.length && (player.money - moneyToSub)<0){
       playerProps.forEach((prop: any) => {
@@ -874,7 +875,7 @@ export class GameService {
         }
       });
       if(((player.money - moneyToSub - this.amountDebt) + moneyFromDistrain)<0){
-        this.textDialog({text: player.name + ' went bankrupt', player, playerToPay},'backrupt');
+        this.textDialog({text: player.name + ' went bankrupt', player, playerToPay}, EventTypes.BANKRUPT);
         return true;
       }else{
         return false;
@@ -885,7 +886,7 @@ export class GameService {
   }
 
   askIfShouldGoBankrupt(){
-    this.textDialog({text: 'You are going to go bankrupt. Confirm?', goBankRupt:true}, 'goBankRupt')
+    this.textDialog({text: 'You are going to go bankrupt. Confirm?', goBankRupt:true}, EventTypes.WANT_TO_BANKRUPT)
   }
 
   goBankRupt(){
@@ -900,7 +901,7 @@ export class GameService {
       this.endTime = Date.now();
       this.playerWhoWonId = this.players.find(player => !player.bankrupt)?.id ?? '';
       this.calculateGameTime()
-      this.textDialog({text: this.players.find(player => !player.bankrupt)?.name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt)?.id}, 'finishGame')
+      this.textDialog({text: this.players.find(player => !player.bankrupt)?.name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt)?.id}, EventTypes.FINISH_GAME)
     }else{
       await this.gameTable.cards.filter((card:any) => card.owner == this.players[this.turn].id).forEach((foundCard:any) => {
         foundCard.owner = '';
@@ -946,7 +947,7 @@ export class GameService {
       }
     }
     if(this.debtWithWho == 'player'){
-      this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountDebt + ' of debts to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner)?.name, property: this.gameTable.cards[(this.players[this.turn].actualCard)],amountDebt:this.amountDebt, playerRent:true, debtWithWho: this.debtWithWho}, 'payMoney');
+      this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountDebt + ' of debts to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner)?.name, property: this.gameTable.cards[(this.players[this.turn].actualCard)],amountDebt:this.amountDebt, playerRent:true, debtWithWho: this.debtWithWho}, EventTypes.PAYMONEY);
       if(this.setDebt){
         const player = (playerId ? this.players.find(player => player.id == playerId) : this.players[this.turn])
         if(playerId && player){
@@ -954,7 +955,7 @@ export class GameService {
         }
       }
     }else if(this.debtWithWho == 'bank'){
-      this.textDialog({text:(playerId??this.players[this.turn].name) + ' have to pay ' + this.amountDebt + ' of debts to the bank.',debtWithWho: this.debtWithWho,amountDebt:this.amountDebt, playerRent:false, playerId: playerId??''}, 'payMoney');
+      this.textDialog({text:(playerId??this.players[this.turn].name) + ' have to pay ' + this.amountDebt + ' of debts to the bank.',debtWithWho: this.debtWithWho,amountDebt:this.amountDebt, playerRent:false, playerId: playerId??''}, EventTypes.PAYMONEY);
       if(this.setDebt){
         const player = (playerId ? this.players.find(player => player.id == playerId) : this.players[this.turn])
         if(playerId && player){

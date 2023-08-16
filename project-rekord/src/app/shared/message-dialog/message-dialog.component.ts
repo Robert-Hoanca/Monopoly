@@ -5,6 +5,8 @@ import { GameService } from 'src/app/services/game.service';
 import { CardDialogComponent } from '../card-dialog/card-dialog.component';
 import { SoundService } from 'src/app/services/sound.service';
 import { SoundTypes } from 'src/app/enums/soundTypes';
+import { EventTypes } from 'src/app/enums/eventTypes';
+import { ChestChanceTypes } from 'src/app/enums/chestChanceTypes';
 
 @Component({
   selector: 'app-message-dialog',
@@ -19,7 +21,7 @@ export class MessageDialogComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
-    if(this.data.eventType === 'changeTurn'){
+    if(this.data.eventType === EventTypes.CHANGE_TURN){
       timer(1000).pipe(take(1)).subscribe({
         complete: () => {
           this.closeDialog();
@@ -27,7 +29,7 @@ export class MessageDialogComponent implements OnInit {
       })
     }
 
-    if(this.data.eventType === 'chance' || this.data.eventType === 'communityChest'){
+    if(this.data.eventType === EventTypes.CHANCE || this.data.eventType === EventTypes.COMMUNITY_CHEST){
       this.soundService.playSound(SoundTypes.OPEN_CARD)
     }else{
       this.soundService.playSound(SoundTypes.OPEN_DIALOG)
@@ -39,7 +41,7 @@ export class MessageDialogComponent implements OnInit {
 
   executeAndClose(){
     switch(this.data.eventType){
-      case 'payMoney':
+      case EventTypes.PAYMONEY :
         const player = (this.data.textData.playerId? this.gameService.players.find(player => player.id === this.data.textData.playerId) : this.gameService.players[this.gameService.turn])
         if(this.data.textData.bankTaxes){
           if(this.gameService.players[this.gameService.turn].money >= this.data.textData.property.taxesCost){
@@ -66,16 +68,16 @@ export class MessageDialogComponent implements OnInit {
         if(this.gameService.setDebt){this.gameService.setDebt = false}
 
         break;
-      case 'chance':
+      case EventTypes.CHANCE :
         this.calculateChestChance(this.data.textData);
         break;
-      case 'communityChest':
+      case EventTypes.COMMUNITY_CHEST :
         this.calculateChestChance(this.data.textData);
         break;
-      case 'goingToPrison':
+      case EventTypes.GO_TO_PRISON :
         this.gameService.goToPrison();
         break;
-      case 'exitFromPrison':
+      case EventTypes.EXIT_FROM_PRISON :
 
       if(!this.data.textData.shouldPay && !this.data.textData.exitFromDice){
         this.gameService.players[this.gameService.turn].prison.getOutCards--;
@@ -90,7 +92,7 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.getCardPosition(this.gameService.players[this.gameService.turn].actualCard + (this.data.textData.dice1+this.data.textData.dice2));
         }
         break;
-      case 'backrupt': //TO DO SISTEMARE LABEL
+      case EventTypes.BANKRUPT : //TO DO SISTEMARE LABEL
         const bankRuptPlayer = this.gameService.players.find(player => player.id == this.data.textData.player.id);
         if(bankRuptPlayer){
           bankRuptPlayer.bankrupt = true;
@@ -102,7 +104,7 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.checkIfSomeoneWon();
         }
         break;
-      case 'goBankRupt':
+      case EventTypes.WANT_TO_BANKRUPT :
         this.gameService.goBankRupt();
         break;
     }
@@ -112,7 +114,7 @@ export class MessageDialogComponent implements OnInit {
 
   calculateChestChance(data:any){
     switch(data.action){
-      case 'move':
+      case ChestChanceTypes.MOVE :
         if(data.cardIndex != undefined && data.cardIndex != null){
           this.gameService.getCardPosition(data.cardIndex)
         }else if(data.count != undefined && data.count != null){
@@ -125,7 +127,7 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.getCardPosition(cardIndex);
         }
         break;
-      case 'movenearest': //Maybe add multiply option in future
+      case ChestChanceTypes.MOVE_NEAREST : //Maybe add multiply option in future
         this.gameService.gameTable.cards.forEach((nearProp: { cardType: any; }, index: number) => {
           if((nearProp.cardType == data.groupid && index > this.gameService.players[this.gameService.turn].actualCard && !this.movedNearest) || (nearProp.cardType == data.groupid && this.gameService.players[this.gameService.turn].actualCard >= 30 && !this.movedNearest)){
             this.gameService.getCardPosition(index);
@@ -133,18 +135,18 @@ export class MessageDialogComponent implements OnInit {
           }
         });
         break;
-      case 'addfunds':
+      case ChestChanceTypes.ADD_FUNDS :
         this.gameService.addingRemovingMoney('add', data.amount, 1000)
         break;
-      case 'jail':
+      case ChestChanceTypes.JAIL :
         if(data.subaction == 'getout'){
           this.gameService.players[this.gameService.turn].prison.getOutCards ++;
         }else if(data.subaction == 'goto'){
           this.closeDialog();
-          this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' have to go to prison.'}, 'goingToPrison');
+          this.gameService.textDialog({text: this.gameService.players[this.gameService.turn].name + ' have to go to prison.'}, EventTypes.GO_TO_PRISON);
         }
         break;
-      case 'propertycharges':
+      case ChestChanceTypes.PROPERTY_CHARGES :
         let amount = 0;
         let housesC = 0;
         let hotelC = 0;
@@ -169,14 +171,14 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.calculateAmountDebt(amount);
         }
         break;
-      case 'removefunds':
+      case ChestChanceTypes.REMOVE_FUNDS :
         if(this.gameService.players[this.gameService.turn].money >= data.amount){
           this.gameService.addingRemovingMoney('remove',data.amount, 1000)
         }else if(!this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn], data.amount)){
           this.gameService.calculateAmountDebt(data.amount);
         }       
         break;
-      case 'removefundstoplayers':
+      case ChestChanceTypes.REMOVE_FUNDS_TO_PLAYERS :
         let removefundstoplayersAmount = 0;
         (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach(otherPlayer => {
           if(this.gameService.players[this.gameService.turn].money >= removefundstoplayersAmount){
@@ -192,7 +194,7 @@ export class MessageDialogComponent implements OnInit {
         }, 1000);
 
         break;
-      case 'addfundsfromplayers':
+      case ChestChanceTypes.ADD_FUNDS_FROM_PLAYERS :
         let addfundsfromplayersAmount = 0;
         (this.gameService.players.filter(player => player.id != this.gameService.players[this.gameService.turn].id)).forEach(otherPlayer => {
           if(otherPlayer.money >= data.amount){
