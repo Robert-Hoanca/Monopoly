@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { GLTFLoaderService } from 'ngx-three';
 import { Subscription } from 'rxjs';
+import { CardTypes } from 'src/app/enums/cardTypes';
 import { GameService } from 'src/app/services/game.service';
 import * as THREE from 'three';
 @Component({
@@ -139,9 +140,9 @@ export class CardComponent implements OnInit {
 
   returnSpecialCardObjRotation(): any {
     if (
-      this.card.cardType == 'chance' ||
-      this.card.cardType == 'communityChest' ||
-      this.card.cardType == 'taxes'
+      this.card.cardType == CardTypes.CHANCE ||
+      this.card.cardType == CardTypes.COMMUNITY_CHEST ||
+      this.card.cardType == CardTypes.TAXES
     ) {
       if (this.cardIndex >= 20 && this.cardIndex <= 30) {
         return [this.rotation[0], -Math.PI, this.rotation[2]];
@@ -179,7 +180,7 @@ export class CardComponent implements OnInit {
   }
 
   enableCursorOnHover(enable:boolean){
-    if(this.card.cardType === 'property' || this.card.cardType === 'station' || this.card.cardType === 'plant'){
+    if(this.card.cardType === CardTypes.PROPERTY || this.card.cardType === CardTypes.STATION || this.card.cardType === CardTypes.PLANT){
       this.gameService.enableCursor = enable;
     }else if(this.gameService.enableCursor){
       this.gameService.enableCursor = false;

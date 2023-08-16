@@ -1,6 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { SoundTypes } from 'src/app/enums/soundTypes';
 import { GameService } from 'src/app/services/game.service';
 import { SoundService } from 'src/app/services/sound.service';
 
@@ -39,7 +40,7 @@ export class ExchangeComponent implements OnInit {
 
   ngOnInit(): void {
     this.resetSelectedProps();
-    this.soundService.playSound('open-dialog')
+    this.soundService.playSound(SoundTypes.OPEN_DIALOG)
   }
   ngAfterViewInit(){
   }
@@ -150,6 +151,6 @@ export class ExchangeComponent implements OnInit {
 
   ngOnDestroy(){
     this.resetSelectedProps();
-    this.soundService.playSound('open-dialog')
+    this.soundService.playSound(SoundTypes.OPEN_DIALOG)
   }
 }

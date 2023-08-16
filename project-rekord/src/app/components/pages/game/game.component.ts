@@ -3,6 +3,7 @@ import { Component, HostListener, OnInit, TemplateRef, ViewChild } from '@angula
 import { MatDialog } from '@angular/material/dialog';
 import { gsap } from 'gsap';
 import { Subscription, take, timer } from 'rxjs';
+import { MessageTypes } from 'src/app/enums/onlineMessageType';
 import { GamePhysicsService } from 'src/app/services/game-physics.service';
 import { GameService } from 'src/app/services/game.service';
 import { OnlineService } from 'src/app/services/online.service';
@@ -183,7 +184,7 @@ export class GameComponent implements OnInit {
 
     if(this.gameService.startToDice){
       this.gameService.startToDice = false;
-      this.gameService.setOnlineData$.next({path: '/online/message', value :{type : 'dice-end'}});
+      this.gameService.setOnlineData$.next({path: '/online/message', value :{type : MessageTypes.DICE_END}});
     }
 
     timer(time).subscribe({
@@ -302,7 +303,7 @@ export class GameComponent implements OnInit {
 
       //If i'm online and its my turn then send dices initial position to other players
       if(this.gameService.amIOnline() && this.gameService.itsMyTurn){
-        this.gameService.setOnlineData$.next({path: '/online/message/', value : {type : 'dice-roll', data : {
+        this.gameService.setOnlineData$.next({path: '/online/message/', value : {type : MessageTypes.DICE_ROLL, data : {
           startPosition : startPosition,
           startRotation : startRotation,
           startForce : startForce,

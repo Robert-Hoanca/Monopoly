@@ -4,6 +4,7 @@ import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { of, take } from 'rxjs';
 import { GamePhysicsService } from './game-physics.service';
 import { allLobby } from '../shared/real-time-db/real-time-dv-save';
+import { MessageTypes } from '../enums/onlineMessageType';
 @Injectable({
   providedIn: 'root'
 })
@@ -141,24 +142,6 @@ export class OnlineService {
     this.realTimeDb.object(this.lobbyName + '/online/message').valueChanges().subscribe(data => {
       this.handleMessages(data);
     })
-
-    this.realTimeDb.object(this.lobbyName + '/online/dices/0/position').valueChanges().subscribe(data => {
-      this.handleMessages({type : 'dice-pos', data : data, diceI : 0});
-    })
-
-    this.realTimeDb.object(this.lobbyName + '/online/dices/1/position').valueChanges().subscribe(data => {
-      this.handleMessages({type : 'dice-pos', data : data, diceI : 1});
-    })
-
-    this.realTimeDb.object(this.lobbyName + '/online/dices/0/rotation').valueChanges().subscribe(data => {
-      //console.log('Dice Rotation',data)
-      this.handleMessages({type : 'dice-rot', data : data, diceI : 0});
-    })
-    this.realTimeDb.object(this.lobbyName + '/online/dices/1/rotation').valueChanges().subscribe(data => {
-      //console.log('Dice Rotation',data)
-      this.handleMessages({type : 'dice-rot', data : data, diceI : 1});
-    })
-
     this.lobbySubs$.forEach(sub => {
       sub.unsubscribe();
     });
@@ -176,27 +159,27 @@ export class OnlineService {
 
   handleMessages(message:any){
       switch (message.type) {
-        case 'change-turn':
+        case MessageTypes.CHANGE_TURN:
           this.gameService.turn = message.data.turn;
           this.gameService.players[this.gameService.turn].canDice = true;
           this.itsMyTurn();
           break;
-        case 'dice-roll':
+        case MessageTypes.DICE_ROLL:
           this.gamePhysicsService.diceStartingFields[message.data.diceI] = message.data;
-          if(message.data.diceI === this.gamePhysicsService.diceCounter < 1){
+          if(message.data.diceI === (this.gamePhysicsService.diceCounter - 1)){
             this.gameService.startToDice = true;
           }
           break
-        case 'dice-end':
+        case MessageTypes.DICE_END:
           this.gameService.startToDice = false;
           break;
-        case 'change-money':
+        case MessageTypes.CHANGE_MONEY:
           if(!this.gameService.itsMyTurn){
             const player = this.gameService.players.find(player => player.id === message.data.playerId)
             this.gameService.addingRemovingMoney(message.data.type, message.data.amount, message.data.duration, player)
           }
           break;
-        case 'change-player-pos':
+        case MessageTypes.CHANGE_PLAYER_POS:
           if(!this.gameService.itsMyTurn){
             this.gameService.getCardPosition(message.data.cardIndex)
           }

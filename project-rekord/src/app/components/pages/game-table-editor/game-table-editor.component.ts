@@ -3,6 +3,7 @@ import { GameService } from 'src/app/services/game.service';
 import {doc, getDoc } from '@angular/fire/firestore';
 import { MatDialog } from '@angular/material/dialog';
 import { take, timer } from 'rxjs';
+import { CardTypes } from 'src/app/enums/cardTypes';
 
 @Component({
   selector: 'app-game-table-editor',
@@ -113,7 +114,7 @@ export class GameTableEditorComponent implements OnInit {
       let newCard = {};
 
       switch (newType){
-        case 'start':
+        case CardTypes.START:
           newCard = {
             canBuy: false,
             cardType: "start",
@@ -123,7 +124,7 @@ export class GameTableEditorComponent implements OnInit {
           
           break;
   
-        case 'property':
+        case CardTypes.PROPERTY:
           newCard = {
             canBuy: true,
             cardType: "property",
@@ -151,7 +152,7 @@ export class GameTableEditorComponent implements OnInit {
           }
           
           break;
-        case 'communityChest':
+        case CardTypes.COMMUNITY_CHEST:
           newCard = {
             chests: [],
             name: "Community Chest",
@@ -160,7 +161,7 @@ export class GameTableEditorComponent implements OnInit {
           }
           
           break;
-        case 'chance':
+        case CardTypes.CHANCE:
           newCard = {
             name: "Chance",
             chances: [],
@@ -170,7 +171,7 @@ export class GameTableEditorComponent implements OnInit {
           } 
           
           break;
-        case 'taxes':
+        case CardTypes.TAXES:
           newCard = {
             name: "Taxes",
             cardType: "taxes",
@@ -179,7 +180,7 @@ export class GameTableEditorComponent implements OnInit {
         }
           
           break;
-        case 'station':
+        case CardTypes.STATION:
           newCard = {
             exchangeSelected: false,
             canBuy: true,
@@ -200,7 +201,7 @@ export class GameTableEditorComponent implements OnInit {
         }
           
           break;
-        case 'prison':
+        case CardTypes.PRISON:
           newCard = {
             name: "Prison Area",
             cardType: "prison",
@@ -208,7 +209,7 @@ export class GameTableEditorComponent implements OnInit {
         }
           
           break;
-        case 'parkArea':
+        case CardTypes.PARK_AREA:
           newCard = {
             name: "Parking Area",
             cardType: "parkArea",
@@ -216,7 +217,7 @@ export class GameTableEditorComponent implements OnInit {
           }
           
           break;
-        case 'goToPrison':
+        case CardTypes.GO_TO_PRISON:
           newCard = {
             name: "Prison",
             cardType: "goToPrison",
@@ -224,7 +225,7 @@ export class GameTableEditorComponent implements OnInit {
           }
           
           break;
-        case 'plant':
+        case CardTypes.PLANT:
           newCard = {
             cardType: "plant",
             canBuy: true,
@@ -251,12 +252,12 @@ export class GameTableEditorComponent implements OnInit {
   ifCantBeMoreThanOne(type:string){
 
     switch (type) {
-      case 'start':
-        return (type === 'start') && (this.gameTable.cards.find( (card:any) => card.cardType === 'start')) ? true : false;
-      case 'prison':
-        return (type === 'prison') && (this.gameTable.cards.find( (card:any) => card.cardType === 'prison')) ? true : false;
-      case 'station':
-        return (this.gameTable.cards.filter( (card:any) => card.cardType === 'station')).length == 4 ? true : false;
+      case CardTypes.START:
+        return (type === 'start') && (this.gameTable.cards.find( (card:any) => card.cardType === CardTypes.START)) ? true : false;
+      case CardTypes.PRISON:
+        return (type === 'prison') && (this.gameTable.cards.find( (card:any) => card.cardType === CardTypes.PRISON)) ? true : false;
+      case CardTypes.STATION:
+        return (this.gameTable.cards.filter( (card:any) => card.cardType === CardTypes.STATION)).length == 4 ? true : false;
     
       default:
         return false;
@@ -269,8 +270,8 @@ export class GameTableEditorComponent implements OnInit {
   }
 
   saveToDb(){
-    const foundPrison = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === 'prison').length ? true : false;
-    const foundGoToPrisonCell = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === 'goToPrison').length ? true : false;;
+    const foundPrison = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === CardTypes.PRISON).length ? true : false;
+    const foundGoToPrisonCell = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === CardTypes.GO_TO_PRISON).length ? true : false;;
 
     if(foundPrison && foundGoToPrisonCell){
       if(this.chosenMap !== 'newMap'){

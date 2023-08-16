@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { interval } from 'rxjs';
 import { SettingsService } from './settings.service';
+import { SoundTypes } from '../enums/soundTypes';
 @Injectable({
   providedIn: 'root'
 })
@@ -169,19 +170,19 @@ export class SoundService {
     if(this.settingsService.settings.sound.enabledSfx){
       let audio;
       switch (sound) {
-        case 'money':
+        case SoundTypes.MONEY_CHANGE:
           const cashI = this.chooseRandomAudio(1,this.cashSounds.length - 1)
           audio = this.cashSounds[cashI];
           break;
-        case 'open-dialog':
+        case SoundTypes.OPEN_DIALOG:
           const dialogI = this.chooseRandomAudio(1,this.dialogSounds.length - 1)
           audio = this.dialogSounds[dialogI];
           break;
-        case 'open-card':
+        case SoundTypes.OPEN_CARD:
           const cardI = this.chooseRandomAudio(1,this.cardSounds.length - 1)
           audio = this.cardSounds[cardI];
           break;
-        case 'pawn-move':
+        case SoundTypes.PAWN_MOVE:
           const pawnI = this.chooseRandomAudio(1,this.pawnSounds.length - 1)
           audio = this.pawnSounds[pawnI];
           break;

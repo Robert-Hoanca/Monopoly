@@ -4,6 +4,7 @@ import { Subject, take, timer } from 'rxjs';
 import { GameService } from 'src/app/services/game.service';
 import { CardDialogComponent } from '../card-dialog/card-dialog.component';
 import { SoundService } from 'src/app/services/sound.service';
+import { SoundTypes } from 'src/app/enums/soundTypes';
 
 @Component({
   selector: 'app-message-dialog',
@@ -27,9 +28,9 @@ export class MessageDialogComponent implements OnInit {
     }
 
     if(this.data.eventType === 'chance' || this.data.eventType === 'communityChest'){
-      this.soundService.playSound('open-card')
+      this.soundService.playSound(SoundTypes.OPEN_CARD)
     }else{
-      this.soundService.playSound('open-dialog')
+      this.soundService.playSound(SoundTypes.OPEN_DIALOG)
     }
   }
 
@@ -224,7 +225,7 @@ export class MessageDialogComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.soundService.playSound('open-dialog');
+    this.soundService.playSound(SoundTypes.OPEN_DIALOG);
   }
 }
 

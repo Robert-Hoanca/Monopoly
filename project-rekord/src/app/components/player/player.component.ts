@@ -3,6 +3,8 @@ import { GameService } from 'src/app/services/game.service';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { SoundService } from 'src/app/services/sound.service';
+import { SoundTypes } from 'src/app/enums/soundTypes';
+import { CardTypes } from 'src/app/enums/cardTypes';
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
@@ -593,7 +595,7 @@ export class PlayerComponent implements OnInit {
         },
         onComplete : () =>{
           if(!shouldJump){
-            this.soundService.playSound('pawn-move');
+            this.soundService.playSound(SoundTypes.PAWN_MOVE);
           }
         }
       }
@@ -621,7 +623,7 @@ export class PlayerComponent implements OnInit {
     const playerCardIndex = this.player.actualCard;
     
     const prisonCardIndex = this.gameService.gameTable.cards.findIndex(
-      (card: any) => card.cardType === 'prison'
+      (card: any) => card.cardType === CardTypes.PRISON
     );
 
     if (
@@ -644,7 +646,7 @@ export class PlayerComponent implements OnInit {
 
   shouldRemovePrison(startingCardIndex: number) {
     const prisonCardIndex = this.gameService.gameTable.cards.findIndex(
-      (card: any) => card.cardType === 'prison'
+      (card: any) => card.cardType === CardTypes.PRISON
     );
 
     if (

@@ -1,7 +1,7 @@
 <th-mesh
   [position]="position"
   [rotation]="rotation"
-  (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType=='property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): '';"
+  (onClick)="((cardIndex == gameService.diceNumber && card.canBuy) || card.owner == gameService.players[gameService.turn].id) && (card.cardType === 'property' || card.cardType=='station' || card.cardType=='plant') && (gameService.playerWhoWonId == '')?  gameService.openCardDialog(card): '';"
   [receiveShadow]="false"
   [castShadow]="false"
   [name]="'cardNumber'+ cardIndex"

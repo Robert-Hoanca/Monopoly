@@ -15,6 +15,9 @@ import { ExchangeComponent } from '../shared/exchange/exchange.component';
 import { SoundService } from './sound.service';
 import { v4 as uuidv4 } from 'uuid';
 import { playerModel } from '../models/player';
+import { MessageTypes } from '../enums/onlineMessageType';
+import { SoundTypes } from '../enums/soundTypes';
+import { CardTypes } from '../enums/cardTypes';
 
 @Injectable({
   providedIn: 'root'
@@ -395,7 +398,7 @@ export class GameService {
   getCardPosition(cardIndex:any){
     this.disabledUserHoveringCard = true;
     this.setOnlineData$.next({path : '/online/message/', value : {
-      type : 'change-player-pos',
+      type : MessageTypes.CHANGE_PLAYER_POS,
       data : {
        cardIndex : cardIndex
       }
@@ -468,7 +471,7 @@ export class GameService {
       this.setOnlineData$.next({path : '/gameTable', value : gameTable})
       
       this.setOnlineData$.next({path : '/turn', value : this.turn})
-      this.setOnlineData$.next({path : '/online/message', value : { type : 'change-turn' , data : { turn : this.turn}}})
+      this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.CHANGE_TURN , data : { turn : this.turn}}})
 
     }
 
@@ -478,7 +481,7 @@ export class GameService {
 
   nextTurn(){
     if(this.startToDice){
-      this.setOnlineData$.next({path: '/online/message', value :{type : 'dice-end'}});
+      this.setOnlineData$.next({path: '/online/message', value :{type : MessageTypes.DICE_END}});
       this.startToDice = false;
     }
     if(this.turn == (this.players.length - 1)){
@@ -496,7 +499,7 @@ export class GameService {
       }
     }
     this.setOnlineData$.next({path : '/turn', value : this.turn})
-    this.setOnlineData$.next({path : '/online/message', value : { type : 'change-turn' , data : { turn : this.turn}}})
+    this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.CHANGE_TURN , data : { turn : this.turn}}})
     this.textDialog({playerName: this.players[this.turn].name},'changeTurn');
     this.setCameraOnPlayer(0);
     this.players[this.turn].canDice = true;
@@ -525,7 +528,7 @@ export class GameService {
     }
   }
   calculateTaxesToPay(property:any, diceNumber:Array<number>){
-    if(property.cardType == 'property'){
+    if(property.cardType == CardTypes.PROPERTY){
       if(property.completedSeries){
         if(property.hotelCounter){
           return property.rentCosts.hotel;
@@ -546,8 +549,8 @@ export class GameService {
       }else if(!property.completedSeries){
         return property.rentCosts.normal;
       }
-    }else if(property.cardType == 'station'){
-      const numOfStations = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'station').length;
+    }else if(property.cardType == CardTypes.STATION){
+      const numOfStations = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == CardTypes.STATION).length;
       switch(numOfStations){
         case 1:
           return property.rentCosts.one;
@@ -558,9 +561,9 @@ export class GameService {
         case 4:
           return property.rentCosts.four;
       }
-    }else if(property.cardType == 'plant'){
-      const maxPlants = this.gameTable.cards.filter((prop: { cardType: any; }) => prop.cardType == 'plant').length;
-      const numOfPlants = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == 'plant').length;
+    }else if(property.cardType == CardTypes.PLANT){
+      const maxPlants = this.gameTable.cards.filter((prop: { cardType: any; }) => prop.cardType == CardTypes.PLANT).length;
+      const numOfPlants = this.gameTable.cards.filter((prop: { owner: any; cardType: any; }) => prop.owner == property.owner && prop.cardType == CardTypes.PLANT).length;
       switch(numOfPlants){
         case 1:
           return ((diceNumber[0] + diceNumber[1]) *4);
@@ -571,23 +574,23 @@ export class GameService {
   }
 
   async whichPropertyAmI(property:any){
-    if(property.cardType == 'property' || property.cardType == 'station' || property.cardType == 'plant'){
+    if(property.cardType == CardTypes.PROPERTY || property.cardType == CardTypes.STATION || property.cardType == CardTypes.PLANT){
       this.openCardDialog(this.gameTable.cards[this.players[this.turn].actualCard]);
       if(this.gameTable.cards[(this.players[this.turn].actualCard)].owner && this.gameTable.cards[(this.players[this.turn].actualCard)].owner!=this.players[this.turn].id && !this.gameTable.cards[(this.players[this.turn].actualCard)].distrained){
         
-        if(this.diceNumber !== undefined || property.cardType == 'property' || property.cardType == 'station'){
+        if(this.diceNumber !== undefined || property.cardType == CardTypes.PROPERTY || property.cardType == CardTypes.STATION){
           this.amountRent = await this.calculateTaxesToPay(this.gameTable.cards[(this.players[this.turn].actualCard)],this.diceRes);
           this.textDialog({text:this.players[this.turn].name + ' have to pay ' + this.amountRent + ' of taxes to ' + this.players.find(player => player.id == this.gameTable.cards[(this.players[this.turn].actualCard)].owner)?.name, property: this.gameTable.cards[(this.players[this.turn].actualCard)], diceRes:this.diceRes, playerRent:true}, 'payMoney');
         }
       
       }
-    }else if(property.cardType == 'goToPrison' || this.players[this.turn].prison.doubleDiceCounter == 3){
+    }else if(property.cardType == CardTypes.GO_TO_PRISON || this.players[this.turn].prison.doubleDiceCounter == 3){
       this.textDialog({text: this.players[this.turn].name + ' have to go to prison.'}, 'goingToPrison');
-    }else if(property.cardType == 'taxes'){
+    }else if(property.cardType == CardTypes.TAXES){
       this.textDialog({text:this.players[this.turn].name + ' have to pay ' + property.taxesCost + ' of taxes.', property, bankTaxes:true}, 'payMoney');
-    }else if(property.cardType == 'chance'){
+    }else if(property.cardType == CardTypes.CHANCE){
       this.getChestChance('chance');
-    }else if(property.cardType == 'communityChest'){
+    }else if(property.cardType == CardTypes.COMMUNITY_CHEST){
       this.getChestChance('communityChest');
     }
   }
@@ -595,7 +598,7 @@ export class GameService {
   addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
     new Observable((subscriber) => {
       this.setOnlineData$.next({path : '/online/message/', value : {
-        type : 'change-money',
+        type : MessageTypes.CHANGE_MONEY,
         data : {
           type : type,
           amount : amount,
@@ -616,7 +619,7 @@ export class GameService {
       this.setOnlineData$.next({
         path : '/players/' + (player ? this.players.findIndex(player => player.id === player.id) : this.turn) + '/money', 
         value : (player ? player.money : this.players[this.turn].money)})
-      this.soundService.playSound('money')
+      this.soundService.playSound(SoundTypes.MONEY_CHANGE)
       subscriber.next(duration)
     }).pipe(switchMap((data:any):any => {
       return timer(data)
@@ -711,7 +714,7 @@ export class GameService {
 
   //DIALOGS
   openCardDialog(card:any){
-    if(card.cardType=='property' || card.cardType=='plant' || card.cardType=='station'){
+    if(card.cardType == CardTypes.PROPERTY || card.cardType == CardTypes.PLANT || card.cardType == CardTypes.STATION){
       this.cardInfoRef = this.dialog.open(CardDialogComponent, {
         panelClass: 'propertyInfo',
         hasBackdrop: true,
@@ -769,7 +772,7 @@ export class GameService {
   goToPrison(){
     this.disabledUserHoveringCard = true;
     this.players[this.turn].prison.inPrison = true;
-    const prisonIndex = this.gameTable.cards.findIndex((card: { cardType: string; }) => card.cardType === 'prison');
+    const prisonIndex = this.gameTable.cards.findIndex((card: { cardType: string; }) => card.cardType === CardTypes.PRISON);
     this.players[this.turn].prison.doubleDiceCounter = 0;
     this.getCardPosition$.next(prisonIndex);
     this.players[this.turn].canDice=false;

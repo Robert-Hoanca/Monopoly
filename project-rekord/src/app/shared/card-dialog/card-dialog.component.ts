@@ -1,6 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { SoundTypes } from 'src/app/enums/soundTypes';
 import { GameService } from 'src/app/services/game.service';
 import { SoundService } from 'src/app/services/sound.service';
 
@@ -36,7 +37,7 @@ export class CardDialogComponent implements OnInit {
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
-    this.soundService.playSound('open-card');
+    this.soundService.playSound(SoundTypes.OPEN_CARD);
   }
   ngAfterViewInit(){
     if(this.data.completedSeries){
@@ -111,6 +112,6 @@ export class CardDialogComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.soundService.playSound('open-card');
+    this.soundService.playSound(SoundTypes.OPEN_CARD);
   }
 }
