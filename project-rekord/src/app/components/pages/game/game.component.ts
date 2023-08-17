@@ -5,6 +5,8 @@ import { gsap } from 'gsap';
 import { Subscription, take, timer } from 'rxjs';
 import { EventTypes } from 'src/app/enums/eventTypes';
 import { MessageTypes } from 'src/app/enums/onlineMessageType';
+import { cardModel } from 'src/app/models/card';
+import { playerModel } from 'src/app/models/player';
 import { GamePhysicsService } from 'src/app/services/game-physics.service';
 import { GameService } from 'src/app/services/game.service';
 import { OnlineService } from 'src/app/services/online.service';
@@ -126,7 +128,7 @@ export class GameComponent implements OnInit {
     timer(500).pipe(take(1)).subscribe({
       complete : () =>{
         this.gameService.setCameraZoom();
-        this.gameService.players.filter((player:any) => player.bankrupt).forEach(player => {
+        this.gameService.players.filter((player:playerModel) => player.bankrupt).forEach(player => {
           this.gameService.showHidePlayerInfo$.next({type : 'show', playerId: player.id})
         });
       }
@@ -161,13 +163,13 @@ export class GameComponent implements OnInit {
     }, 5000);
   }
   getActualPlayerProps(){
-    return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: { owner: any; }) => card.owner == this.gameService.players[this.gameService.turn].id));
+    return this.gameService.sortProperties(this.gameService.gameTable.cards.filter((card: cardModel) => card.owner == this.gameService.players[this.gameService.turn].id));
   }
 
   tryToGoNextTurn(){
     if(this.gameService.amountDebt!=0){
       if(this.gameService.debtWithWho == 'player'){
-        this.gameService.textDialog({text:this.gameService.players[this.gameService.turn].name + ' have to pay ' + this.gameService.amountDebt + ' of debts to ' + this.gameService.players.find(player => player.id == this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)].owner)?.name, property: this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)],amountDebt:this.gameService.amountDebt, playerRent:true, debtWithWho: this.gameService.debtWithWho}, EventTypes.PAYMONEY);
+        this.gameService.textDialog({text:this.gameService.players[this.gameService.turn].name + ' have to pay ' + this.gameService.amountDebt + ' of debts to ' + this.gameService.players.find((player:playerModel) => player.id == this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)].owner)?.name, property: this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)],amountDebt:this.gameService.amountDebt, playerRent:true, debtWithWho: this.gameService.debtWithWho}, EventTypes.PAYMONEY);
     
       }else if(this.gameService.debtWithWho == 'bank'){
         this.gameService.textDialog({text:(this.gameService.players[this.gameService.turn].name) + ' have to pay ' + this.gameService.amountDebt + ' of debts to the bank.',debtWithWho: this.gameService.debtWithWho,amountDebt:this.gameService.amountDebt, playerRent:false, playerId:''}, EventTypes.PAYMONEY);

@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { cardModel } from 'src/app/models/card';
+import { playerModel } from 'src/app/models/player';
 import { GameService } from 'src/app/services/game.service';
 
 @Component({
@@ -22,7 +24,7 @@ export class PlayerPropertiesComponent implements OnInit {
   }
 
   getPlayerProps(){
-    this.playerProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerId))
+    this.playerProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: cardModel) => prop.owner == this.playerId))
    
     const districts:Array<any> = [];
 
@@ -39,7 +41,7 @@ export class PlayerPropertiesComponent implements OnInit {
   }
 
   getPlayerGetOutCards(){
-    this.playerGetOutCards = this.gameService.players.find(player => player.id === this.playerId)?.prison.getOutCards;
+    this.playerGetOutCards = this.gameService.players.find((player:playerModel) => player.id === this.playerId)?.prison.getOutCards;
   }
 
   selectProperty(property:any){

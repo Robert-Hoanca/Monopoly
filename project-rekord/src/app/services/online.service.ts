@@ -6,6 +6,7 @@ import { GamePhysicsService } from './game-physics.service';
 import { allLobby } from '../shared/real-time-db/real-time-dv-save';
 import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 import { cardModel } from '../models/card';
+import { playerModel } from '../models/player';
 @Injectable({
   providedIn: 'root'
 })
@@ -173,7 +174,7 @@ export class OnlineService {
           break;
         case MessageTypes.CHANGE_MONEY:
           if(!this.gameService.itsMyTurn){
-            const player = this.gameService.players.find(player => player.id === message.data.playerId)
+            const player = this.gameService.players.find((player:playerModel) => player.id === message.data.playerId)
             this.gameService.addingRemovingMoney(message.data.type, message.data.amount, message.data.duration, player)
           }
           break;
@@ -190,7 +191,7 @@ export class OnlineService {
                 break;
               case DialogTypes.COMPLETED_SERIES:
                 const cards = this.gameService.gameTable.cards.filter((card:cardModel) => message.data.cardsIds.includes(card.index));
-                this.gameService.openCardDialog(cards);
+                this.gameService.openCompletedSeriesDialog(cards);
                 break;
               case DialogTypes.EXCHANGE:
                 this.gameService.openExchangeDialog();

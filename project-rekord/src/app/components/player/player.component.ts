@@ -5,6 +5,8 @@ import gsap from 'gsap';
 import { SoundService } from 'src/app/services/sound.service';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { CardTypes } from 'src/app/enums/cardTypes';
+import { cardModel } from 'src/app/models/card';
+import { playerModel } from 'src/app/models/player';
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
@@ -79,7 +81,7 @@ export class PlayerComponent implements OnInit {
     this.finalRotation = [0,this.calcPlayerRotation(side),0];
     
     //Calculate player position in the new card.
-    const playerInTheSameCard = this.gameService.players.filter(player => player.id !== this.player.id && player.actualCard === this.player.actualCard);
+    const playerInTheSameCard = this.gameService.players.filter((player:playerModel) => player.id !== this.player.id && player.actualCard === this.player.actualCard);
     this.oldInCardIndex = this.player.pawn.cardSection;
 
     this.inCardPositionIndex = this.calculateNewCardSection(playerInTheSameCard)
@@ -623,7 +625,7 @@ export class PlayerComponent implements OnInit {
     const playerCardIndex = this.player.actualCard;
     
     const prisonCardIndex = this.gameService.gameTable.cards.findIndex(
-      (card: any) => card.cardType === CardTypes.PRISON
+      (card: cardModel) => card.cardType === CardTypes.PRISON
     );
 
     if (
@@ -646,7 +648,7 @@ export class PlayerComponent implements OnInit {
 
   shouldRemovePrison(startingCardIndex: number) {
     const prisonCardIndex = this.gameService.gameTable.cards.findIndex(
-      (card: any) => card.cardType === CardTypes.PRISON
+      (card: cardModel) => card.cardType === CardTypes.PRISON
     );
 
     if (
@@ -733,7 +735,7 @@ export class PlayerComponent implements OnInit {
   }
 
   setPlayerCardPosition(){
-    const playerIndex = this.gameService.players.findIndex(player => player.id === this.player.id)
+    const playerIndex = this.gameService.players.findIndex((player:playerModel) => player.id === this.player.id)
     const infoEl = document.querySelectorAll<HTMLElement>('.playerCard[player-id="' + this.player.name + playerIndex + '"]')[0];
     const position = this.gameService.getObjectScreenPosition(this.playerRef);
     //Aggiungere sistema che controlla se due o piu' info si sovrappongono

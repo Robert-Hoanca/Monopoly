@@ -3,6 +3,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
+import { cardModel } from 'src/app/models/card';
+import { playerModel } from 'src/app/models/player';
 import { GameService } from 'src/app/services/game.service';
 import { SoundService } from 'src/app/services/sound.service';
 
@@ -31,8 +33,8 @@ import { SoundService } from 'src/app/services/sound.service';
 })
 export class ExchangeComponent implements OnInit {
   playerToExchangeWith:any= '';
-  playerToExchangeProps:Array<any> = [];
-  actualPlayerProps:Array<any> = [];
+  playerToExchangeProps:Array<cardModel> = [];
+  actualPlayerProps:Array<cardModel> = [];
   moneyToExchange:Array<any> = [[0],[0],];
   startExchange:boolean=false;
   actualExpanded:string = '';
@@ -58,36 +60,40 @@ export class ExchangeComponent implements OnInit {
   }
 
   getPlayersToExchangeWith(){
-    return this.gameService.players.filter(player => player.id !== this.gameService.players[this.gameService.turn].id)
+    return this.gameService.players.filter((player:playerModel) => player.id !== this.gameService.players[this.gameService.turn].id)
   }
 
   selectPlayerToExchange(player:any){
     this.playerToExchangeWith = player;
-    this.actualPlayerProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.gameService.players[this.gameService.turn].id));
-    this.playerToExchangeProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == player.id));
+    this.actualPlayerProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: cardModel) => prop.owner == this.gameService.players[this.gameService.turn].id));
+    this.playerToExchangeProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: cardModel) => prop.owner == player.id));
     this.actualExpanded = this.gameService.players[this.gameService.turn].id;
   }
 
   finaliseExchange(answer:string){
     if(answer=='accept'){
       const allPropsFound:Array<any> = [];
-      if(this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
-        const props = this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected)
-        props.forEach((property: {completedSeries: any; name: any;}) => {
-          const card = this.gameService.gameTable.cards.find((card: { name: any; })=>card.name == property.name);
-          card.owner = this.gameService.players[this.gameService.turn].id;
-          card.exchangeSelected = false;
-          card.completedSeries = false;
+      if(this.playerToExchangeProps.filter((property: cardModel) => property.exchangeSelected).length){
+        const props = this.playerToExchangeProps.filter((property: cardModel) => property.exchangeSelected)
+        props.forEach((property: cardModel) => {
+          const card = this.gameService.gameTable.cards.find((card: cardModel)=>card.name == property.name);
+          if(card){
+            card.owner = this.gameService.players[this.gameService.turn].id;
+            card.exchangeSelected = false;
+            card.completedSeries = false;
+          }
           allPropsFound.push(property);
         });
       }
-      if(this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length){
-        const props = this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected)
-        props.forEach((property: {completedSeries: any; name: any;}) => {
-          const card = this.gameService.gameTable.cards.find((card: { name: any; })=>card.name == property.name);
-          card.owner = this.playerToExchangeWith.id;
-          card.exchangeSelected = false;
-          card.completedSeries = false;
+      if(this.actualPlayerProps.filter((property: cardModel) => property.exchangeSelected).length){
+        const props = this.actualPlayerProps.filter((property: cardModel) => property.exchangeSelected)
+        props.forEach((property: cardModel) => {
+          const card = this.gameService.gameTable.cards.find((card: cardModel)=>card.name == property.name);
+          if(card){
+            card.owner = this.playerToExchangeWith.id;
+            card.exchangeSelected = false;
+            card.completedSeries = false;
+          }
           allPropsFound.push(property);
         });
       }
@@ -109,12 +115,12 @@ export class ExchangeComponent implements OnInit {
   }
 
   resetSelectedProps(){
-    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.playerToExchangeWith.id)).forEach(property => {
+    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: cardModel) => prop.owner == this.playerToExchangeWith.id)).forEach(property => {
       if(property.exchangeSelected){
         property.exchangeSelected = false;
       }
     });;
-    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: { owner: any; }) => prop.owner == this.gameService.players[this.gameService.turn].id)).forEach(property => {
+    this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: cardModel) => prop.owner == this.gameService.players[this.gameService.turn].id)).forEach(property => {
       if(property.exchangeSelected){
         property.exchangeSelected = false;
       }
@@ -122,9 +128,9 @@ export class ExchangeComponent implements OnInit {
   }
   checkIfCanExchange(){
     if(
-      ( this.moneyToExchange[0] > 0 || this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length) 
+      ( this.moneyToExchange[0] > 0 || this.playerToExchangeProps.filter((property: cardModel) => property.exchangeSelected).length) 
         ||
-      ( this.moneyToExchange[1] > 0 || this.actualPlayerProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length) 
+      ( this.moneyToExchange[1] > 0 || this.actualPlayerProps.filter((property: cardModel) => property.exchangeSelected).length) 
         && 
       (this.moneyToExchange[0] <= this.playerToExchangeWith.money && this.moneyToExchange[1] <= this.gameService.players[this.gameService.turn].money)
     ){

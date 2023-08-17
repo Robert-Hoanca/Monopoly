@@ -283,8 +283,8 @@ export class GameTableEditorComponent implements OnInit {
   }
 
   saveToDb(){
-    const foundPrison = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === CardTypes.PRISON).length ? true : false;
-    const foundGoToPrisonCell = this.gameTable.cards.filter((card: { cardType: string; }) => card.cardType === CardTypes.GO_TO_PRISON).length ? true : false;;
+    const foundPrison = this.gameTable.cards.filter((card: cardModel) => card.cardType === CardTypes.PRISON).length ? true : false;
+    const foundGoToPrisonCell = this.gameTable.cards.filter((card: cardModel) => card.cardType === CardTypes.GO_TO_PRISON).length ? true : false;;
 
     if(foundPrison && foundGoToPrisonCell){
       if(this.chosenMap !== 'newMap'){

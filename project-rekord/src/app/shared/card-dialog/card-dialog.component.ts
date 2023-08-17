@@ -3,6 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
+import { playerModel } from 'src/app/models/player';
 import { GameService } from 'src/app/services/game.service';
 import { SoundService } from 'src/app/services/sound.service';
 
@@ -98,7 +99,7 @@ export class CardDialogComponent implements OnInit {
   
   getPlayerName(){
     if(this.completedSeriesCards[0]){
-      return this.gameService.players.find(player => player.id === this.completedSeriesCards[0].owner)?.name ?? '';
+      return this.gameService.players.find((player:playerModel) => player.id === this.completedSeriesCards[0].owner)?.name ?? '';
     }else{
       return ''
     }
