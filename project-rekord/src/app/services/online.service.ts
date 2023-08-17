@@ -19,14 +19,10 @@ export class OnlineService {
   lobbySubs$: Array<any> = [];
   inGameSubs$: Array<any> = [];
 
-  constructor(public gameService : GameService, public gamePhysicsService : GamePhysicsService , private realTimeDb: AngularFireDatabase) { 
-    //console.log('------  gameService from onlineService', this.gameService)
-    //console.log('------ DB', this.realTimeDb)
-  }
+  constructor(public gameService : GameService, public gamePhysicsService : GamePhysicsService , private realTimeDb: AngularFireDatabase) { }
 
 
   createLobby(){
-    //console.log('------ CREATING LOBBY')
     this.lobbyName = this.randomString(10, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
     const lobby:any = {
       gameName: '',
@@ -158,6 +154,7 @@ export class OnlineService {
   }
 
   handleMessages(message:any){
+    console.log('message', message)
       switch (message.type) {
         case MessageTypes.CHANGE_TURN:
           this.gameService.turn = message.data.turn;
@@ -184,7 +181,33 @@ export class OnlineService {
             this.gameService.getCardPosition(message.data.cardIndex)
           }
           break;
+        case MessageTypes.OPEN_DIALOG:
+          if(!this.gameService.itsMyTurn){
+            switch (message.data.dialogType) {
+              case 'card':
+                this.gameService.openCardDialog(message.data.cardId);
+                break;
+              case 'completedSeries':
+                const cards = this.gameService.gameTable.cards.filter((card:any) => card.id.includes(message.data.cardsIds));
+                this.gameService.openCardDialog(cards);
+                break;
+              case 'exchange':
+                this.gameService.openExchangeDialog();
+                break;
+              case 'message':
+                this.gameService.textDialog(message.data.textData, message.data.eventType)
+                break;
+              case 'dice-res':
+                this.gamePhysicsService.openShowDiceResDialog(message.data.diceRes)
+                break;
+              default:
+                break;
+            }
+          }
+          break;
         default:
+        case MessageTypes.CLOSE_DIALOG: 
+        //this.gameService.closeDialog()
           break;
     }
   }

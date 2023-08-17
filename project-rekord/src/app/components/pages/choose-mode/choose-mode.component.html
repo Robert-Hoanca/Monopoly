@@ -168,7 +168,7 @@
            
         </div>
 
-        <div id="mapsContainer">
+        <div id="mapsContainer" *ngIf="this.gameService.choosenMode === 'local' || (this.gameService.choosenMode === 'online' && this.gameService.imLobbyMaster)">
             <mat-card class="map" *ngFor="let map of gameService.gameMaps" fxLayout="row">
                 <span class="chosenMap" (click)="gameService.chosenMap = map" fxLayoutAlign="center center"><mat-icon *ngIf="gameService.chosenMap==map">check</mat-icon></span>
                 <span class="title">{{map}}</span>

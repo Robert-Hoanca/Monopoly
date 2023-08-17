@@ -43,10 +43,12 @@ export class PlayerPropertiesComponent implements OnInit {
   }
 
   selectProperty(property:any){
-    if(this.imInExchange){
-      property.exchangeSelected = !property.exchangeSelected;
-    }else if(this.gameService.playerWhoWonId == ''){
-      this.gameService.openCardDialog(property)
+    if(this.gameService.itsMyTurn){
+      if(this.imInExchange){
+        property.exchangeSelected = !property.exchangeSelected;
+      }else if(this.gameService.playerWhoWonId == ''){
+        this.gameService.openCardDialog(property)
+      }
     }
   }
 }

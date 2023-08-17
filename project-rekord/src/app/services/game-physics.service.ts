@@ -6,6 +6,7 @@ import { debounceTime, fromEvent ,interval,take ,takeUntil,timer } from 'rxjs';
 import { GameService } from './game.service';
 import { SoundService } from './sound.service';
 import gsap from 'gsap';
+import { MessageTypes } from '../enums/onlineMessageType';
 @Injectable({
   providedIn: 'root',
 })
@@ -230,6 +231,7 @@ export class GamePhysicsService {
         diceRes: diceRes,
       },
     });
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'dice-res' , diceRes}}});
 
     timer(2000)
       .pipe(
@@ -238,7 +240,9 @@ export class GamePhysicsService {
       .subscribe({
         complete: () => {
           this.dialog.closeAll();
-          this.doAfterRollingTheDice();
+          if(this.gameService.itsMyTurn){
+            this.doAfterRollingTheDice();
+          }
         },
       });
   }

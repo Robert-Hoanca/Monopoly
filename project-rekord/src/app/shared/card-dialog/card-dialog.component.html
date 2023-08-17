@@ -1,7 +1,7 @@
 <div *ngIf="data.card && !data.cards" id="cardInfo" fxLayout="column" fxLayoutAlign="start start">
     
    
-    <div class="externalBtns" fxLayoutAlign="space-between center">
+    <div *ngIf="gameService.itsMyTurn" class="externalBtns" fxLayoutAlign="space-between center">
         <button mat-raised-button *ngIf="!data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.distrainProperty(data.card);close()" [matTooltipPosition]="'above'" matTooltip="Mortgage" [disabled]="data.card.housesCounter>0"><mat-icon>credit_card</mat-icon></button>
         <button mat-raised-button *ngIf="data.card.distrained && data.card.owner == gameService.players[gameService.turn].id" (click)="gameService.cancelDistrainedFromProperty(data.card)" [disabled]="gameService.players[gameService.turn].money<data.card.distrainedCost" [matTooltipPosition]="'above'" matTooltip="Remove mortgage"><mat-icon>credit_card_off</mat-icon></button>
         <button mat-raised-button (click)="gameService.closeDialog(dialogRef)"><mat-icon>close</mat-icon></button>
@@ -64,7 +64,7 @@
     <div id="auctionContainer">
 
     </div>
-    <div class="cardBtns" fxLayoutAlign="end center">
+    <div *ngIf="gameService.itsMyTurn" class="cardBtns" fxLayoutAlign="end center">
         <button mat-raised-button class="buyPropertyBtn" (click)="gameService.buyProperty(data.card);close()" *ngIf="data.card.canBuy" [disabled]="gameService.players[gameService.turn].money<data.card.cost">Buy <mat-icon>attach_money</mat-icon></button>
         <button mat-raised-button *ngIf="data.card.canBuy && false" [disabled]="true">Asta</button>
 

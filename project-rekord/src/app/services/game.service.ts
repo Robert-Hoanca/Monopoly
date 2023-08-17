@@ -398,12 +398,14 @@ export class GameService {
 
   getCardPosition(cardIndex:any){
     this.disabledUserHoveringCard = true;
-    this.setOnlineData$.next({path : '/online/message/', value : {
-      type : MessageTypes.CHANGE_PLAYER_POS,
-      data : {
-       cardIndex : cardIndex
-      }
-    }})
+    if(this.itsMyTurn) {
+      this.setOnlineData$.next({path : '/online/message/', value : {
+        type : MessageTypes.CHANGE_PLAYER_POS,
+        data : {
+         cardIndex : cardIndex
+        }
+      }})
+    }
     this.getCardPosition$.next(cardIndex);
   }
 
@@ -714,6 +716,7 @@ export class GameService {
   }
 
   //DIALOGS
+
   openCardDialog(card:any){
     if(card.cardType == CardTypes.PROPERTY || card.cardType == CardTypes.PLANT || card.cardType == CardTypes.STATION){
       this.cardInfoRef = this.dialog.open(CardDialogComponent, {
@@ -725,6 +728,7 @@ export class GameService {
           card: card,
         }
       });
+      if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'card' , cardId : card}}});
     }
   }
   openCompletedSeriesDialog(cards:Array<any>){
@@ -739,6 +743,11 @@ export class GameService {
         completedSeries: true
       }
     });
+    const cardsIds:Array<string> = [];
+    cards.forEach(card => {
+      cardsIds.push(card.id)
+    });
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'completedSeries' , cardsIds : cardsIds}}});
   }
   openExchangeDialog(){
     this.cardInfoRef = this.dialog.open(ExchangeComponent, {
@@ -749,6 +758,7 @@ export class GameService {
       data: {
       }
     });
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'exchange'}}});
   }
 
   textDialog(textData:any, eventType:string) {
@@ -763,6 +773,7 @@ export class GameService {
       disableClose:true,
       data: data
     });
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'message' , eventType,  textData}}});
   }
 
   closeDialog(dialogRef:any){
