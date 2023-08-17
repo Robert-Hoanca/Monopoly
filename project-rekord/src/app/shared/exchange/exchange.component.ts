@@ -1,6 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { GameService } from 'src/app/services/game.service';
 import { SoundService } from 'src/app/services/sound.service';
@@ -92,28 +93,14 @@ export class ExchangeComponent implements OnInit {
       }
       this.gameService.checkCompletedSeries(allPropsFound);
       if(this.moneyToExchange[0]>0){
-          //this.gameService.players[this.gameService.turn].money -= this.moneyToExchange[0];
-          //this.playerToExchangeWith.money += this.moneyToExchange[0];
           this.gameService.addingRemovingMoney('remove', this.moneyToExchange[0], 1000);
           this.gameService.addingRemovingMoney('add', this.moneyToExchange[0], 1000, this.playerToExchangeWith);
-
-
-          //IMPEDIRE DI AVVIARE LO SCAMBIO SE SI CHIEDE TROPPI SOLDI DI QUELLO CHE SI HA E DI QUELLO CHE L'ALTRO GIOCATORE HA
-          //this.gameService.checkBankrupt(this.gameService.players[this.gameService.turn],this.moneyToExchange[0]);
       }
       if(this.moneyToExchange[1]>0){
-        //this.gameService.players[this.gameService.turn].money += this.moneyToExchange[1];
-        //this.playerToExchangeWith.money -= this.moneyToExchange[1];
-        
         this.gameService.addingRemovingMoney('add', this.moneyToExchange[1], 1000);
         this.gameService.addingRemovingMoney('remove', this.moneyToExchange[1], 1000, this.playerToExchangeWith);
-
-        //IMPEDIRE DI AVVIARE LO SCAMBIO SE SI CHIEDE TROPPI SOLDI DI QUELLO CHE SI HA E DI QUELLO CHE L'ALTRO GIOCATORE HA
-        //this.gameService.checkBankrupt(this.playerToExchangeWith,this.moneyToExchange[1]);
       }
-    }/*else{
-      this.goBackToSelection();
-    }*/
+    }
     this.close();
   }
 
@@ -134,8 +121,6 @@ export class ExchangeComponent implements OnInit {
     });;
   }
   checkIfCanExchange(){
-    
-
     if(
       ( this.moneyToExchange[0] > 0 || this.playerToExchangeProps.filter((property: { exchangeSelected: any; }) => property.exchangeSelected).length) 
         ||
@@ -151,6 +136,7 @@ export class ExchangeComponent implements OnInit {
 
   ngOnDestroy(){
     this.resetSelectedProps();
-    this.soundService.playSound(SoundTypes.OPEN_DIALOG)
+    this.soundService.playSound(SoundTypes.OPEN_DIALOG);
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : DialogTypes.EXCHANGE }}});
   }
 }

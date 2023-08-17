@@ -1,6 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { GameService } from 'src/app/services/game.service';
 import { SoundService } from 'src/app/services/sound.service';
@@ -69,30 +70,22 @@ export class CardDialogComponent implements OnInit {
   }
   
   addHouse(){
-    //this.houses.push('');
     this.data.card.housesCounter++;
     this.gameService.addingRemovingMoney('remove', this.data.card.houseCost, 1000);
-    //this.gameService.players[this.gameService.turn].money -= this.data.card.houseCost;
   }
 
   removeHouse(){
-    //this.houses.splice((this.houses.length -1),1);
     this.data.card.housesCounter--;
     this.gameService.addingRemovingMoney('add', ((this.data.card.houseCost / 100) * 50), 1000);
-    //this.gameService.players[this.gameService.turn].money += ((this.data.card.houseCost / 100) * 50);
   }
 
   addHotel(){
-    //this.hotel = true;
     this.data.card.hotelCounter++;
     this.gameService.addingRemovingMoney('remove', this.data.card.hotelCost, 1000);
-    //this.gameService.players[this.gameService.turn].money -= this.data.card.hotelCost;
   }
   removeHotel(){
-    //this.hotel = false;
     this.data.card.hotelCounter--;
     this.gameService.addingRemovingMoney('add', ((this.data.card.hotelCost / 100) * 50), 1000);
-    //this.gameService.players[this.gameService.turn].money += ((this.data.card.hotelCost / 100) * 50);
   }
   getContrastColor(bgColor:string) {
     var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
@@ -113,5 +106,6 @@ export class CardDialogComponent implements OnInit {
 
   ngOnDestroy(){
     this.soundService.playSound(SoundTypes.OPEN_CARD);
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : 'card' }}});
   }
 }

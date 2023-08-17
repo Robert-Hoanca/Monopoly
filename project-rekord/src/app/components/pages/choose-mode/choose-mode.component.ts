@@ -43,6 +43,7 @@ export class ChooseModeComponent implements OnInit {
   constructor(public gameService: GameService, public onlineService : OnlineService) { }
 
   ngOnInit(): void {
+    this.onlineService.itsMyTurn();
   }
 
   changeModel(way:string,){

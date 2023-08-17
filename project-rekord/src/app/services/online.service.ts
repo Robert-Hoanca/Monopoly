@@ -4,7 +4,7 @@ import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { of, take } from 'rxjs';
 import { GamePhysicsService } from './game-physics.service';
 import { allLobby } from '../shared/real-time-db/real-time-dv-save';
-import { MessageTypes } from '../enums/onlineMessageType';
+import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 @Injectable({
   providedIn: 'root'
 })
@@ -184,30 +184,52 @@ export class OnlineService {
         case MessageTypes.OPEN_DIALOG:
           if(!this.gameService.itsMyTurn){
             switch (message.data.dialogType) {
-              case 'card':
-                this.gameService.openCardDialog(message.data.cardId);
+              case DialogTypes.CARD:
+                this.gameService.openCardDialog(this.gameService.gameTable.cards[message.data.cardI]);
                 break;
-              case 'completedSeries':
+              case DialogTypes.COMPLETED_SERIES:
                 const cards = this.gameService.gameTable.cards.filter((card:any) => card.id.includes(message.data.cardsIds));
                 this.gameService.openCardDialog(cards);
                 break;
-              case 'exchange':
+              case DialogTypes.EXCHANGE:
                 this.gameService.openExchangeDialog();
                 break;
-              case 'message':
+              case DialogTypes.MESSAGE:
                 this.gameService.textDialog(message.data.textData, message.data.eventType)
                 break;
-              case 'dice-res':
-                this.gamePhysicsService.openShowDiceResDialog(message.data.diceRes)
+              case DialogTypes.DICE_RES:
+                // this.gamePhysicsService.diceRes = message.data.diceRes;
+                // this.gamePhysicsService.showRollResults()
                 break;
               default:
                 break;
             }
           }
           break;
+        case MessageTypes.CLOSE_DIALOG:
+          let dialog;
+          switch (message.data.dialogType) {
+            case DialogTypes.CARD:
+              dialog = this.gameService.cardDialogRef;
+              break;
+            case DialogTypes.COMPLETED_SERIES:
+              dialog = this.gameService.completedSeriesDialogRef;
+              break;
+            case DialogTypes.EXCHANGE:
+              dialog = this.gameService.exchangeDialogRef;
+              break;
+            case DialogTypes.MESSAGE:
+              dialog = this.gameService.messageDialogRef;
+              break;
+            case DialogTypes.DICE_RES:
+              dialog = this.gameService.diceResDialogRef;
+              break;
+            default:
+              break;
+          }
+          this.gameService.closeDialog(dialog)
+          break;
         default:
-        case MessageTypes.CLOSE_DIALOG: 
-        //this.gameService.closeDialog()
           break;
     }
   }

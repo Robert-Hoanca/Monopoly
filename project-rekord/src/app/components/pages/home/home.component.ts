@@ -99,7 +99,7 @@ export class HomeComponent implements OnInit {
 
   chooseMode(mode:string){
     this.gameService.choosenMode = mode;
-    this.gameService.switchRouter('mode')
+    this.gameService.switchRouter('mode');
   }
 
   returnSessionBg(){

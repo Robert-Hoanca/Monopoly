@@ -6,7 +6,7 @@ import { debounceTime, fromEvent ,interval,take ,takeUntil,timer } from 'rxjs';
 import { GameService } from './game.service';
 import { SoundService } from './sound.service';
 import gsap from 'gsap';
-import { MessageTypes } from '../enums/onlineMessageType';
+import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 @Injectable({
   providedIn: 'root',
 })
@@ -83,8 +83,8 @@ export class GamePhysicsService {
 
   createDice(dice: any) {
     this.world.addBody(dice.body);
-    //Adding dice events only if i'm plating in local or it's my turn in a online match.
-    if(!this.gameService.amIOnline() || (this.gameService.amIOnline() && this.gameService.itsMyTurn)){
+    //Adding dice events only if i'm playing in local or it's my turn in a online match.
+    if(this.gameService.itsMyTurn){
       this.addDiceEvents(dice);
     }
     this.diceRoll(dice, dice.diceindex)
@@ -115,7 +115,6 @@ export class GamePhysicsService {
   }
 
   addDiceEvents(dice: any) {
-
     fromEvent(dice.body, 'collide').pipe(debounceTime(65)).subscribe({
       next: (data) => {
         if (dice.body.velocity.length() > 2) {
@@ -222,7 +221,7 @@ export class GamePhysicsService {
   }
 
   openShowDiceResDialog(diceRes: Array<number>) {
-    this.dialog.open(this.showDiceResultDialogRef, {
+    this.gameService.diceResDialogRef = this.dialog.open(this.showDiceResultDialogRef, {
       panelClass: 'showDiceResult',
       hasBackdrop: true,
       autoFocus: false,
@@ -231,20 +230,18 @@ export class GamePhysicsService {
         diceRes: diceRes,
       },
     });
-    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'dice-res' , diceRes}}});
-
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.DICE_RES , diceRes}}});
     timer(2000)
-      .pipe(
-        take(1)
-      )
-      .subscribe({
-        complete: () => {
-          this.dialog.closeAll();
-          if(this.gameService.itsMyTurn){
-            this.doAfterRollingTheDice();
-          }
-        },
-      });
+    .pipe(
+      take(1)
+    )
+    .subscribe({
+      complete: () => {
+        this.gameService.closeDialog(this.gameService.diceResDialogRef);
+        this.doAfterRollingTheDice();
+        if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : DialogTypes.DICE_RES }}});
+      },
+    });
   }
 
   doAfterRollingTheDice() {

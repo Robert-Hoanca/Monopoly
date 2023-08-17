@@ -7,6 +7,7 @@ import { SoundService } from 'src/app/services/sound.service';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { EventTypes } from 'src/app/enums/eventTypes';
 import { ChestChanceTypes } from 'src/app/enums/chestChanceTypes';
+import { DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 
 @Component({
   selector: 'app-message-dialog',
@@ -228,6 +229,7 @@ export class MessageDialogComponent implements OnInit {
 
   ngOnDestroy(){
     this.soundService.playSound(SoundTypes.OPEN_DIALOG);
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : DialogTypes.MESSAGE }}});
   }
 }
 

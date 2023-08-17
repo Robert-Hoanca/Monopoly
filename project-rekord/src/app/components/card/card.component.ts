@@ -24,11 +24,11 @@ export class CardComponent implements OnInit {
   @ViewChild('carpetRef', { static: true }) carpetRef: any;
   bakcSideOption = THREE.BackSide;
   constructor(
-    public gameService: GameService,
-    private service: GLTFLoaderService
+    public gameService: GameService
   ) {}
 
   ngOnInit() {
+    this.card.index = this.cardIndex;
     this.url =
       (this.cardIndex / 10) % 1 == 0
         ? '/assets/blenderModels/card/definitiveCard/card2.gltf'

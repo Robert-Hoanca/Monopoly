@@ -15,7 +15,7 @@ import { ExchangeComponent } from '../shared/exchange/exchange.component';
 import { SoundService } from './sound.service';
 import { v4 as uuidv4 } from 'uuid';
 import { playerModel } from '../models/player';
-import { MessageTypes } from '../enums/onlineMessageType';
+import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 import { SoundTypes } from '../enums/soundTypes';
 import { CardTypes } from '../enums/cardTypes';
 import { EventTypes } from '../enums/eventTypes';
@@ -141,8 +141,11 @@ export class GameService {
 
 
   //DIALOGS
-  cardInfoRef: MatDialogRef<any> | undefined;
-  exchangeRef: MatDialogRef<any> | undefined;
+  cardDialogRef: MatDialogRef<any> | undefined;
+  completedSeriesDialogRef: MatDialogRef<any> | undefined;
+  exchangeDialogRef: MatDialogRef<any> | undefined;
+  messageDialogRef: MatDialogRef<any> | undefined;
+  diceResDialogRef: MatDialogRef<any> | undefined;
 
   //Extra Options
   debugMode:boolean = false;
@@ -719,7 +722,7 @@ export class GameService {
 
   openCardDialog(card:any){
     if(card.cardType == CardTypes.PROPERTY || card.cardType == CardTypes.PLANT || card.cardType == CardTypes.STATION){
-      this.cardInfoRef = this.dialog.open(CardDialogComponent, {
+      this.cardDialogRef = this.dialog.open(CardDialogComponent, {
         panelClass: 'propertyInfo',
         hasBackdrop: true,
         disableClose:true,
@@ -728,11 +731,11 @@ export class GameService {
           card: card,
         }
       });
-      if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'card' , cardId : card}}});
+      if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.CARD , cardI : card.index}}});
     }
   }
   openCompletedSeriesDialog(cards:Array<any>){
-    this.cardInfoRef = this.dialog.open(CardDialogComponent, {
+    this.completedSeriesDialogRef = this.dialog.open(CardDialogComponent, {
       panelClass: 'completedSeriesInfo',
       hasBackdrop: true,
       disableClose:true,
@@ -747,10 +750,10 @@ export class GameService {
     cards.forEach(card => {
       cardsIds.push(card.id)
     });
-    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'completedSeries' , cardsIds : cardsIds}}});
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.COMPLETED_SERIES , cardsIds : cardsIds}}});
   }
   openExchangeDialog(){
-    this.cardInfoRef = this.dialog.open(ExchangeComponent, {
+    this.exchangeDialogRef = this.dialog.open(ExchangeComponent, {
       panelClass: 'exchangePanel',
       hasBackdrop: true,
       autoFocus: false,
@@ -758,7 +761,7 @@ export class GameService {
       data: {
       }
     });
-    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'exchange'}}});
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.EXCHANGE}}});
   }
 
   textDialog(textData:any, eventType:string) {
@@ -766,14 +769,14 @@ export class GameService {
       textData,
       eventType,
     }
-    this.cardInfoRef = this.dialog.open(MessageDialogComponent, {
+    this.messageDialogRef = this.dialog.open(MessageDialogComponent, {
       panelClass: 'messageDialog',
       hasBackdrop: true,
       autoFocus: false,
       disableClose:true,
       data: data
     });
-    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: 'message' , eventType,  textData}}});
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.MESSAGE , eventType,  textData}}});
   }
 
   closeDialog(dialogRef:any){
