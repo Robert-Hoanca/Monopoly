@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { GLTFLoaderService } from 'ngx-three';
 import { Subscription } from 'rxjs';
 import { CardTypes } from 'src/app/enums/cardTypes';
+import { cardModel } from 'src/app/models/card';
 import { GameService } from 'src/app/services/game.service';
 import * as THREE from 'three';
 @Component({
@@ -10,7 +11,7 @@ import * as THREE from 'three';
   styleUrls: ['./card.component.scss'],
 })
 export class CardComponent implements OnInit {
-  @Input() card!: any;
+  @Input() card!: cardModel;
   @Input() cardIndex!: any;
   @Input() scene!: any;
   url: string = '';

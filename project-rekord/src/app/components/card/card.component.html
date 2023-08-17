@@ -40,7 +40,7 @@
   #carpetRef
 >
   <th-boxGeometry [args]="[2,0.1,0.4]"></th-boxGeometry>
-  <th-meshBasicMaterial [args]="{color: gameService.checkCardColorDistrict(card.district)}"
+  <th-meshBasicMaterial [args]="{color: gameService.checkCardColorDistrict(card.district ?? '')}"
   ></th-meshBasicMaterial>
 </th-mesh>
 

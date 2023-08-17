@@ -19,6 +19,9 @@ import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 import { SoundTypes } from '../enums/soundTypes';
 import { CardTypes } from '../enums/cardTypes';
 import { EventTypes } from '../enums/eventTypes';
+import { cardModel } from '../models/card';
+import { chanceModel } from '../models/chance';
+import { chestModel } from '../models/chest';
 
 @Injectable({
   providedIn: 'root'
@@ -100,8 +103,14 @@ export class GameService {
   pawnUrls:Array<any> = [];
   specialPawnTypes: any = [];
   specialPawn:String='';
-  randomChest:any;
-  randomChance:any;
+  randomChest:chestModel | undefined  = {
+    action : '',
+    title : ''
+  };
+  randomChance:chanceModel | undefined = {
+    action : '',
+    title : ''
+  };
   turn:number= 0;
   amountRent:number=0;
   amountDebt:number=0;
@@ -720,7 +729,7 @@ export class GameService {
 
   //DIALOGS
 
-  openCardDialog(card:any){
+  openCardDialog(card:cardModel){
     if(card.cardType == CardTypes.PROPERTY || card.cardType == CardTypes.PLANT || card.cardType == CardTypes.STATION){
       this.cardDialogRef = this.dialog.open(CardDialogComponent, {
         panelClass: 'propertyInfo',
@@ -834,7 +843,7 @@ export class GameService {
     });
 
     possibleDistricts.forEach((district:string) => {
-      const groupCards = this.gameTable.cards.filter((card:any) => card.district == district);
+      const groupCards = this.gameTable.cards.filter((card:cardModel) => card.district == district);
       const ownerCards = groupCards.filter((card: { owner: any; }) => card.owner == groupCards[0].owner);
       if(groupCards.length == ownerCards.length && ownerCards.findIndex((cardI: { distrained: any; }) => cardI.distrained)<0){
         groupCards.forEach((card: { completedSeries: boolean; }) => {
@@ -917,12 +926,12 @@ export class GameService {
       this.calculateGameTime()
       this.textDialog({text: this.players.find(player => !player.bankrupt)?.name + ' has won the game!', playerId: this.players.find(player => !player.bankrupt)?.id}, EventTypes.FINISH_GAME)
     }else{
-      await this.gameTable.cards.filter((card:any) => card.owner == this.players[this.turn].id).forEach((foundCard:any) => {
+      await this.gameTable.cards.filter((card:cardModel) => card.owner == this.players[this.turn].id).forEach((foundCard:cardModel) => {
         foundCard.owner = '';
         foundCard.canBuy = true;
-        if(foundCard.housesCounter>0){
+        if(foundCard.housesCounter){
           foundCard.housesCounter = 0;
-          if(foundCard.hotelCounter>0){
+          if(foundCard.hotelCounter){
             foundCard.hotelCounter = 0;
           }
         }

@@ -97,8 +97,8 @@
             <div class="card-editing-container__card" fxLayout="column">
 
                 <mat-card *ngIf="editingCard.cardType === 'property' || editingCard.cardType === 'station' || editingCard.cardType === 'plant'" [ngClass]="['cardForm', 'owned']">
-                    <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(editingCard.district)}" fxLayoutAlign="center center">
-                        <span class="cardName" [ngStyle]="{'color': gameService.getContrastColor(gameService.checkCardColorDistrict(editingCard.district))}">{{editingCard.name}}</span>
+                    <span class="propDistrict" [ngStyle]="{'background': gameService.checkCardColorDistrict(editingCard.district ?? '')}" fxLayoutAlign="center center">
+                        <span class="cardName" [ngStyle]="{'color': gameService.getContrastColor(gameService.checkCardColorDistrict(editingCard.district ?? ''))}">{{editingCard.name}}</span>
                     </span>
                     
                     <div class="cardCosts" fxLayout="column">
@@ -158,7 +158,7 @@
 
                 </mat-card>
 
-                <button *ngIf="editingCard != {} && editingCard.cardType !== 'start'" class="card-editing-container__card__delete-card" mat-raised-button color="warn" (click)="deleteCard(editingCard)"> Delete card</button>
+                <button *ngIf="editingCard && editingCard.cardType !== 'start'" class="card-editing-container__card__delete-card" mat-raised-button color="warn" (click)="deleteCard(editingCard)"> Delete card</button>
 
             </div>
 

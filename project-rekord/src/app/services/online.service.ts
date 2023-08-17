@@ -5,6 +5,7 @@ import { of, take } from 'rxjs';
 import { GamePhysicsService } from './game-physics.service';
 import { allLobby } from '../shared/real-time-db/real-time-dv-save';
 import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
+import { cardModel } from '../models/card';
 @Injectable({
   providedIn: 'root'
 })
@@ -188,7 +189,7 @@ export class OnlineService {
                 this.gameService.openCardDialog(this.gameService.gameTable.cards[message.data.cardI]);
                 break;
               case DialogTypes.COMPLETED_SERIES:
-                const cards = this.gameService.gameTable.cards.filter((card:any) => card.id.includes(message.data.cardsIds));
+                const cards = this.gameService.gameTable.cards.filter((card:cardModel) => message.data.cardsIds.includes(card.index));
                 this.gameService.openCardDialog(cards);
                 break;
               case DialogTypes.EXCHANGE:

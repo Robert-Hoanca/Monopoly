@@ -4,6 +4,7 @@ import {doc, getDoc } from '@angular/fire/firestore';
 import { MatDialog } from '@angular/material/dialog';
 import { take, timer } from 'rxjs';
 import { CardTypes } from 'src/app/enums/cardTypes';
+import { cardModel } from 'src/app/models/card';
 
 @Component({
   selector: 'app-game-table-editor',
@@ -17,7 +18,11 @@ export class GameTableEditorComponent implements OnInit {
 
   gameTable:any;
 
-  editingCard:any;
+  editingCard:cardModel = {
+    index : 0,
+    cardType : '',
+    name : '',
+  };
 
   cardTypes:Array<any> = [
     {label: 'Start', value : 'start'},
@@ -78,7 +83,7 @@ export class GameTableEditorComponent implements OnInit {
     }
   }
 
-  openEditDialog(clickedCard:any){
+  openEditDialog(clickedCard:cardModel){
 
     this.editingCard = clickedCard;
 
@@ -91,13 +96,17 @@ export class GameTableEditorComponent implements OnInit {
 
   }
 
-  deleteCard(deleteCard:any){
+  deleteCard(deleteCard:cardModel){
 
-    const deletingCardIndex =  this.gameTable.cards.findIndex((card:any) => card === deleteCard);
+    const deletingCardIndex =  this.gameTable.cards.findIndex((card:cardModel) => card === deleteCard);
 
     if(deleteCard){
       this.gameTable.cards[deletingCardIndex] = {};
-      this.editingCard = {};
+      this.editingCard = {
+        index : 0,
+        cardType : '',
+        name : '',
+      };
 
       this.closeDialog();
     }
@@ -106,7 +115,7 @@ export class GameTableEditorComponent implements OnInit {
 
   changeCardType(newType:string){
 
-    const cardIndex = this.gameTable.cards.findIndex( (card:any) => card == this.editingCard);
+    const cardIndex = this.gameTable.cards.findIndex( (card:cardModel) => card == this.editingCard);
 
     if(cardIndex){
       this.closeDialog();
@@ -245,7 +254,11 @@ export class GameTableEditorComponent implements OnInit {
       }
 
       this.gameTable.cards[cardIndex] = newCard;
-      this.editingCard = {};
+      this.editingCard = {
+        index : 0,
+        cardType : '',
+        name : '',
+      };
     }
   }
 
@@ -253,11 +266,11 @@ export class GameTableEditorComponent implements OnInit {
 
     switch (type) {
       case CardTypes.START:
-        return (type === 'start') && (this.gameTable.cards.find( (card:any) => card.cardType === CardTypes.START)) ? true : false;
+        return (type === 'start') && (this.gameTable.cards.find( (card:cardModel) => card.cardType === CardTypes.START)) ? true : false;
       case CardTypes.PRISON:
-        return (type === 'prison') && (this.gameTable.cards.find( (card:any) => card.cardType === CardTypes.PRISON)) ? true : false;
+        return (type === 'prison') && (this.gameTable.cards.find( (card:cardModel) => card.cardType === CardTypes.PRISON)) ? true : false;
       case CardTypes.STATION:
-        return (this.gameTable.cards.filter( (card:any) => card.cardType === CardTypes.STATION)).length == 4 ? true : false;
+        return (this.gameTable.cards.filter( (card:cardModel) => card.cardType === CardTypes.STATION)).length == 4 ? true : false;
     
       default:
         return false;

@@ -8,6 +8,7 @@ import { SoundTypes } from 'src/app/enums/soundTypes';
 import { EventTypes } from 'src/app/enums/eventTypes';
 import { ChestChanceTypes } from 'src/app/enums/chestChanceTypes';
 import { DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
+import { cardModel } from 'src/app/models/card';
 
 @Component({
   selector: 'app-message-dialog',
@@ -224,7 +225,7 @@ export class MessageDialogComponent implements OnInit {
   }
 
   getActualPlayerProps(){
-    return this.gameService.gameTable.cards.filter((card:any) => card.owner === this.data.textData.playerId).length
+    return this.gameService.gameTable.cards.filter((card:cardModel) => card.owner === this.data.textData.playerId).length
   }
 
   ngOnDestroy(){
