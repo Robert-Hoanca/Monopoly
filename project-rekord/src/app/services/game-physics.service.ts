@@ -239,7 +239,7 @@ export class GamePhysicsService {
       complete: () => {
         this.gameService.closeDialog(this.gameService.diceResDialogRef);
         this.doAfterRollingTheDice();
-        if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : DialogTypes.DICE_RES }}});
+        if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : DialogTypes.DICE_RES}}});
       },
     });
   }
@@ -268,9 +268,9 @@ export class GamePhysicsService {
         this.gameService.players[this.gameService.turn].prison
           .doubleDiceCounter === 3
       ) {
-        this.gameService.whichPropertyAmI('goToPrison');
+        if(this.gameService.itsMyTurn) this.gameService.whichPropertyAmI('goToPrison');
       } else {
-        this.gameService.getCardPosition(this.gameService.diceNumber);
+        if(this.gameService.itsMyTurn) this.gameService.getCardPosition(this.gameService.diceNumber);
       }
     } else {
       if (this.diceRes[0] == this.diceRes[1]) {

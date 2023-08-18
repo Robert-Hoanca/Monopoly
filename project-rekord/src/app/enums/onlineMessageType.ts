@@ -5,7 +5,7 @@ export enum MessageTypes {
     CHANGE_MONEY = "changeMoney",
     CHANGE_PLAYER_POS = "changePlayerPos",
     OPEN_DIALOG = 'openDialog',
-    CLOSE_DIALOG = 'closeDialog',
+    DIALOG_ACTION = 'dialogAction',
 }
 
 export enum DialogTypes {
@@ -14,4 +14,26 @@ export enum DialogTypes {
     EXCHANGE = "exchange",
     MESSAGE = "message",
     DICE_RES = "diceRes",
+}
+
+export enum DialogActionTypes {
+    //Shared
+    CLOSE = "close",
+
+    //Card
+    BUY_PROPERTY = "buyProperty",
+    ADD_HOTEL = "addHotel",
+    REMOVE_HOTEL = "removeHotel",
+    ADD_HOUSE = "addHouse",
+    REMOVE_HOUSE = "removeHouse",
+    DISTRAIN_PROPERTY = "distrainProperty",
+    CANCEL_DISTRAIN = "cancelDistrain",
+    
+    //Exchange
+    SELECT_PLAYER = "selectPlayer",
+    CHANGE_EXPANDED = "changeExpanded",
+    START_EXCHANGE = "startExchange",
+    BACK_TO_SELECTION = "backToSelection",
+    FINALISE_EXCHANGE = "finaliseExchange"
+
 }

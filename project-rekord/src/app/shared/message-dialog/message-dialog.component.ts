@@ -7,7 +7,7 @@ import { SoundService } from 'src/app/services/sound.service';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { EventTypes } from 'src/app/enums/eventTypes';
 import { ChestChanceTypes } from 'src/app/enums/chestChanceTypes';
-import { DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
+import { DialogActionTypes, DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 import { cardModel } from 'src/app/models/card';
 import { playerModel } from 'src/app/models/player';
 
@@ -20,7 +20,7 @@ export class MessageDialogComponent implements OnInit {
 
   getCardPosition$ = new Subject();
   movedNearest:boolean=false;
-
+  subscriptions$: Array<any> = [];
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
@@ -37,6 +37,9 @@ export class MessageDialogComponent implements OnInit {
     }else{
       this.soundService.playSound(SoundTypes.OPEN_DIALOG)
     }
+    this.subscriptions$.push( this.gameService.messageDialogAction$.subscribe( (data:any) => {
+      this.executeOnlineAction(data.type)
+    }))
   }
 
   ngAfterViewInit(){
@@ -63,7 +66,7 @@ export class MessageDialogComponent implements OnInit {
           this.gameService.payRentToPlayer(this.gameService.gameTable.cards[(this.gameService.players[this.gameService.turn].actualCard)],true);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
-        }else if(this.data.textData.amountDebt && player && (player.money >= this.data.textData.amountDebt) && this.data.textData.debtWithWho == 'bank' && !this.gameService.checkBankrupt((this.data.textData.playerId? this.gameService.players.find((player:playerModel) => player.id == this.data.textData.playerId) : this.gameService.players[this.gameService.turn]),this.data.textData.amountDebt)){
+        }else if(this.data.textData.amountDebt && player && (player.money >= this.data.textData.amountDebt) && this.data.textData.debtWithWho == 'bank' && !this.gameService.checkBankrupt((this.data.textData.playerId ? this.gameService.players.find((player:playerModel) => player.id === this.data.textData.playerId) : this.gameService.players[this.gameService.turn]),this.data.textData.amountDebt)){
           this.data.textData.playerId? this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000 ,this.gameService.players.find((player:playerModel) => player.id == this.data.textData.playerId)) : this.gameService.addingRemovingMoney('remove', this.data.textData.amountDebt, 1000);
           this.gameService.debtWithWho = '';
           this.gameService.amountDebt = 0;
@@ -229,9 +232,20 @@ export class MessageDialogComponent implements OnInit {
     return this.gameService.gameTable.cards.filter((card:cardModel) => card.owner === this.data.textData.playerId).length
   }
 
+  executeOnlineAction(type:string){
+    switch (type) {
+      case 'close':
+        this.closeDialog();
+        break;
+    
+      default:
+        break;
+    }
+  }
+
   ngOnDestroy(){
     this.soundService.playSound(SoundTypes.OPEN_DIALOG);
-    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : DialogTypes.MESSAGE }}});
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : DialogTypes.MESSAGE , actionType : DialogActionTypes.CLOSE}}});
   }
 }
 

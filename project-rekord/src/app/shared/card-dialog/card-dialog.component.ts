@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MessageTypes } from 'src/app/enums/onlineMessageType';
+import { DialogActionTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { playerModel } from 'src/app/models/player';
 import { GameService } from 'src/app/services/game.service';
@@ -35,11 +35,15 @@ export class CardDialogComponent implements OnInit {
   hotel:boolean=false;
   completedSeriesCards:Array<any> = [];
   ownerName:string = '';
+  subscriptions$: Array<any> = [];
 
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
     this.soundService.playSound(SoundTypes.OPEN_CARD);
+    this.subscriptions$.push(this.gameService.cardDialogAction$.subscribe( (data:any) => {
+      this.executeOnlineAction(data.type)
+    }))
   }
   ngAfterViewInit(){
     if(this.data.completedSeries){
@@ -73,20 +77,24 @@ export class CardDialogComponent implements OnInit {
   addHouse(){
     this.data.card.housesCounter++;
     this.gameService.addingRemovingMoney('remove', this.data.card.houseCost, 1000);
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.ADD_HOUSE}}});
   }
 
   removeHouse(){
     this.data.card.housesCounter--;
     this.gameService.addingRemovingMoney('add', ((this.data.card.houseCost / 100) * 50), 1000);
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.REMOVE_HOUSE}}});
   }
 
   addHotel(){
     this.data.card.hotelCounter++;
     this.gameService.addingRemovingMoney('remove', this.data.card.hotelCost, 1000);
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.ADD_HOTEL}}});
   }
   removeHotel(){
     this.data.card.hotelCounter--;
     this.gameService.addingRemovingMoney('add', ((this.data.card.hotelCost / 100) * 50), 1000);
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.REMOVE_HOTEL}}});
   }
   getContrastColor(bgColor:string) {
     var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
@@ -105,8 +113,42 @@ export class CardDialogComponent implements OnInit {
     }
   }
 
+  executeOnlineAction(type:string){
+    switch (type) {
+      case DialogActionTypes.CLOSE:
+        this.close();
+        break;
+      case DialogActionTypes.BUY_PROPERTY:
+        this.gameService.buyProperty(this.data.card);
+        this.close();
+        break;
+      case DialogActionTypes.ADD_HOTEL:
+        this.addHotel();
+        break;
+      case DialogActionTypes.REMOVE_HOTEL:
+        this.removeHotel();
+        break;
+      case DialogActionTypes.ADD_HOUSE:
+        this.addHouse();
+        break;
+      case DialogActionTypes.REMOVE_HOUSE:
+        this.removeHouse();
+        break;
+      case DialogActionTypes.DISTRAIN_PROPERTY:
+        this.gameService.distrainProperty(this.data.card);
+        this.close();
+        break;
+      case DialogActionTypes.CANCEL_DISTRAIN:
+        this.gameService.cancelDistrainedFromProperty(this.data.card);
+        break;
+    
+      default:
+        break;
+    }
+  }
+
   ngOnDestroy(){
     this.soundService.playSound(SoundTypes.OPEN_CARD);
-    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : 'card' }}});
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.CLOSE}}});
   }
 }

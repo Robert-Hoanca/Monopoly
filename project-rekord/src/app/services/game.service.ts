@@ -15,7 +15,7 @@ import { ExchangeComponent } from '../shared/exchange/exchange.component';
 import { SoundService } from './sound.service';
 import { v4 as uuidv4 } from 'uuid';
 import { playerModel } from '../models/player';
-import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
+import { DialogActionTypes, DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 import { SoundTypes } from '../enums/soundTypes';
 import { CardTypes } from '../enums/cardTypes';
 import { EventTypes } from '../enums/eventTypes';
@@ -153,6 +153,11 @@ export class GameService {
   setOnlineData$ = new Subject();
   getOnlineData$ = new Subject();
 
+  cardDialogAction$ = new Subject();
+  exchangeDialogAction$ = new Subject();
+  messageDialogAction$ = new Subject();
+  diceResDialogAction$ = new Subject();
+  
 
   //DIALOGS
   cardDialogRef: MatDialogRef<any> | undefined;
@@ -160,6 +165,7 @@ export class GameService {
   exchangeDialogRef: MatDialogRef<any> | undefined;
   messageDialogRef: MatDialogRef<any> | undefined;
   diceResDialogRef: MatDialogRef<any> | undefined;
+
 
   //Extra Options
   debugMode:boolean = false;
@@ -329,7 +335,7 @@ export class GameService {
   createPlayer(name:string, pawnIndex:number){
     //Create a player with the defalt fields, give to id a uuid.
     const type = this.specialPawn != ''? 'special' : 'normal';
-    const newPlayer = JSON.parse(JSON.stringify(this.playersModel));
+    const newPlayer:playerModel = JSON.parse(JSON.stringify(this.playersModel));
     newPlayer.name = name;
     newPlayer.id = uuid.v4();
     newPlayer.money = 1500;
@@ -457,11 +463,8 @@ export class GameService {
       if(this.localSaves == 'new'){
         this.beginTime = Date.now();
         const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
-        const gameTable = (await getDoc(gameTableRef)).data();
-        console.log(gameTable)
-        // if(gameTable){
-        //   this.gameTable = gameTable;
-        // }
+        const gameTable:any = (await getDoc(gameTableRef)).data();
+        this.gameTable = gameTable;
         this.turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
         this.players[this.turn].canDice = true;
       }else{
@@ -619,17 +622,17 @@ export class GameService {
     }
   }
 
-  addingRemovingMoney(type:string, amount:number,duration:number, player?:any){
+  addingRemovingMoney(type:string, amount:number,duration:number, player?:playerModel){
     new Observable((subscriber) => {
-      this.setOnlineData$.next({path : '/online/message/', value : {
-        type : MessageTypes.CHANGE_MONEY,
-        data : {
-          type : type,
-          amount : amount,
-          duration : duration,
-          playerId : player ? player.id : this.players[this.turn].id
-        }
-      }})
+      // this.setOnlineData$.next({path : '/online/message/', value : {
+      //   type : MessageTypes.CHANGE_MONEY,
+      //   data : {
+      //     type : type,
+      //     amount : amount,
+      //     duration : duration,
+      //     playerId : player ? player.id : this.players[this.turn].id
+      //   }
+      // }})
       player ? this.showHidePlayerInfo$.next({type:'show', playerId: player.id}) : this.showHidePlayerInfo$.next({type:'show', playerId: this.players[this.turn].id});
       this.addingPlayerMoney = true;
       this.playerMoneyChangeValue = amount;
@@ -681,6 +684,9 @@ export class GameService {
   }
 
   buyProperty(property:any){
+    if(this.itsMyTurn){
+      this.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.BUY_PROPERTY}}});
+    }
     this.addingRemovingMoney('remove', property.cost, 1000);
     property.canBuy = false;
     property.owner = this.players[this.turn].id;
@@ -699,13 +705,15 @@ export class GameService {
     property.owner = "";
   }
   distrainProperty(property:any){
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.DISTRAIN_PROPERTY}}});
     property.distrained = true;
     this.addingRemovingMoney('add', property.distrainedCost, 1000);
     this.checkCompletedSeries([property]);
   }
   cancelDistrainedFromProperty(property:any){
+    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.CANCEL_DISTRAIN}}});
     property.distrained = false;
-   this.addingRemovingMoney('remove', property.distrainedCost, 1000);
+    this.addingRemovingMoney('remove', property.distrainedCost, 1000);
     this.checkCompletedSeries([property]);
   }
 
@@ -896,12 +904,12 @@ export class GameService {
       this.textDialog({text: player.name + ' went bankrupt', player, playerToPay}, EventTypes.BANKRUPT);
       return true;
     }else if(playerProps.length && (player.money - moneyToSub)<0){
-      playerProps.forEach((prop: any) => {
+      playerProps.forEach((prop: cardModel) => {
         if(!prop.distrained){
-          moneyFromDistrain += prop.distrainedCost;
-          if(prop.hotelCounter){
+          if( prop.distrainedCost ) moneyFromDistrain += prop.distrainedCost;
+          if(prop.hotelCounter && prop.hotelCost){
             moneyFromDistrain += prop.hotelCost;
-          }else if(prop.housesCounter){
+          }else if(prop.housesCounter && prop.houseCost){
             moneyFromDistrain += prop.houseCost;
           }
         }

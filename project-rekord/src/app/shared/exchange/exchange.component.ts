@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
+import { DialogActionTypes, DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { cardModel } from 'src/app/models/card';
 import { playerModel } from 'src/app/models/player';
@@ -38,12 +38,16 @@ export class ExchangeComponent implements OnInit {
   moneyToExchange:Array<any> = [[0],[0],];
   startExchange:boolean=false;
   actualExpanded:string = '';
+  subscriptions$: Array<any> = [];
 
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<ExchangeComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
     this.resetSelectedProps();
     this.soundService.playSound(SoundTypes.OPEN_DIALOG)
+    this.subscriptions$.push( this.gameService.exchangeDialogAction$.subscribe( (data:any) => {
+      this.executeOnlineAction(data.actionType, data)
+    }))
   }
   ngAfterViewInit(){
   }
@@ -53,6 +57,7 @@ export class ExchangeComponent implements OnInit {
   }
 
   goBackToSelection(){
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'exchange' , actionType : DialogActionTypes.BACK_TO_SELECTION}}});
     this.playerToExchangeWith = '';
     this.moneyToExchange[0]= 0;
     this.moneyToExchange[1]= 0;
@@ -64,6 +69,7 @@ export class ExchangeComponent implements OnInit {
   }
 
   selectPlayerToExchange(player:any){
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'exchange' , actionType : DialogActionTypes.SELECT_PLAYER, playerId: player.id}}});
     this.playerToExchangeWith = player;
     this.actualPlayerProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: cardModel) => prop.owner == this.gameService.players[this.gameService.turn].id));
     this.playerToExchangeProps = this.gameService.sortProperties(this.gameService.gameTable.cards.filter((prop: cardModel) => prop.owner == player.id));
@@ -71,6 +77,7 @@ export class ExchangeComponent implements OnInit {
   }
 
   finaliseExchange(answer:string){
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'exchange' , actionType : DialogActionTypes.FINALISE_EXCHANGE, answer: answer}}});
     if(answer=='accept'){
       const allPropsFound:Array<any> = [];
       if(this.playerToExchangeProps.filter((property: cardModel) => property.exchangeSelected).length){
@@ -111,6 +118,7 @@ export class ExchangeComponent implements OnInit {
   }
 
   changeActualExpanded(playerId:string){
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'exchange' , actionType : DialogActionTypes.CHANGE_EXPANDED, playerId: playerId}}});
     this.actualExpanded = this.actualExpanded == playerId ? '' : playerId;
   }
 
@@ -139,10 +147,39 @@ export class ExchangeComponent implements OnInit {
       return true;
     }
   }
+  startToExchange(){
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'exchange' , actionType : DialogActionTypes.START_EXCHANGE}}});
+    this.startExchange = true;
+  }
+
+  executeOnlineAction(type:string, data?:any){
+    switch (type) {
+      case DialogActionTypes.CLOSE:
+        this.close();
+        break;
+      case DialogActionTypes.SELECT_PLAYER:
+        this.selectPlayerToExchange(this.gameService.players.find((player:playerModel) => player.id === data.playerId))
+        break;
+      case DialogActionTypes.CHANGE_EXPANDED:
+        this.changeActualExpanded(data.playerId);
+        break
+      case DialogActionTypes.START_EXCHANGE:
+        this.startToExchange()
+        break
+      case DialogActionTypes.BACK_TO_SELECTION:
+        this.goBackToSelection();
+        break
+      case DialogActionTypes.FINALISE_EXCHANGE:
+        this.finaliseExchange(data.answer);
+        break
+      default:
+        break;
+    }
+  }
 
   ngOnDestroy(){
     this.resetSelectedProps();
     this.soundService.playSound(SoundTypes.OPEN_DIALOG);
-    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.CLOSE_DIALOG , data : { dialogType : DialogTypes.EXCHANGE }}});
+    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : DialogTypes.EXCHANGE, actionType : DialogActionTypes.CLOSE }}});
   }
 }

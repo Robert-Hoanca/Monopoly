@@ -55,8 +55,8 @@
                
             </div>
         </div>
-        <button mat-raised-button (click)="startExchange = true" class="handshakeButton" [matTooltipPosition]="'above'" matTooltip="Finalise Exchange" [disabled]="checkIfCanExchange()"> <mat-icon>handshake</mat-icon> </button>
-        <span class="goBackMessage" (click)="goBackToSelection()">
+        <button mat-raised-button (click)="startToExchange()" class="handshakeButton" [matTooltipPosition]="'above'" matTooltip="Finalise Exchange" [disabled]="checkIfCanExchange() && !gameService.itsMyTurn"> <mat-icon>handshake</mat-icon> </button>
+        <span *ngIf="gameService.itsMyTurn" class="goBackMessage" (click)="goBackToSelection()">
             Go Back To Selection
         </span>
         
@@ -67,8 +67,8 @@
     <div *ngIf="startExchange" class="startExchange" fxLayout="column" fxLayoutAlign="center center">
         <div class="title" fxLayoutAlign="center center">Deal?</div>
         <div fxLayoutAlign="space-evenly center" class="btnContainer">
-            <button mat-raised-button (click)="finaliseExchange('refuse')" color="warn"> <mat-icon>close</mat-icon> </button>
-            <button mat-raised-button (click)="finaliseExchange('accept')" color="'#7cb77c'"> <mat-icon>done</mat-icon> </button>
+            <button mat-raised-button (click)="finaliseExchange('refuse')" color="warn" [disabled]="!gameService.itsMyTurn"> <mat-icon>close</mat-icon> </button>
+            <button mat-raised-button (click)="finaliseExchange('accept')" color="'#7cb77c'" [disabled]="!gameService.itsMyTurn"> <mat-icon>done</mat-icon> </button>
         </div>
     </div>
 
