@@ -85,6 +85,14 @@ export class GameComponent implements OnInit {
 
   @HostListener('window:beforeunload')
   confirmLeavingPageBeforeSaving(): boolean {
+    if(this.gameService.amIOnline()){
+      const playerId = this.onlineService.onlineData.playersId.find((player:any) => player.uuid === this.gameService.currentUUID).id;
+      const playerIndex = this.gameService.players.findIndex((player:playerModel) => player.id === playerId);
+      this.gameService.setOnlineData$.next({path: '/online/playersId/' + playerIndex + '/status', value : 'disconnected'});
+      this.onlineService.subscriptions$.forEach(sub => {
+        sub.unsubscribe();
+      });
+    }
     return this.gameService.godMode ? true : false; 
   }
 

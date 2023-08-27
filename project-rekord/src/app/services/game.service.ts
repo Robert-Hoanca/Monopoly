@@ -23,6 +23,7 @@ import { cardModel } from '../models/card';
 import { chanceModel } from '../models/chance';
 import { chestModel } from '../models/chest';
 import { gameTableModel } from '../models/gameTable';
+import { onlineStatus } from '../enums/online';
 
 @Injectable({
   providedIn: 'root'
@@ -163,7 +164,7 @@ export class GameService {
   cardDialogRef: MatDialogRef<any> | undefined;
   completedSeriesDialogRef: MatDialogRef<any> | undefined;
   exchangeDialogRef: MatDialogRef<any> | undefined;
-  messageDialogRef: MatDialogRef<any> | undefined;
+  messageDialogRef: MatDialogRef<any>[]= [];
   diceResDialogRef: MatDialogRef<any> | undefined;
 
 
@@ -172,10 +173,11 @@ export class GameService {
   godMode:boolean = false;
   enableCursor:boolean = false;
   disabledUserHoveringCard:boolean = false;
-  onlineGameStatus:string = 'inLobby';
+  onlineGameStatus:string = onlineStatus.IN_LOBBY;
   currentUUID:string = localStorage.getItem("rekord-uuid") ?? '';
   imLobbyMaster:boolean = false;
   itsMyTurn : boolean = false;
+  disconnectedPlayers:boolean = false;
 
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog, public soundService : SoundService) { }
 
@@ -350,7 +352,7 @@ export class GameService {
       this.players.push(newPlayer);
     }else{
       this.setOnlineData$.next({path: '/players/' + this.players.length, value : newPlayer})
-      this.setOnlineData$.next({path: '/online/playersId/' + this.players.length, value : {id : newPlayer.id , uuid: this.currentUUID , master : this.imLobbyMaster}})
+      this.setOnlineData$.next({path: '/online/playersId/' + this.players.length, value : {id : newPlayer.id , uuid: this.currentUUID , master : this.imLobbyMaster, status : 'connected'}});
     }
     //type == 'normal'? this.pawnTypes.splice(pawnIndex,1) : this.specialPawnTypes.splice(this.specialPawnTypes.findIndex((pawn: { name: String; }) => pawn.name == this.specialPawn),1);
     //this.specialPawn= '';
@@ -486,23 +488,15 @@ export class GameService {
         }
       }
     }else if(this.amIOnline()){
-      //retrieve data from a save service (?)
-
       const beginTime = Date.now();
       const gameTableRef = doc(this.db, "gameTables", this.chosenMap);
       const gameTable  = (await getDoc(gameTableRef)).data();
       const turn = Math.round(Math.random() * ((this.players.length - 1) - 0) + 0);
-
       this.setOnlineData$.next({path : '/time/begin', value : beginTime})
-      
       this.setOnlineData$.next({path : '/gameTable', value : gameTable})
-      
-      this.setOnlineData$.next({path : '/turn', value : this.turn})
+      this.setOnlineData$.next({path : '/turn', value : turn})
       this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.CHANGE_TURN , data : { turn : this.turn}}})
-
     }
-
-
     this.switchRouter('game');
   }
 
@@ -790,23 +784,25 @@ export class GameService {
     if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.EXCHANGE}}});
   }
 
-  textDialog(textData:any, eventType:string) {
+  textDialog(textData:any, eventType:string, noOnlineMessage?:boolean) {
     const data = {
       textData,
       eventType,
     }
-    this.messageDialogRef = this.dialog.open(MessageDialogComponent, {
+    this.messageDialogRef?.push(this.dialog.open(MessageDialogComponent, {
       panelClass: 'messageDialog',
       hasBackdrop: true,
       autoFocus: false,
       disableClose:true,
       data: data
-    });
-    if(this.itsMyTurn) this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.MESSAGE , eventType,  textData}}});
+    }))
+    if(this.itsMyTurn && noOnlineMessage !== true) {
+      this.setOnlineData$.next({path : '/online/message', value : { type : MessageTypes.OPEN_DIALOG , data : { dialogType: DialogTypes.MESSAGE , eventType,  textData}}});
+    }
   }
 
   closeDialog(dialogRef:any){
-    dialogRef.close()
+    dialogRef.close();
   }
 
   //EVENTS

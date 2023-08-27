@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { GameService } from './game.service';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
-import {  take } from 'rxjs';
+import {  EMPTY, Subscription, concat, concatMap, mergeMap, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs';
 import { GamePhysicsService } from './game-physics.service';
 import { allLobby } from '../shared/real-time-db/real-time-dv-save';
-import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
+import { DialogActionTypes, DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 import { cardModel } from '../models/card';
 import { playerModel } from '../models/player';
+import { EventTypes } from '../enums/eventTypes';
+import { gameTableModel } from '../models/gameTable';
+import { onlineStatus } from '../enums/online';
 @Injectable({
   providedIn: 'root'
 })
@@ -18,8 +21,7 @@ export class OnlineService {
   onlineData:any = {}
 
   //Subs
-  lobbySubs$: Array<any> = [];
-  inGameSubs$: Array<any> = [];
+  subscriptions$: Array<Subscription> = [];
 
   constructor(public gameService : GameService, public gamePhysicsService : GamePhysicsService , private realTimeDb: AngularFireDatabase) { }
 
@@ -46,7 +48,7 @@ export class OnlineService {
       playerWhoWonId : '',
       localId: '',
       online: {
-        gameStatus: 'inLobby',
+        gameStatus: onlineStatus.IN_LOBBY,
         message: {
           type : '',
           data : {}
@@ -55,26 +57,68 @@ export class OnlineService {
       }
     }
     this.setData('', lobby);
-    this.enableLobbySubs();
     this.gameService.imLobbyMaster = true;
+    
+    //Listen for players and onlineData changes while on lobby to update correctly the template.
+    this.subscriptions$.push(
+      this.realTimeDb.object(this.lobbyName + '/players').valueChanges().pipe(tap( (data:any) => {
+        if(data)  this.gameService.players = data;
+      })).subscribe(),
+      this.realTimeDb.object(this.lobbyName + '/online').valueChanges().pipe(tap( data => {
+        if(data) this.onlineData = data;
+      })).subscribe()
+    )
   }
 
   joinLobby(){
     this.gameService.loading = true;
     this.lobbyName = this.joinLobbyName;
-    this.enableLobbySubs();
-    this.realTimeDb.object(this.lobbyName + '/online/gameStatus').valueChanges().pipe(take(1)).subscribe((data:any) => {
-      if(data){
-        this.gameService.onlineGameStatus = data;
+    this.loadData()
+  }
+
+  retrieveData(){
+    this.subscriptions$.forEach(sub => {
+      sub.unsubscribe();
+    });
+    return concat(
+      //Get gameTable
+      this.realTimeDb.object(this.lobbyName + '/gameTable').valueChanges().pipe(tap( (data:any) => {
+        if(data) this.gameService.gameTable = data
+      }), switchMap( () => {
+      //Get players
+      return this.realTimeDb.object(this.lobbyName + '/players').valueChanges().pipe(take(1),tap( (data:any) => {
+        if(this.gameService.players.length === 0){
+          this.gameService.players = data;
+        }
+      }));
       }
-
-      if( this.gameService.onlineGameStatus === 'inGame'){
-        //console.log('starting game...')
-        this.startGame()
-       }
-    })
-
-    
+      ), switchMap(() => {
+        return this.realTimeDb.object(this.lobbyName + '/online').valueChanges().pipe(tap( data => {
+          if(data) this.onlineData = data;
+        }), take(1))
+      }), switchMap(() => {
+        return this.realTimeDb.object(this.lobbyName + '/online/gameStatus').valueChanges().pipe(tap( (data:any) => {
+          if(data){
+            this.gameService.onlineGameStatus = data;
+            if(data === onlineStatus.IN_GAME) {
+              this.joinGame();
+            }
+          }
+        }), take(1))
+      }))
+    ).pipe(
+      concatMap( () => {
+        //When starting search if can set player status to connected
+        return this.realTimeDb.object(this.lobbyName + '/online/playersId').valueChanges().pipe(tap(() => {
+          if(this.onlineData.playersId && this.gameService.onlineGameStatus === onlineStatus.IN_GAME){
+            const playerId = this.onlineData.playersId.find((player:any) => player.uuid === this.gameService.currentUUID).id;
+            const playerIndex = this.gameService.players.findIndex((player:playerModel) => player.id === playerId);
+            this.gameService.setOnlineData$.next({path: '/online/playersId/' + playerIndex + '/status', value : 'connected'});
+          }
+          this.enableSubs();
+        }), take(1));
+      }),
+    )
   }
 
   setData(path:string, value:any){
@@ -93,66 +137,77 @@ export class OnlineService {
     return result;
   }
 
+  enableSubs(){
+    //Update local saved onlineData
+    this.realTimeDb.object(this.lobbyName + '/online').valueChanges().pipe(tap( data => {
+      if(data) this.onlineData = data;
+    })).subscribe();
 
-
-  enableLobbySubs(){
-
-    this.lobbySubs$.push(
-      this.realTimeDb.object(this.lobbyName + '/players').valueChanges().pipe().subscribe((data:any) => {
-        //console.log('players',data);
-        if(data){
-          this.gameService.players = data
-        }
-      })
-    )
-
-    this.lobbySubs$.push(
-      this.realTimeDb.object(this.lobbyName + '/online/gameStatus').valueChanges().pipe().subscribe((data:any) => {
-       // console.log('gameStatus',data);
-        if(data){
-          this.gameService.onlineGameStatus = data;
-          if(data === 'inGame'){
-            this.startGame()
-          }
-        }
-      })
-    )
-
-    this.realTimeDb.object(this.lobbyName + '/gameTable').valueChanges().pipe(take(2)).subscribe((data:any) => {
-      if(data){
-        this.gameService.gameTable = data
-      }
+    //Listen for game Messages 
+    this.realTimeDb.object(this.lobbyName + '/online/message').valueChanges().subscribe(data => {
+      if(data) this.handleMessages(data);
     })
 
-    this.inGameSubs$.push(
-      this.realTimeDb.object(this.lobbyName + '/online').valueChanges().pipe().subscribe((data:any) => {
-       // console.log('gameStatus',data);
-        if(data){
-          this.onlineData = data;
-        }
-      })
-    )
   }
 
+  loadData(){
 
-  enableInGameObs(){
+    this.realTimeDb.object(this.lobbyName + '/online/gameStatus').valueChanges().pipe(tap( (data:any) => {
+      if(data) this.gameService.onlineGameStatus = data;
+    }), switchMap(() => {
 
-    this.realTimeDb.object(this.lobbyName + '/online/message').valueChanges().subscribe(data => {
-      this.handleMessages(data);
-    })
-    this.lobbySubs$.forEach(sub => {
-      sub.unsubscribe();
-    });
-    
+      if(this.gameService.onlineGameStatus === onlineStatus.IN_LOBBY && this.joinLobbyName !== ''){
 
+        //Listen for players and onlineData changes while on lobby to update correctly the template.
+        this.subscriptions$.push(this.realTimeDb.object(this.lobbyName + '/players').valueChanges().pipe(tap( (data:any) => {
+          if(data && this.gameService.onlineGameStatus === onlineStatus.IN_LOBBY) this.gameService.players = data;
+        })).subscribe(),
+        this.realTimeDb.object(this.lobbyName + '/online').valueChanges().pipe(tap( data => {
+          if(data) this.onlineData = data;
+        })).subscribe())
+
+      }else if(this.gameService.onlineGameStatus === onlineStatus.IN_GAME){
+        return this.retrieveData().pipe(
+          take(1),
+          concatMap( () => {   
+            //When a player status changed check if someone is disconnected, if so show a message.
+            return this.realTimeDb.object(this.lobbyName + '/online/playersId').valueChanges().pipe( tap( ( data:any) => {
+            if(data){
+              const notActivePlayers = data.filter((player:any) => player.status === 'disconnected' && player.uuid !== this.gameService.currentUUID);
+              if(notActivePlayers.length && !this.gameService.disconnectedPlayers){
+                this.gameService.disconnectedPlayers = true;
+                let playersNames = '';
+                notActivePlayers.forEach((player:any) => {
+                  const playerName = this.gameService.players.find((realPlayer:playerModel) => realPlayer.id === player.id)?.name;
+                  playersNames = playersNames.concat(playerName + ', ');
+                });
+                this.gameService.textDialog({text: 'One or more players have left the game... waiting for ' + playersNames}, EventTypes.ONLINE_PLAYER_LEFT, true)
+              }else if(!notActivePlayers.length && this.gameService.disconnectedPlayers){
+                this.gameService.disconnectedPlayers = false;
+                if(this.gameService.messageDialogRef){
+                  this.gameService.closeDialog(this.gameService.messageDialogRef[this.gameService.messageDialogRef?.length - 1])
+                }
+              }
+            }
+            }))
+        }))
+      }
+      return EMPTY;
+    })).subscribe();
+  }
+
+  joinGame(){
+    this.itsMyTurn();
+    this.gameService.switchRouter('game');
   }
 
   startGame(){
-    if(this.gameService.onlineGameStatus === 'inLobby'){
-      this.gameService.setOnlineData$.next({path: '/online/gameStatus', value : 'inGame'})
+    if(this.gameService.onlineGameStatus === onlineStatus.IN_LOBBY){
+      this.gameService.setOnlineData$.next({path: '/online/gameStatus', value : onlineStatus.IN_GAME})
     }
-    this.enableInGameObs();
-    this.gameService.startGame()
+    this.itsMyTurn();
+    this.gameService.startGame();
+    this.loadData()
   }
 
   handleMessages(message:any){

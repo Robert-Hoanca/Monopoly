@@ -49,7 +49,7 @@
 
     <div id="gameButtons" fxLayout="row" fxLayoutAlign="space-around center">
         
-        <div fxLayout="row" fxLayoutAlign="space-around center" *ngIf="gameService.choosenMode === 'local' || (gameService.choosenMode === 'online' && gameService.itsMyTurn)">
+        <div fxLayout="row" fxLayoutAlign="space-around center" *ngIf="gameService.choosenMode === 'local' || (gameService.choosenMode === 'online' && gameService.itsMyTurn && !gameService.disconnectedPlayers)">
             <button mat-raised-button id="bankRupt" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.askIfShouldGoBankrupt()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gameService.addingPlayerMoney" color="warn" [matTooltipPosition]="'above'" matTooltip="Go Bankrupt"><mat-icon class="material-symbols-outlined">home</mat-icon></button>
             <button mat-raised-button id="seeProperties" *ngIf="!gameService.players[gameService.turn].canDice" [disabled]="!getActualPlayerProps().length && !gameService.players[gameService.turn].prison.getOutCards || gameService.playerWhoWonId != '' || gameService.movingPlayer || gameService.addingPlayerMoney" (click)="gameService.showPlayerProps()" [matTooltipPosition]="'above'" matTooltip="See Player Info"><span class="title">Player Info</span><mat-icon class="material-symbols-outlined">person</mat-icon> <mat-icon class="material-symbols-outlined info">info</mat-icon> </button>
             <button mat-raised-button id="openExchange" *ngIf="!gameService.players[gameService.turn].canDice" (click)="gameService.openExchangeDialog()" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Start an Exchange"><span class="title">Exchange</span><mat-icon class="material-symbols-outlined">currency_exchange</mat-icon></button>
@@ -59,7 +59,7 @@
             <button mat-raised-button *ngIf="gameService.players[gameService.turn].prison.inPrison && gameService.players[gameService.turn].prison.getOutCards && gameService.players[gameService.turn].canDice" (click)="whatToDoInPrison('freeExit')" [disabled]="gameService.playerWhoWonId != '' || gameService.movingPlayer || gamePhysicsService.dicesRolling || gameService.addingPlayerMoney" [matTooltipPosition]="'above'" matTooltip="Use Free Card And Exit"><span class="title">Exit Free</span><mat-icon class="material-symbols-outlined">exit_to_app</mat-icon></button>
         </div>
         
-        <div class="waiting-turn" *ngIf="gameService.choosenMode === 'online' && !gameService.itsMyTurn" fxLayoutAlign="center center">Waiting for {{ gameService.players[gameService.turn].name }} ...</div>
+        <div class="waiting-turn" *ngIf="gameService.choosenMode === 'online' && !gameService.itsMyTurn && !gameService.disconnectedPlayers" fxLayoutAlign="center center">Waiting for {{ gameService.players[gameService.turn].name }} ...</div>
     </div>
 
     <div class="left-side-btns">

@@ -9,5 +9,6 @@ export enum EventTypes {
     CHANGE_TURN = "changeTurn",
     PLAYER_WHO_BEGINS = "playerWhoBegins",
     FINISH_GAME = "finishGame",
-    SHOW_PLAYER_PROPS = "showPlayerProps"
+    SHOW_PLAYER_PROPS = "showPlayerProps",
+    ONLINE_PLAYER_LEFT = "onlinePlayerLeft"
 }

@@ -2,7 +2,7 @@
 
     <div *ngIf="data.eventType === 'showPlayerProps'" class="messageTitle" fxLayoutAlign="space-between center">
         <h1>Player Info</h1>
-        <button mat-raised-button *ngIf="gameService.itsMyTurn" (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
+        <button mat-raised-button *ngIf="gameService.itsMyTurn && data.eventType !== 'onlinePlayerLeft'" (click)="gameService.closeDialog(dialogRef)" class="closeDialog"><mat-icon>close</mat-icon></button>
 
     </div>
 
@@ -35,7 +35,7 @@
         <div *ngIf="data.eventType !== 'changeTurn' && !data.textData.showPlayerProps && gameService.itsMyTurn" class="finishWarning" fxLayoutAlign="space-evenly center">
             <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn" class="bankRuptBtn">Confirm</button>
             <button mat-raised-button (click)="closeDialog()" *ngIf="data.textData.goBankRupt" class="bankRuptBtn">No</button>
-            <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps'" class="okBtn">Ok</button>
+            <button mat-raised-button (click)="executeAndClose()" *ngIf="!data.textData.goBankRupt && data.eventType !== 'showPlayerProps' && data.eventType !== 'onlinePlayerLeft'" class="okBtn">Ok 1</button>
         </div>
         
         <div *ngIf="data.eventType === 'changeTurn'" class="changedTurn">
@@ -54,8 +54,8 @@
             </div>
         </div>
         
-        <div class="specialCardBtnContainer" *ngIf="(!data.textData.goBankRupt && data.eventType !== 'showPlayerProps' && data.eventType === 'chance' || data.eventType === 'communityChest' ) && gameService.itsMyTurn">
-            <button  mat-raised-button (click)="executeAndClose()" class="okBtnCards">Ok</button>
+        <div class="specialCardBtnContainer" *ngIf="(!data.textData.goBankRupt && data.eventType !== 'showPlayerProps' && data.eventType === 'chance' || data.eventType === 'communityChest' || data.eventType !== 'onlinePlayerLeft' ) && gameService.itsMyTurn">
+            <button  mat-raised-button (click)="executeAndClose()" class="okBtnCards">Ok 2</button>
         </div>
     </div>
 
