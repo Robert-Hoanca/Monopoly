@@ -1,6 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { DialogActionTypes, DialogTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
 import { cardModel } from 'src/app/models/card';
@@ -38,7 +39,7 @@ export class ExchangeComponent implements OnInit {
   moneyToExchange:Array<any> = [[0],[0],];
   startExchange:boolean=false;
   actualExpanded:string = '';
-  subscriptions$: Array<any> = [];
+  subscriptions$: Array<Subscription> = [];
 
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<ExchangeComponent>, public gameService: GameService, public soundService : SoundService) { }
 
@@ -181,5 +182,8 @@ export class ExchangeComponent implements OnInit {
     this.resetSelectedProps();
     this.soundService.playSound(SoundTypes.OPEN_DIALOG);
     if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : DialogTypes.EXCHANGE, actionType : DialogActionTypes.CLOSE }}});
+    this.subscriptions$.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }

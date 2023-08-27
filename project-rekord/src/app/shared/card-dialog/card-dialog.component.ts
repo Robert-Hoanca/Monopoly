@@ -1,8 +1,10 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { DialogActionTypes, MessageTypes } from 'src/app/enums/onlineMessageType';
 import { SoundTypes } from 'src/app/enums/soundTypes';
+import { cardModel } from 'src/app/models/card';
 import { playerModel } from 'src/app/models/player';
 import { GameService } from 'src/app/services/game.service';
 import { SoundService } from 'src/app/services/sound.service';
@@ -35,14 +37,14 @@ export class CardDialogComponent implements OnInit {
   hotel:boolean=false;
   completedSeriesCards:Array<any> = [];
   ownerName:string = '';
-  subscriptions$: Array<any> = [];
+  subscriptions$: Array<Subscription> = [];
 
   constructor( @Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
     this.soundService.playSound(SoundTypes.OPEN_CARD);
     this.subscriptions$.push(this.gameService.cardDialogAction$.subscribe( (data:any) => {
-      this.executeOnlineAction(data.type)
+      this.executeOnlineAction(data.type, data.data)
     }))
   }
   ngAfterViewInit(){
@@ -113,13 +115,13 @@ export class CardDialogComponent implements OnInit {
     }
   }
 
-  executeOnlineAction(type:string){
+  executeOnlineAction(type:string, data:any){
     switch (type) {
       case DialogActionTypes.CLOSE:
         this.close();
         break;
       case DialogActionTypes.BUY_PROPERTY:
-        this.gameService.buyProperty(this.data.card);
+        this.gameService.buyProperty(this.gameService.gameTable.cards.find((card:cardModel) => card.index === data.cardI));
         this.close();
         break;
       case DialogActionTypes.ADD_HOTEL:
@@ -150,5 +152,8 @@ export class CardDialogComponent implements OnInit {
   ngOnDestroy(){
     this.soundService.playSound(SoundTypes.OPEN_CARD);
     if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.CLOSE}}});
+    this.subscriptions$.forEach(sub => {
+      sub.unsubscribe()
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Subject, take, timer } from 'rxjs';
+import { Subject, Subscription, take, timer } from 'rxjs';
 import { GameService } from 'src/app/services/game.service';
 import { CardDialogComponent } from '../card-dialog/card-dialog.component';
 import { SoundService } from 'src/app/services/sound.service';
@@ -20,7 +20,7 @@ export class MessageDialogComponent implements OnInit {
 
   getCardPosition$ = new Subject();
   movedNearest:boolean=false;
-  subscriptions$: Array<any> = [];
+  subscriptions$: Array<Subscription> = [];
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,  public dialogRef: MatDialogRef<CardDialogComponent>, public gameService: GameService, public soundService : SoundService) { }
 
   ngOnInit(): void {
@@ -245,7 +245,10 @@ export class MessageDialogComponent implements OnInit {
 
   ngOnDestroy(){
     this.soundService.playSound(SoundTypes.OPEN_DIALOG);
-    if(this.gameService.itsMyTurn) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : DialogTypes.MESSAGE , actionType : DialogActionTypes.CLOSE}}});
+    if(this.gameService.itsMyTurn && !this.data.noOnlineMessage) this.gameService.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : DialogTypes.MESSAGE , actionType : DialogActionTypes.CLOSE}}});
+    this.subscriptions$.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }
 

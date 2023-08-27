@@ -174,7 +174,7 @@ export class GameService {
   enableCursor:boolean = false;
   disabledUserHoveringCard:boolean = false;
   onlineGameStatus:string = onlineStatus.IN_LOBBY;
-  currentUUID:string = localStorage.getItem("rekord-uuid") ?? '';
+  currentUUID:string = '';
   imLobbyMaster:boolean = false;
   itsMyTurn : boolean = false;
   disconnectedPlayers:boolean = false;
@@ -182,9 +182,12 @@ export class GameService {
   constructor(private afs: AngularFirestore,public router: Router, public dialog: MatDialog, public soundService : SoundService) { }
 
   handleUuid(){
-    if(!localStorage.getItem("rekord-uuid")){
-      localStorage.setItem("rekord-uuid", uuid.v4());
+    let newUuid = localStorage.getItem("rekord-uuid");
+    if(!newUuid){
+      newUuid = uuid.v4()
+      localStorage.setItem("rekord-uuid", newUuid);
     }
+    this.currentUUID = newUuid;
   }
 
   async retrieveDBData(){
@@ -679,7 +682,7 @@ export class GameService {
 
   buyProperty(property:any){
     if(this.itsMyTurn){
-      this.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.BUY_PROPERTY}}});
+      this.setOnlineData$.next({path : '/online/message', value : {  type : MessageTypes.DIALOG_ACTION , data : { dialogType : 'card' , actionType : DialogActionTypes.BUY_PROPERTY, value : { cardI: property.index }}}});
     }
     this.addingRemovingMoney('remove', property.cost, 1000);
     property.canBuy = false;
@@ -788,6 +791,7 @@ export class GameService {
     const data = {
       textData,
       eventType,
+      noOnlineMessage
     }
     this.messageDialogRef?.push(this.dialog.open(MessageDialogComponent, {
       panelClass: 'messageDialog',

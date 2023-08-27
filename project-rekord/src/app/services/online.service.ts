@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import { GameService } from './game.service';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
-import {  EMPTY, Subscription, concat, concatMap, mergeMap, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs';
+import { EMPTY, Subscription, concat, concatMap, switchMap, take, tap } from 'rxjs';
 import { GamePhysicsService } from './game-physics.service';
-import { allLobby } from '../shared/real-time-db/real-time-dv-save';
-import { DialogActionTypes, DialogTypes, MessageTypes } from '../enums/onlineMessageType';
-import { cardModel } from '../models/card';
+import { allLobby } from '../shared/real-time-db/real-time-db-save';
+import { DialogTypes, MessageTypes } from '../enums/onlineMessageType';
 import { playerModel } from '../models/player';
 import { EventTypes } from '../enums/eventTypes';
-import { gameTableModel } from '../models/gameTable';
 import { onlineStatus } from '../enums/online';
 @Injectable({
   providedIn: 'root'
@@ -215,8 +213,11 @@ export class OnlineService {
       switch (message.type) {
         case MessageTypes.CHANGE_TURN:
           this.gameService.turn = message.data.turn;
+          this.gameService.setCameraOnPlayer(0);
           this.gameService.players[this.gameService.turn].canDice = true;
+          this.gameService.diceNumber = undefined;
           this.itsMyTurn();
+          this.gameService.textDialog({playerName: this.gameService.players[this.gameService.turn].name}, EventTypes.CHANGE_TURN, true);
           break;
         case MessageTypes.DICE_ROLL:
           this.gamePhysicsService.diceStartingFields[message.data.diceI] = message.data;
@@ -267,7 +268,7 @@ export class OnlineService {
           if(!this.gameService.itsMyTurn){
             switch (message.data.dialogType) {
               case DialogTypes.CARD:
-                this.gameService.cardDialogAction$.next({ type : message.data.actionType})
+                this.gameService.cardDialogAction$.next({ type : message.data.actionType, data : message.data.value})
                 break;
               case DialogTypes.COMPLETED_SERIES:
                 this.gameService.cardDialogAction$.next({ type : message.data.actionType})

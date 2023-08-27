@@ -30,7 +30,7 @@
         </div>
 
         <div *ngIf="(gameService.playerWhoWonId != '' || data.textData.showPlayerProps ) && getActualPlayerProps()" class="playerProps">
-            <app-player-properties [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : gameService.players[gameService.turn].id"></app-player-properties>
+            <app-player-properties [playerId]="gameService.playerWhoWonId != '' ? gameService.playerWhoWonId : data.textData.playerId"></app-player-properties>
         </div>
         <div *ngIf="data.eventType !== 'changeTurn' && !data.textData.showPlayerProps && gameService.itsMyTurn" class="finishWarning" fxLayoutAlign="space-evenly center">
             <button mat-raised-button (click)="executeAndClose()" *ngIf="data.textData.goBankRupt"color="warn" class="bankRuptBtn">Confirm</button>
